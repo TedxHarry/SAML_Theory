@@ -1,9 +1,25 @@
 document.documentElement.classList.add("js");
 
 const menu = document.querySelector(".course-menu");
-if (menu && matchMedia("(max-width: 799px)").matches) menu.open = false;
-const outline = document.querySelector(".toc details");
-if (outline && matchMedia("(max-width: 1100px)").matches) outline.open = false;
+if (menu) {
+  const narrow = matchMedia("(max-width: 799px)");
+  const preferenceKey = () =>
+    `saml-lessons-${narrow.matches ? "mobile" : "desktop"}`;
+  const restoreMenu = () => {
+    let saved = null;
+    try {
+      saved = localStorage.getItem(preferenceKey());
+    } catch {}
+    menu.open = saved === null ? !narrow.matches : saved === "open";
+  };
+  restoreMenu();
+  menu.addEventListener("toggle", () => {
+    try {
+      localStorage.setItem(preferenceKey(), menu.open ? "open" : "closed");
+    } catch {}
+  });
+  narrow.addEventListener("change", restoreMenu);
+}
 
 const dialog = document.querySelector("#diagram-dialog");
 let diagramTrigger;

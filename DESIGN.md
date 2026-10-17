@@ -35,11 +35,11 @@ Cool paper and white surfaces, dark blue ink, restrained blue links and teal tec
 
 ## Typography
 
-Self-hosted Manrope for headings, navigation and controls; Source Serif 4 for long reading; Consolas fallback for code. Body prose is 19px with 1.8 line height and about 70 characters per line. Headings have shorter line height. Local font licenses are retained under site/fonts. Avoid all-uppercase prose and aggressive letter spacing.
+Self-hosted Manrope for headings, navigation and controls; Source Serif 4 for long reading; Consolas fallback for code. Body prose is 19px with 1.8 line height and a centered, bounded reading measure. Headings have shorter line height. Local font licenses are retained under site/fonts. Avoid all-uppercase prose and aggressive letter spacing.
 
 ## Layout
 
-Desktop uses a 260px lesson sidebar, a centered reading column and a modest section outline. Below 1100px the section outline becomes an ordinary disclosure. Below 800px the sidebar becomes a native disclosure above the document. The document owns vertical scrolling. Tables and long code have their own labeled horizontal regions. Diagrams have bounded reading previews and a native modal full-size view. The generated HTML works under the /SAML_Theory/ project path.
+Desktop uses a collapsible 260px lesson sidebar, reduced to a 72px navigation rail when closed, and one centered reading column up to 60rem wide. There is no right-hand section outline. The native lesson disclosure remains keyboard accessible at every width. Below 800px the menu sits above the document and defaults closed. Desktop and mobile menu preferences are stored separately and restored across page navigation when browser storage is available. The document owns vertical scrolling. Tables and long code have their own labeled horizontal regions. Diagrams have bounded reading previews and a native modal full-size view. The generated HTML works under the /SAML_Theory/ project path.
 
 ## Elevation & Depth
 

@@ -152,6 +152,31 @@ input {
   padding: 2rem 1rem 3rem;
 }
 .sidebar details > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  padding: 0.65rem 0.7rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 800;
+  list-style: none;
+  background: var(--surface);
+}
+.sidebar details > summary::-webkit-details-marker {
+  display: none;
+}
+.sidebar details > summary:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.menu-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+.sidebar details:not([open]) > :not(summary) {
   display: none;
 }
 .nav-label {
@@ -211,10 +236,9 @@ input {
   padding: 2.8rem clamp(1.25rem, 3vw, 3.5rem) 4rem;
 }
 .reading-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 760px) 170px;
-  gap: 2.5rem;
-  justify-content: center;
+  display: block;
+  max-width: 60rem;
+  margin-inline: auto;
 }
 .reading-layout > section {
   min-width: 0;
@@ -387,42 +411,7 @@ input {
 .diagram figcaption button {
   font-size: 0.75rem;
 }
-.toc {
-  font-size: 0.75rem;
-  padding-top: 0.3rem;
-}
-.toc details {
-  position: sticky;
-  top: 1.5rem;
-  max-height: calc(100vh - 3rem);
-  overflow: auto;
-  padding: 0 0.4rem 0.5rem;
-}
-.toc summary {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 800;
-  color: var(--muted);
-  list-style: none;
-  cursor: default;
-  margin-bottom: 0.8rem;
-}
-.toc ul {
-  padding: 0;
-  list-style: none;
-  margin: 0;
-}
-.toc a {
-  display: block;
-  color: var(--muted);
-  text-decoration: none;
-  padding: 0.45rem 0;
-  border-bottom: 1px solid var(--border);
-}
-.toc a:hover {
-  color: var(--primary);
-}
+
 .page-navigation {
   display: flex;
   justify-content: space-between;
@@ -711,32 +700,26 @@ dialog::backdrop {
   display: inline-flex;
 }
 @media (min-width: 800px) {
-  .sidebar details:not([open]) > *:not(summary) {
-    display: block;
+  .shell:has(.course-menu:not([open])) {
+    grid-template-columns: 72px minmax(0, 1fr);
   }
-  .sidebar details > ol {
-    display: block;
+  .sidebar:has(.course-menu:not([open])) {
+    padding-inline: 0.75rem;
+  }
+  .course-menu:not([open]) .menu-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .course-menu:not([open]) > summary {
+    justify-content: center;
+    padding-inline: 0;
   }
 }
 @media (max-width: 1100px) {
-  .reading-layout {
-    grid-template-columns: minmax(0, 760px);
-  }
-  .toc {
-    grid-row: 1;
-  }
-  .toc details {
-    position: static;
-    max-height: none;
-    border-bottom: 1px solid var(--border);
-  }
-  .toc summary {
-    cursor: pointer;
-    padding: 0.6rem 0;
-  }
-  .toc ul {
-    columns: 2;
-  }
   .main {
     padding-top: 2rem;
   }
@@ -766,10 +749,12 @@ dialog::backdrop {
     padding: 0.6rem 1rem;
   }
   .sidebar details > summary {
-    display: block;
-    padding: 0.6rem 0;
+    padding: 0.6rem 0.7rem;
+    margin-bottom: 0;
     font-size: 0.85rem;
-    font-weight: 800;
+  }
+  .sidebar details[open] > summary {
+    margin-bottom: 0.8rem;
   }
   .sidebar .nav-label,
   .sidebar-note {
@@ -826,9 +811,7 @@ dialog::backdrop {
   .reference-grid {
     grid-template-columns: 1fr;
   }
-  .toc ul {
-    columns: 1;
-  }
+
   .section-heading {
     display: block;
   }

@@ -44,6 +44,11 @@ try {
     assert.equal(response.status(), 200, route);
     assert.equal(await page.locator("h1").count(), 1, route);
     assert.equal(
+      await page.locator('.toc, [aria-label="On this page"]').count(),
+      0,
+      route,
+    );
+    assert.equal(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth + 1,
       ),
@@ -60,6 +65,30 @@ try {
   await audit(page, "home");
   await page.getByRole("link", { name: "Start with Lesson 1" }).click();
   assert(page.url().includes("/lessons/lesson-01-"));
+  const menuToggle = page.locator(".course-menu > summary");
+  const expandedMain = await page.locator("main").boundingBox();
+  assert((await page.locator(".reading-layout").boundingBox()).width > 800);
+  await menuToggle.click();
+  await page.waitForFunction(
+    () => localStorage.getItem("saml-lessons-desktop") === "closed",
+  );
+  assert.equal(await page.locator(".course-menu").getAttribute("open"), null);
+  assert(
+    (await page.locator("main").boundingBox()).width > expandedMain.width + 150,
+  );
+  assert((await page.locator(".sidebar").boundingBox()).width <= 73);
+  await page.reload();
+  assert.equal(await page.locator(".course-menu").getAttribute("open"), null);
+  await menuToggle.focus();
+  await page.keyboard.press("Enter");
+  await page.waitForFunction(
+    () => localStorage.getItem("saml-lessons-desktop") === "open",
+  );
+  assert.equal(await page.locator(".course-menu").getAttribute("open"), "");
+  await audit(page, "expanded-sidebar");
+  results.push(
+    "Right outline removed on every route; desktop menu collapses to a rail, frees content width, persists across reload and expands by keyboard.",
+  );
   assert(
     (
       await page
