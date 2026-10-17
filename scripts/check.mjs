@@ -1,0 +1,84 @@
+import fs from "node:fs";
+import path from "node:path";
+import assert from "node:assert/strict";
+const root = path.resolve("docs");
+const manifest = JSON.parse(
+  fs.readFileSync(path.join(root, "build-manifest.json"), "utf8"),
+);
+assert.equal(manifest.documents.length, 31);
+assert.equal(
+  manifest.documents.reduce((n, d) => n + (d.questions || 0), 0),
+  155,
+);
+const pages = [];
+function walk(dir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, entry.name);
+    if (entry.isDirectory()) walk(p);
+    else if (p.endsWith(".html")) pages.push(p);
+  }
+}
+walk(root);
+assert.equal(pages.length, 35);
+let links = 0;
+let diagrams = 0;
+let answers = 0;
+const decode = (s) =>
+  s.replaceAll("&amp;", "&").replaceAll("&quot;", '"').replaceAll("&#39;", "'");
+for (const file of pages) {
+  const text = fs.readFileSync(file, "utf8");
+  assert.equal((text.match(/<h1\b/g) || []).length, 1, file);
+  assert(!text.includes("portable-canonical-v2:"));
+  assert(!text.includes("\u2014"));
+  assert(!/C:[\\/]|work\/research/.test(text), `Private path in ${file}`);
+  diagrams += (text.match(/<figure class="diagram"/g) || []).length;
+  if (file.includes(`${path.sep}questions${path.sep}`))
+    answers += (text.match(/<summary>Show explanation<\/summary>/g) || [])
+      .length;
+  for (const [, attribute, raw] of text.matchAll(/\b(href|src)="([^"]+)"/g)) {
+    const target = decode(raw);
+    if (/^(?:https?:|mailto:|data:)/.test(target)) continue;
+    const currentRoute =
+      manifest.base + path.relative(root, file).split(path.sep).join("/");
+    const url = new URL(target, "https://example.test" + currentRoute);
+    assert(
+      url.pathname.startsWith(manifest.base),
+      `${file}: escaped project base: ${target}`,
+    );
+    let local = path.join(
+      root,
+      decodeURIComponent(url.pathname.slice(manifest.base.length)),
+    );
+    if (fs.existsSync(local) && fs.statSync(local).isDirectory())
+      local = path.join(local, "index.html");
+    assert(fs.existsSync(local), `${file}: missing ${attribute} ${target}`);
+    if (url.hash) {
+      const source = fs.readFileSync(local, "utf8");
+      const ids = [...source.matchAll(/\bid="([^"]+)"/g)].map((m) =>
+        decode(m[1]),
+      );
+      assert(
+        ids.includes(decodeURIComponent(url.hash.slice(1))),
+        `${file}: missing anchor ${target}`,
+      );
+    }
+    links++;
+  }
+}
+assert.equal(diagrams, 66);
+assert.equal(answers, 155);
+console.log(
+  JSON.stringify(
+    {
+      generatedPages: pages.length,
+      courseFiles: 31,
+      questions: 155,
+      diagrams,
+      localLinksAndAssets: links,
+      independentExpandableAnswers: answers,
+      privateWorkingPaths: 0,
+    },
+    null,
+    2,
+  ),
+);

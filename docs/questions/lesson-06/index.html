@@ -1,0 +1,291 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Practice Lesson 6 with independent scenarios and expandable explanations."><meta name="color-scheme" content="light"><title>Trust and protection: questions | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/questions/lesson-06/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/" aria-current="page"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><nav class="reading-modes" aria-label="Lesson material"><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/">Lesson 6</a><a href="/SAML_Theory/questions/lesson-06/" aria-current="page">Questions <span>(16)</span></a></nav><article class="prose"><h1 id="lesson-6-trust-signatures-encryption-and-certificate-lifecycle">Lesson 6: Trust, signatures, encryption, and certificate lifecycle</h1>
+<h2 id="1-which-protection-does-each-observation-establish">1. Which protection does each observation establish?</h2>
+<p>In a fictional Okta-to-Atlas browser POST sign-in, an engineer observes these facts independently:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Observation</th>
+<th>Fact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>The assertion is Base64 encoded.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>A supplied unkeyed hash matches the supplied content.</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Required signature checks pass over the intended assertion using Atlas's approved key for the expected Okta issuer.</td>
+</tr>
+<tr>
+<td>D</td>
+<td>Atlas decrypts content encrypted for its recipient key.</td>
+</tr>
+<tr>
+<td>E</td>
+<td>The browser's separate connections to Okta and Atlas use correctly established HTTPS.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Which observations alone establish neither secrecy nor trustworthy origin? Does C make the assertion unreadable? Does D prove that Okta supplied it? Does E replace message-level checks?</p>
+<details>
+<summary>Show explanation</summary>
+<p>A is a representation of bytes as text. It does not provide secrecy or trustworthy origin. B also does not authenticate the supplier: someone replacing content can calculate a new unkeyed hash for that replacement.</p>
+<p>C establishes the stated signature result over the selected content under approved trust. A signed plaintext assertion can still be readable. Target, time, correlation, account and access requirements remain separate checks.</p>
+<p>D establishes the supplied decryption result, not the approved sender's identity. Someone with Atlas's public encryption information can encrypt content for Atlas. E protects the respective connections under their TLS rules, but the browser-mediated journey contains separate connections. It does not replace the required SAML protection and acceptance checks. Message protection likewise does not make TLS unnecessary for sensitive traffic or session cookies.</p>
+</details>
+<h2 id="2-match-the-certificate-to-the-operation-and-direction">2. Match the certificate to the operation and direction</h2>
+<p>Northstar's approved Atlas integration has three operations: Okta signs assertions for Atlas, Atlas signs authentication requests to Okta, and Okta encrypts assertions for Atlas. Separate supported keys are used for these purposes.</p>
+<p>Daniel sees Okta app fields named Signature Certificate and Encryption Certificate. He proposes uploading Okta's own signing certificate into both and asking Atlas to supply its private key so encryption will work.</p>
+<p>Explain the correct ownership and public-material exchange. Which operation does the app form's Signature Certificate concern?</p>
+<details>
+<summary>Show explanation</summary>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Private capability stays with</th>
+<th>Public material used by the other side</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Okta signs assertions</td>
+<td>Okta</td>
+<td>Atlas receives approved Okta verification material.</td>
+</tr>
+<tr>
+<td>Atlas signs requests</td>
+<td>Atlas</td>
+<td>Okta receives approved Atlas verification material.</td>
+</tr>
+<tr>
+<td>Okta encrypts for Atlas</td>
+<td>Atlas retains its private decryption key</td>
+<td>Okta receives Atlas's approved public encryption certificate.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The app form's Signature Certificate is for validating application-supplied sign-in and logout requests. It is not another label for the Okta signing certificate Atlas needs. Encryption Certificate identifies the public recipient material for encrypted assertions. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference, advanced settings</a></p>
+<p>Okta does not need Atlas's private key to encrypt for it. Read the operation and direction before choosing a certificate; a familiar field name does not make all certificate files interchangeable.</p>
+</details>
+<h2 id="3-does-a-matching-fingerprint-create-approved-trust">3. Does a matching fingerprint create approved trust?</h2>
+<p>Atlas expects Northstar's approved Okta issuer. A received message claims that issuer and includes an unfamiliar certificate in KeyInfo. A utility reports that the signature verifies under the included public key. Daniel calculates the certificate's SHA-256 fingerprint and finds it matches a fingerprint printed in the same unverified message. No approved metadata or change record authorizes this key.</p>
+<p>Is that enough to accept the key for this issuer? What would make a fingerprint comparison useful?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The message has not established why this key is authorized for the claimed issuer. A sender can supply its own certificate, issuer text and matching fingerprint. Agreement among those supplied values is not an independent trust decision.</p>
+<p>A fingerprint helps compare certificate bytes when both parties use the agreed algorithm. It becomes useful for trust establishment when the reference value comes through an authenticated, authorized process for the intended relationship.</p>
+<p>Compare the candidate with approved provider information and the effective receiver trust configuration. The supplied verification result concerns the included key and covered content; it does not authorize silently replacing Atlas's trusted key. Readable KeyInfo can help identify a candidate without becoming permission to trust it.</p>
+</details>
+<h2 id="4-must-federation-certificates-behave-like-website-certificates">4. Must federation certificates behave like website certificates?</h2>
+<p>Atlas's documented federation trust model uses keys from authenticated, accepted metadata under the SAML Metadata Interoperability Profile. Its SAML signature decision does not apply the browser's website-certificate chain and hostname checks. The accepted metadata contains a self-signed signing certificate whose key remains approved.</p>
+<p>A reviewer proposes rejecting it solely because it is self-signed, while accepting a different certificate solely because it chains to a public certificate authority. Are those decisions justified under the supplied model? What should an unfamiliar receiver's expiry behavior be based on?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Neither conclusion follows from the stated federation model. The approved relationship comes through metadata acceptance. Self-signing is not automatically disqualifying, and a public certificate chain does not automatically authorize a key to sign for this Okta issuer.</p>
+<p>Website TLS validation and federation-key acceptance can use different rules. This question supplies a particular documented profile model, rather than claiming every SAML receiver behaves that way. <a href="https://docs.oasis-open.org/security/saml/Post2.0/sstc-metadata-iop.pdf">SAML Metadata Interoperability Profile, key processing</a></p>
+<p>For an unfamiliar receiver, establish its documented and enforced trust, certificate-expiry and revocation behavior. Plan changes before the applicable operational deadlines. Do not assume every receiver rejects an expired certificate, or that an unexpired certificate remains authorized after its key has been removed from trust.</p>
+</details>
+<h2 id="5-which-layer-protects-the-outer-response">5. Which layer protects the outer response?</h2>
+<p>Atlas's integration requires a signed assertion. A supplied scope inspection establishes that the signature references only assertion <code>_assert_Q06_SCOPE</code> and covers its issuer, subject, conditions and statements. The enclosing Response has no separate signature. Its status and Destination are outside the assertion reference.</p>
+<p>Does this assertion signature protect the outer status and Destination? Conversely, would a response-only signature satisfy the supplied signed-assertion requirement merely because the amended browser POST profile permits response signing?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The assertion signature does not extend to the enclosing Response's fields. Atlas must still apply their required processing, but it cannot claim that this particular signature covers them.</p>
+<p>A correctly constructed response signature can protect the response and enclosed content under its actual reference and transforms. That is a different protection arrangement. Permission in the amended profile to use response signing does not override Atlas's specifically agreed assertion-signing requirement. <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E93</a></p>
+<p>Locate the reference and covered content, then compare the result with the integration's requirements. The visual presence of a signature somewhere in the document is not a complete description of what was protected or what the receiver must enforce.</p>
+</details>
+<h2 id="6-read-the-two-connected-signature-checks">6. Read the two connected signature checks</h2>
+<p>This standalone XML Signature fragment is a fictional reading aid. The reference target is outside the fragment. Both AA== values are deliberately unusable cryptographic placeholders, not a real SHA-256 digest or valid signature. The fragment is not verifiable signed SAML.</p>
+<pre><code class="language-xml">&lt;ds:Signature xmlns:ds=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt;
+  &lt;ds:SignedInfo&gt;
+    &lt;ds:CanonicalizationMethod Algorithm=&quot;http://www.w3.org/2001/10/xml-exc-c14n#&quot; /&gt;
+    &lt;ds:SignatureMethod Algorithm=&quot;http://www.w3.org/2001/04/xmldsig-more#rsa-sha256&quot; /&gt;
+    &lt;ds:Reference URI=&quot;#_assert_Q06_READ&quot;&gt;
+      &lt;ds:Transforms&gt;
+        &lt;ds:Transform Algorithm=&quot;http://www.w3.org/2000/09/xmldsig#enveloped-signature&quot; /&gt;
+        &lt;ds:Transform Algorithm=&quot;http://www.w3.org/2001/10/xml-exc-c14n#&quot; /&gt;
+      &lt;/ds:Transforms&gt;
+      &lt;ds:DigestMethod Algorithm=&quot;http://www.w3.org/2001/04/xmlenc#sha256&quot; /&gt;
+      &lt;ds:DigestValue&gt;AA==&lt;/ds:DigestValue&gt;
+    &lt;/ds:Reference&gt;
+  &lt;/ds:SignedInfo&gt;
+  &lt;ds:SignatureValue&gt;AA==&lt;/ds:SignatureValue&gt;
+&lt;/ds:Signature&gt;
+</code></pre>
+<p>Which object does Reference select? What do reference validation and signature-value validation each check? Would either check alone establish the required protection of the content? Why can a receiver operate without KeyInfo appearing here?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The reference selects the same-document assertion whose ID is <code>_assert_Q06_READ</code>. The fragment marker <code>#</code> is not part of that assertion ID.</p>
+<p>Reference validation recomputes the digest over the selected content after its declared transforms and compares it with DigestValue. Signature-value validation checks SignatureValue against canonicalized SignedInfo using the permitted method and verification key. Both are needed for the required connected result; a digest match alone does not authenticate the supplier, and checking only the signature value leaves required content-reference validation unresolved.</p>
+<p>KeyInfo is optional because the receiver can obtain its approved verification key from configuration. These relationships explain what software must check; the placeholder values demonstrate none of those checks succeeding. <a href="https://www.w3.org/TR/xmldsig-core1/">W3C XML Signature, core validation</a></p>
+</details>
+<h2 id="7-does-canonicalization-ignore-every-xml-change">7. Does canonicalization ignore every XML change?</h2>
+<p>Consider three small XML values in isolation, without namespaces or surrounding context:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Version</th>
+<th>XML</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td><code>&lt;item a=&quot;1&quot; b=&quot;2&quot;/&gt;</code></td>
+</tr>
+<tr>
+<td>B</td>
+<td><code>&lt;item b=&quot;2&quot; a=&quot;1&quot;&gt;&lt;/item&gt;</code></td>
+</tr>
+<tr>
+<td>C</td>
+<td><code>&lt;item a=&quot;9&quot; b=&quot;2&quot;/&gt;</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The selected process uses exclusive canonicalization. Which two have the same canonical representation? Does that result justify arbitrary pretty-printing of a signed SAML document or ignoring text whitespace?</p>
+<details>
+<summary>Show explanation</summary>
+<p>A and B both become <code>&lt;item a=&quot;1&quot; b=&quot;2&quot;&gt;&lt;/item&gt;</code> in this deliberately limited example. Attribute ordering and empty-element notation are normalized by the defined process.</p>
+<p>C changes the attribute value, so it has different canonical content. Canonicalization does not mean “treat XML that looks similar as identical.” Text whitespace and namespace context can affect the result, and the selected algorithms and transforms matter.</p>
+<p>Do not generalize this small equivalence into permission to tidy a signed document. Preserve the relevant evidence and use the supported signature-processing implementation. A formatting change that seems cosmetic to a reader is not automatically irrelevant to cryptographic processing.</p>
+</details>
+<h2 id="8-did-the-application-use-what-it-verified">8. Did the application use what it verified?</h2>
+<p>Atlas receives a fictional document containing assertions A and B. Its diagnostic proves required signature validation over A using the approved key. A identifies Devi as <code>E1042</code>. The application then uses an unrestricted XML search that selects B's NameID, <code>E9009</code>, for account lookup. No evidence establishes the required protection for B.</p>
+<p>Can Atlas rely on the successful check over A to authenticate the identity it consumed from B? What relationship must a safe implementation preserve?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The result over A does not protect an identity read from B. The supplied facts identify a mismatch between the verified object and the object consumed for the application decision.</p>
+<p>The implementation must select the intended content unambiguously under its supported SAML rules and use the content whose required protection passed. A generic search for the first convenient NameID does not establish that connection. This distinction is central to recognizing signature-wrapping problems.</p>
+<p>Approved keys and successful cryptographic checks do not excuse unsafe object selection. Use a maintained implementation with safe XML and signature processing, investigate the specific selection mismatch, and verify the intended identity and rejection behavior after correction. The packet does not establish whether the mismatch arose from malicious input or an ordinary implementation defect.</p>
+</details>
+<h2 id="9-can-every-encrypted-assertion-be-processed-in-the-same-order">9. Can every encrypted assertion be processed in the same order?</h2>
+<p>Compare two explicitly supported fictional arrangements:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Arrangement</th>
+<th>Protected layers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>A readable signed assertion inside a response.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>A signed assertion is encrypted for Atlas, and the ciphertext-containing response also has an outer signature.</td>
+</tr>
+</tbody>
+</table></div>
+<p>An engineer proposes always decrypting first, verifying afterward, and considering decryption proof that Okta sent the assertion. Explain the limits of that rule. Also distinguish content encryption from key transport in a public-key XML Encryption arrangement.</p>
+<details>
+<summary>Show explanation</summary>
+<p>A has no encrypted assertion to decrypt. In B, the inner assertion signature cannot be checked until the relevant plaintext is recovered, but required outer protection may need verification before decryption. The supported construction and secure receiver processing determine the actual order. Historical CBC constructions are one reason a universal decrypt-first rule is unsafe.</p>
+<p>Decryption also does not authenticate the approved sender. A party with Atlas's public encryption information can encrypt content for Atlas. Required trust, signatures and SAML restrictions still apply.</p>
+<p>Content encryption protects assertion data, commonly with a symmetric content key. Key transport protects that content key for the recipient. Those are different algorithms and settings, even though both participate in the encrypted arrangement. They must match the supported integration rather than be inferred from the word “encrypted.”</p>
+</details>
+<h2 id="10-is-an-approved-certificate-enough-to-approve-every-algorithm">10. Is an approved certificate enough to approve every algorithm?</h2>
+<p>Atlas recognizes the approved provider key in a received certificate. The certificate itself was signed using SHA-256, but the SAML signature uses a SHA-1-based SignatureMethod and its reference uses SHA-1 as DigestMethod. Atlas's current approved policy rejects both of those SAML choices. No other failure has been established.</p>
+<p>A colleague proposes accepting the message because the certificate says SHA-256. Which algorithm roles were confused? Would changing the assertion-encryption algorithm address this signature-policy failure?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The certificate's signature algorithm is separate from the SAML SignatureMethod and reference DigestMethod. Its SHA-256 label does not change the algorithms used for the received XML signature and content digest.</p>
+<p>The message fails the supplied SAML algorithm policy even though the key is recognized. Select a currently approved combination supported by sender and receiver, then verify the actual emitted methods and processing result. Contemporary defensive guidance rejects SHA-1-based SAML signatures and digests. <a href="https://cheatsheetseries.owasp.org/cheatsheets/SAML_Security_Cheat_Sheet.html">OWASP SAML security guidance</a></p>
+<p>An assertion-encryption algorithm serves a different operation. Changing it does not repair the stated signature and digest choices. Keep key approval, algorithm policy and successful cryptographic processing distinct.</p>
+</details>
+<h2 id="11-what-changed-when-the-new-certificate-was-generated">11. What changed when the new certificate was generated?</h2>
+<p>Northstar uses symbolic signing-key labels K1 and K2 for a planned Atlas rollover. Daniel generates the intended new certificate material in Okta. At the observation time, K1 is still the active signing key, a captured response uses K1, and Atlas's effective trust configuration contains only K1. No receiver update has been performed.</p>
+<p>Has generation switched signing or prepared Atlas for K2? Which facts should a change record distinguish before claiming the rollover succeeded?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The supplied observations show availability of new material, continued signing with K1 and receiver trust still limited to K1. Generation has established neither sender activation of K2 nor Atlas adoption of K2.</p>
+<p>Record the approved new material, selected active sender state, observed signing key and effective receiver trust. Also identify the integration and relevant receiving instances, update mechanism and owners. Okta documents generation and activation as distinct management actions; the receiver's supported adoption process is another responsibility. <a href="https://help.okta.com/oie/en-us/content/topics/apps/manage-signing-certificates.htm">Okta signing certificate management</a></p>
+<p>Success requires an actual K2-based result under the intended trust configuration, followed by the relevant application outcome. A new certificate appearing in a list is not that evidence, and a metadata publication does not prove the receiver consumed it.</p>
+</details>
+<h2 id="12-read-a-cutover-across-two-receiving-nodes">12. Read a cutover across two receiving nodes</h2>
+<p>On 20 October 2026, Northstar plans an uncompromised-key rollover with approved overlap support. All times are UTC. K1 remains acceptable during the stated overlap.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>System</th>
+<th>Effective signing or trust state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Okta</td>
+<td>Signs with K1 before 10:00; signs with K2 from 10:00 onward.</td>
+</tr>
+<tr>
+<td>Atlas node A</td>
+<td>Trusts K1 throughout; additionally trusts K2 from 09:30.</td>
+</tr>
+<tr>
+<td>Atlas node B</td>
+<td>Trusts only K1 until 10:20; then additionally trusts K2.</td>
+</tr>
+</tbody>
+</table></div>
+<p>At 10:05, K2-signed attempts reach each node. Both nodes use the same documented rule requiring an approved verification key. What configuration outcome should the teams expect at each node? Is importing K2 on A sufficient evidence to remove K1 everywhere?</p>
+<details>
+<summary>Show explanation</summary>
+<p>At 10:05, node A is prepared to verify using approved K2. Node B has no configured approved K2 and cannot satisfy that key requirement for these attempts. This identifies a configuration difference; A's readiness does not by itself prove the message's signature bytes or every later acceptance check pass.</p>
+<p>One successful import is not evidence of all-node adoption. Confirm the sender's observed key, effective trust on every relevant receiver, actual K2-based processing results and the agreed handling of in-flight messages, caches and recovery.</p>
+<p>Only then retire K1 under the approved plan. Overlap preserves K1's authority while it lasts, so its duration needs a reason. This schedule is an example coordination plan, not a standard SAML waiting period or an Okta guarantee.</p>
+</details>
+<h2 id="13-what-if-atlas-can-trust-only-one-key">13. What if Atlas can trust only one key?</h2>
+<p>The Atlas team's documentation says this deployment accepts exactly one verification key for its Okta relationship. K1 is currently approved and uncompromised. A proposed change plan assumes K1 and K2 can overlap because another application supports multi-key trust. No supported fallback process has been confirmed.</p>
+<p>Can the team reuse that plan? What must a supported replacement and recovery plan establish instead?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The plan assumes a capability this Atlas deployment does not have. Another application's overlap support is not evidence of support here.</p>
+<p>Coordinate the sender switch and receiver replacement through documented mechanisms. Establish sequencing, the expected service impact or maintenance arrangement, owners, effective configuration checks and the evidence for a successful retest. Agree on recovery conditions before the change.</p>
+<p>A rollback to K1 is possible only if K1 remains permitted, can be selected through the supported sender process and is trusted by the relevant receiver after any required restoration. Do not promise an automatic reversal. Accepting any certificate in the next incoming message would bypass approved trust rather than provide safe overlap.</p>
+</details>
+<h2 id="14-what-does-a-generic-signature-error-establish">14. What does a generic signature error establish?</h2>
+<p>Devi authenticates at Okta and the browser submits a response to Atlas. Atlas's only supplied diagnostic is “signature invalid.” There is no captured protection evidence, algorithm result, effective key inventory or object-selection detail. A certificate change occurred recently, but its relationship to this attempt is unknown.</p>
+<p>Can the engineer conclude that Atlas lacks the new certificate? What evidence would distinguish that possibility from other failures?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The recent change makes a key mismatch worth investigating, but the generic error does not establish it. Altered signed content, an unsupported or rejected algorithm, incorrect reference handling and an unapproved verification key can produce different failures behind a broad label.</p>
+<p>Inspect the exact integration and attempt, actual signing material, receiver's effective approved keys, required signature layer, allowed algorithms, reference validation and signature-value result through supported diagnostics. Where multiple nodes exist, compare their effective state and import or refresh history.</p>
+<p>If later evidence specifically says no approved key matches the observed K2, that supports a key-configuration diagnosis. Without it, do not report a guessed cause or disable verification merely to remove the visible error. Changing the ACS is also unsupported by the facts supplied here.</p>
+</details>
+<h2 id="15-did-a-new-certificate-necessarily-introduce-a-new-key">15. Did a new certificate necessarily introduce a new key?</h2>
+<p>Under an agreed SHA-256 certificate-fingerprint procedure, certificate C1 and its approved replacement C2 have different fingerprints. An independent public-key comparison establishes that both certificates contain exactly the same public key. Atlas's certificate and key-acceptance rules have not yet been checked for the replacement.</p>
+<p>Does this prove a signing-key rollover? What might still need coordination even though the public key is unchanged?</p>
+<details>
+<summary>Show explanation</summary>
+<p>This is a certificate replacement using the same public key, not evidence of a change to the key material. Certificate fingerprints compare certificate bytes; a certificate can change while carrying the same key.</p>
+<p>Atlas may nevertheless need a supported update depending on whether it pins a particular certificate, trusts the key through metadata or enforces other relevant certificate rules. The scenario deliberately leaves those receiver behaviors unknown. Neither universal acceptance nor universal rejection is established.</p>
+<p>Confirm the authorized replacement, effective sender and receiver behavior, applicable deadlines and the required test outcomes. Describing the change accurately helps the team avoid both an unnecessary key-rollover diagnosis and an assumption that unchanged key bytes make every configuration update irrelevant.</p>
+</details>
+<h2 id="16-is-a-compromised-key-a-safe-rollback-option">16. Is a compromised key a safe rollback option?</h2>
+<p>During an Atlas certificate change, evidence indicates that K1's private signing key may be controlled by an attacker. Some receivers trust K1 directly and do not consult certificate-revocation services. K2 is the intended replacement, but adoption has not yet been verified on every receiver. Users also have application sessions created before the incident.</p>
+<p>A recovery proposal retains K1 for convenient overlap, rolls signing back to it if K2 fails, and assumes certificate revocation will automatically end all existing Atlas sessions. Which assumptions are unsafe, and what should the incident response separate?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Continuing to trust K1 preserves the authority of anyone holding that private key. Convenience overlap and rollback conditions for an uncompromised planned change do not carry over to this incident.</p>
+<p>Coordinate approved trust removal and replacement under the organization's incident process, accounting for the actual receivers and verified K2 adoption. Revocation alone cannot remove trust at receivers that do not consult the revocation mechanism. Confirm the effective trust decision rather than treating publication of revocation as proof of enforcement.</p>
+<p>Previously created application sessions require their own incident assessment and supported termination or containment decisions. Removing a verification key does not automatically erase every session established earlier. Keep replacement readiness, compromised-key authority and existing-session exposure as separate responsibilities with explicit evidence and owners.</p>
+</details>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://www.w3.org/TR/xmldsig-core1/">W3C XML Signature, validation and signature structure</a></li>
+<li><a href="https://www.w3.org/TR/xml-exc-c14n/">W3C Exclusive XML Canonicalization</a></li>
+<li><a href="https://www.w3.org/TR/xmlenc-core1/">W3C XML Encryption, data and key protection</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/Post2.0/sstc-metadata-iop.pdf">SAML Metadata Interoperability Profile, key trust and processing</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, POST protection and encrypted-content integrity: E93</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/manage-signing-certificates.htm">Okta signing certificate management</a></li>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/SAML_Security_Cheat_Sheet.html">OWASP SAML security guidance</a></li>
+</ul>
+</article><nav class="page-navigation" aria-label="Lesson sequence"><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><small>← Previous lesson</small>Bindings and alternative paths</a><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><small>Next lesson →</small>Response acceptance</a></nav></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#1-which-protection-does-each-observation-establish">1. Which protection does each observation establish?</a></li><li><a href="#2-match-the-certificate-to-the-operation-and-direction">2. Match the certificate to the operation and direction</a></li><li><a href="#3-does-a-matching-fingerprint-create-approved-trust">3. Does a matching fingerprint create approved trust?</a></li><li><a href="#4-must-federation-certificates-behave-like-website-certificates">4. Must federation certificates behave like website certificates?</a></li><li><a href="#5-which-layer-protects-the-outer-response">5. Which layer protects the outer response?</a></li><li><a href="#6-read-the-two-connected-signature-checks">6. Read the two connected signature checks</a></li><li><a href="#7-does-canonicalization-ignore-every-xml-change">7. Does canonicalization ignore every XML change?</a></li><li><a href="#8-did-the-application-use-what-it-verified">8. Did the application use what it verified?</a></li><li><a href="#9-can-every-encrypted-assertion-be-processed-in-the-same-order">9. Can every encrypted assertion be processed in the same order?</a></li><li><a href="#10-is-an-approved-certificate-enough-to-approve-every-algorithm">10. Is an approved certificate enough to approve every algorithm?</a></li><li><a href="#11-what-changed-when-the-new-certificate-was-generated">11. What changed when the new certificate was generated?</a></li><li><a href="#12-read-a-cutover-across-two-receiving-nodes">12. Read a cutover across two receiving nodes</a></li><li><a href="#13-what-if-atlas-can-trust-only-one-key">13. What if Atlas can trust only one key?</a></li><li><a href="#14-what-does-a-generic-signature-error-establish">14. What does a generic signature error establish?</a></li><li><a href="#15-did-a-new-certificate-necessarily-introduce-a-new-key">15. Did a new certificate necessarily introduce a new key?</a></li><li><a href="#16-is-a-compromised-key-a-safe-rollback-option">16. Is a compromised key a safe rollback option?</a></li><li><a href="#sources">Sources</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

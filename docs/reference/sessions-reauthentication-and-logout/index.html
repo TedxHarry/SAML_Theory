@@ -1,0 +1,272 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Independent state, reauthentication and confirmed outcomes."><meta name="color-scheme" content="light"><title>Sessions and logout | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/reference/sessions-reauthentication-and-logout/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/" aria-current="page">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><div class="eyebrow">Reference library</div><article class="prose"><h1 id="saml-with-okta-sessions-reauthentication-and-logout">SAML with Okta: sessions, reauthentication and logout</h1>
+<p>Devi signs out of Atlas, then opens Ledger successfully. That can be the correct result of Atlas's local logout. To evaluate it, identify which sessions existed, which action targeted them and what each service did afterward. SAML sign-in does not combine the provider and applications into one shared session.</p>
+<p>The Northstar Research examples use Okta Identity Engine, Atlas and Ledger. Times and session lifetimes are fictional, not product defaults. Each example supplies its own starting state.</p>
+<h2 id="identify-the-state-and-its-owner">Identify the state and its owner</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Owner or role</th>
+<th>What it is separate from</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Okta global session</td>
+<td>Okta context for subsequent authentication and policy decisions.</td>
+<td>Atlas and Ledger's local sessions.</td>
+</tr>
+<tr>
+<td>Atlas session</td>
+<td>Atlas's continuing signed-in state and local enforcement.</td>
+<td>The assertion originally used to establish it.</td>
+</tr>
+<tr>
+<td>Ledger session</td>
+<td>Ledger's independent signed-in state.</td>
+<td>Activity or logout at Atlas.</td>
+</tr>
+<tr>
+<td>Browser cookie</td>
+<td>Browser-held information used by a service's session mechanism.</td>
+<td>Proof that the corresponding server-side session remains usable.</td>
+</tr>
+<tr>
+<td>SAML SessionIndex</td>
+<td>Authentication-session association within a federation relationship.</td>
+<td>A browser cookie, assertion ID or LogoutRequest ID.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Okta’s Identity Engine global session rules cover session establishment, lifetime, idle limits and cookie persistence. The application owns its local implementation; do not infer app session behavior from an Okta cookie or build custom behavior around an assumed cookie name. <a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/add-okta-sign-on-policy-rule.htm">Okta Identity Engine global session rules and cookies</a></p>
+<p>Removing cookie bytes and invalidating a server session are different events. A server can refuse an old session even if the browser still holds its cookie. Removing one browser's cookie does not prove every related session elsewhere ended. <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies">MDN: HTTP cookies</a></p>
+<h2 id="read-the-independent-clocks">Read the independent clocks</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Time control</th>
+<th>Meaning</th>
+<th>Common wrong conclusion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Conditions and bearer presentation limits</td>
+<td>Restrict use of the SAML information and its presentation.</td>
+<td>Every application session must end at assertion expiry.</td>
+</tr>
+<tr>
+<td>AuthnInstant</td>
+<td>Reported authentication time.</td>
+<td>A newly issued response proves new authentication.</td>
+</tr>
+<tr>
+<td>SessionNotOnOrAfter, when supplied</td>
+<td>Upper bound for derived sessions under applicable processing.</td>
+<td>It is another name for Conditions expiry.</td>
+</tr>
+<tr>
+<td>Session maximum lifetime</td>
+<td>Service-defined total-duration limit.</td>
+<td>Activity can always extend it.</td>
+</tr>
+<tr>
+<td>Idle timeout</td>
+<td>Limit without qualifying activity under the service's rules.</td>
+<td>Activity in any app keeps all sessions alive.</td>
+</tr>
+<tr>
+<td>Browser cookie persistence</td>
+<td>How long browser-held information is retained.</td>
+<td>A retained cookie overrides server-side expiration.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The optional SAML session bound and local policy must be understood together. Applicable processing does not turn all the clocks into one value. <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E79</a></p>
+<h3 id="compare-a-supplied-schedule">Compare a supplied schedule</h3>
+<p><strong>Figure RF-S1: Separate assertion and session intervals.</strong> This is the established Lesson 8 example on 16 October 2026, in UTC. Bars show stated intervals, not messages. The assertion bar illustrates Conditions; bearer restrictions still apply separately.</p>
+<!-- mermaid:id=RF-S1 -->
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/RF-S1.svg" alt="RF-S1: Separate assertion and session intervals" width="1264" height="196" loading="lazy"><figcaption><span>RF-S1</span><a href="/SAML_Theory/assets/diagrams/RF-S1.svg" data-diagram="RF-S1: Separate assertion and session intervals">Open full diagram</a></figcaption></figure><p>Authentication occurs at 09:00. The assertion is issued at 09:00:05, with an illustrated Conditions window ending at 09:05:05. Atlas's session starts at 09:00:06 and ends at 10:00; Ledger's starts at 09:10 and ends at 11:10. The example Okta session ends at 17:00.</p>
+<p>The example supplies no earlier session bound, idle expiry, logout or other invalidation, and no later sign-in replaces or extends these sessions.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Observation time</th>
+<th>Assertion's illustrated window</th>
+<th>Atlas session</th>
+<th>Ledger session</th>
+<th>Okta session</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>09:30</td>
+<td>Ended.</td>
+<td>Usable.</td>
+<td>Usable.</td>
+<td>Usable.</td>
+</tr>
+<tr>
+<td>10:30</td>
+<td>Ended.</td>
+<td>Expired.</td>
+<td>Usable.</td>
+<td>Usable.</td>
+</tr>
+</tbody>
+</table></div>
+<p>At 09:30, Atlas uses its established session rather than accepting the old assertion again for each request. At 10:30, a new Atlas sign-in would be a new exchange under current requirements. It would not revive the expired assertion.</p>
+<p>For a separate idle-time example, assume Atlas counts the last qualifying activity at 09:10 and has a 15-minute idle limit. Without more qualifying Atlas activity, that limit is reached at 09:25, even if the maximum lifetime would permit use until 10:00. Ledger activity alone does not change the supplied Atlas activity record.</p>
+<h2 id="locate-the-reauthentication-decision">Locate the reauthentication decision</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Decision owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Is the existing Atlas session sufficient for this operation?</td>
+<td>Atlas's session/action policy.</td>
+</tr>
+<tr>
+<td>Is there usable Okta session context?</td>
+<td>Okta global-session processing.</td>
+</tr>
+<tr>
+<td>Are the requested integration's authentication requirements satisfied?</td>
+<td>Applicable Okta app sign-in policy and request processing.</td>
+</tr>
+<tr>
+<td>May the resulting Atlas account perform the operation?</td>
+<td>Atlas authorization.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Identity Engine global session policy and app sign-in policy have distinct roles. A usable Okta session does not establish that every app's current authentication requirements are satisfied. Conversely, an Atlas resource request served under a local session may not consult Okta at all. Changing an Okta rule does not prove Atlas reevaluates that rule on every page request. <a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/about-okta-sign-on-policies.htm">Okta global session policies</a>, <a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/about-app-sign-on-policies.htm">app sign-in policies</a></p>
+<p>ForceAuthn requests fresh authentication. Okta's Honor Force Authentication setting and actual processing determine how the request is handled; the flag alone does not prove the returned authentication is fresh. IsPassive constrains visible interaction. If requirements cannot be met passively, an existing session does not justify bypassing them. These flags do not grant resource permission or terminate unrelated sessions. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference</a></p>
+<p>A recent IssueInstant and an older AuthnInstant can coexist. Compare the returned evidence with the actual authentication requirement, then apply the <a href="/SAML_Theory/reference/response-validation-and-acceptance/">response acceptance requirements</a>. Lesson 8's <a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/#83-explain-reauthentication-at-the-right-boundary">reauthentication decision flow</a> connects these owners.</p>
+<h2 id="distinguish-local-logout-from-coordinated-logout">Distinguish local logout from coordinated logout</h2>
+<h3 id="local-atlas-logout">Local Atlas logout</h3>
+<p>For this independent case, Devi has usable Okta, Atlas and Ledger sessions. Atlas's supported local-only action invalidates the current Atlas session and clears its cookie. No SAML logout messages are sent, and the other services are unaffected by that action.</p>
+<p><strong>Figure RF-S2: Complete local logout and subsequent observations.</strong> Browser arrows show requests and responses; the Atlas self-arrow changes local state. The Atlas landing behavior requires sign-in without immediately starting SSO.</p>
+<!-- mermaid:id=RF-S2 -->
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/RF-S2.svg" alt="RF-S2: Complete local logout and subsequent observations" width="1146" height="556" loading="lazy"><figcaption><span>RF-S2</span><a href="/SAML_Theory/assets/diagrams/RF-S2.svg" data-diagram="RF-S2: Complete local logout and subsequent observations">Open full diagram</a></figcaption></figure><p>Steps 1–3 perform local Atlas logout. Steps 4–5 establish that the old Atlas session no longer grants projects access. Steps 6–7 show Ledger's separate session still working. Those results agree with the supplied local-only scope.</p>
+<p>If Atlas instead immediately starts SSO, a usable Okta session can help create a new Atlas session, subject to policy and acceptance. A rapid return to Atlas does not establish that its old session survived. Check whether the observed resource request used the old session or followed a new sign-in.</p>
+<h3 id="basic-atlas-initiated-saml-slo">Basic Atlas-initiated SAML SLO</h3>
+<p>Okta's basic SLO guidance describes an SP-initiated flow requiring supported app configuration and a signed request. Its documented SAML logout response return uses POST. The application's request-verification certificate at Okta is distinct from Okta's signing certificate supplied to the app. <a href="https://help.okta.com/oie/en-us/content/topics/apps/apps_single_logout.htm">Okta Single Logout configuration</a></p>
+<p>For the following independent successful case, Atlas and Okta have approved endpoints, keys and session associations. Redirect is the selected supported request binding. Ledger is outside this basic logout arrangement and retains a usable session.</p>
+<p><strong>Figure RF-S3: Complete basic SLO with its scope made explicit.</strong> The browser carries both logout messages. Atlas retains the needed logout association while invalidating its initiating local session. That invalidation timing is this example's supported implementation choice.</p>
+<!-- mermaid:id=RF-S3 -->
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/RF-S3.svg" alt="RF-S3: Complete basic SLO with its scope made explicit" width="1506" height="745" loading="lazy"><figcaption><span>RF-S3</span><a href="/SAML_Theory/assets/diagrams/RF-S3.svg" data-diagram="RF-S3: Complete basic SLO with its scope made explicit">Open full diagram</a></figcaption></figure><p>Steps 1–3 deliver signed LogoutRequest <code>_lo_A08_01</code>. At step 4, Okta validates it and ends the targeted session. Steps 5–6 carry the protected reply <code>_lor_A08_01</code> in a form submitted to Atlas. At steps 7–8, Atlas verifies the response, correlation and result before reporting the outcome. Steps 9–10 show Ledger's explicitly separate scope.</p>
+<p>If a later step fails, a local invalidation that already happened does not automatically reverse. Report the per-service result. A browser reaching a signed-out page is not proof of termination at every participant.</p>
+<h2 id="read-participation-identifiers-and-results-precisely">Read participation, identifiers and results precisely</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Information</th>
+<th>What to establish</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LogoutRequest ID and issuer</td>
+<td>Which request and sender belong to this relationship.</td>
+</tr>
+<tr>
+<td>Subject, including agreed NameID format/scope</td>
+<td>Which principal is being targeted.</td>
+</tr>
+<tr>
+<td>SessionIndex, where applicable</td>
+<td>Which session association is targeted.</td>
+</tr>
+<tr>
+<td>Destination, expiry and protection</td>
+<td>Whether the logout message is suitable for this receiver and use.</td>
+</tr>
+<tr>
+<td>LogoutResponse InResponseTo and result</td>
+<td>Which logout request the reply answers and what it reports.</td>
+</tr>
+</tbody>
+</table></div>
+<p>A request without SessionIndex can target all sessions for the identified principal at that participant under SAML's rules. This does not imply every device or service is selected by a particular product's logout action. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §§3.7.1–3.7.3</a></p>
+<p>Okta separately documents front-channel SLO for participating apps, currently marked Early Access in the cited guide. It uses browser-mediated notification, including an iframe path; receiving apps must invalidate their associated state. Basic SLO configuration alone does not establish that Ledger participates. Nor does the initiating reply prove every downstream callback completed. The <a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/#front-channel-notification-of-another-participating-app">complete front-channel flow in Lesson 8</a> shows those separate results. <a href="https://developer.okta.com/docs/guides/single-logout/saml2/main/">Okta front-channel SLO guide</a></p>
+<p>SAML also defines server-to-server logout arrangements. The <a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/#a-direct-server-logout-alternative-in-the-saml-standard">generic SOAP example</a> is an awareness example, not a claim that the Okta integration supports SOAP logout. Okta's separately supported <a href="https://developer.okta.com/docs/guides/oin-universal-logout-overview/">Universal Logout capability</a> is another mechanism; using SAML does not by itself enable it.</p>
+<p>The authority's top-level logout status concerns its own termination result. A nested PartialLogout can report incomplete propagation alongside top-level Success. Do not convert that into &quot;all participants confirmed.&quot; Establish how the selected product path exposes its per-participant results. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §3.7.3.2</a></p>
+<h2 id="separate-session-termination-from-account-lifecycle">Separate session termination from account lifecycle</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Known intended boundary</th>
+<th>Downstream result still needs evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Atlas local logout</td>
+<td>Current Atlas session under its implementation.</td>
+<td>Okta and other application sessions.</td>
+</tr>
+<tr>
+<td>End a targeted Okta session</td>
+<td>Selected provider session.</td>
+<td>Independently established application sessions and configured propagation.</td>
+</tr>
+<tr>
+<td>Remove Atlas assignment</td>
+<td>Okta integration access and applicable lifecycle effects.</td>
+<td>Provisioning completion, Atlas account and existing-session handling.</td>
+</tr>
+<tr>
+<td>Deactivate the Okta user</td>
+<td>Okta account/session state and configured deprovisioning.</td>
+<td>Completion and partner enforcement, including established app sessions.</td>
+</tr>
+<tr>
+<td>Disable the Atlas account</td>
+<td>Atlas account state.</td>
+<td>Whether and how Atlas invalidates or refuses already-issued sessions.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Okta deactivation stops active Okta sessions and removes assignments. It runs in the background, and downstream deprovisioning depends on enabled, applicable app behavior. An accepted administrative request therefore does not prove instantaneous completion everywhere. <a href="https://help.okta.com/oie/en-us/content/topics/users-groups-profiles/usgp-deactivate-user-account.htm">Okta user deactivation</a></p>
+<p>In a brokered journey, the external IdP owns another session. Include that provider or another device in a logout claim only when the supported mechanism actually targets it and the evidence establishes its result.</p>
+<h2 id="explain-an-uncertain-sign-out-result">Explain an uncertain sign-out result</h2>
+<p>These independent fictional observations establish different limits.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Observation</th>
+<th>Supported conclusion</th>
+<th>Next useful evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Atlas's cookie disappears.</td>
+<td>A browser-held value changed.</td>
+<td>Atlas server-session invalidation and a fresh protected request.</td>
+</tr>
+<tr>
+<td>Ledger's logout request was scheduled; no callback is recorded.</td>
+<td>Participant completion is unconfirmed.</td>
+<td>Delivery, Ledger processing, callback and protected-resource evidence.</td>
+</tr>
+<tr>
+<td>A protected request succeeds after sign-out.</td>
+<td>The service supplied access on that request.</td>
+<td>Whether it used the old session or completed new authentication.</td>
+</tr>
+<tr>
+<td>An old page remains visible without a network request.</td>
+<td>Cached/displayed content remains visible.</td>
+<td>A fresh protected operation and its server result.</td>
+</tr>
+</tbody>
+</table></div>
+<p>An absent callback does not prove Ledger stayed signed in: it may have invalidated its session before the response was lost. It also does not prove logout succeeded. A precise report can say: &quot;Atlas and the targeted Okta session ended; Ledger's result is unconfirmed.&quot; Identify the user, browser/device, targeted sessions, participants and time behind that statement.</p>
+</article></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#identify-the-state-and-its-owner">Identify the state and its owner</a></li><li><a href="#read-the-independent-clocks">Read the independent clocks</a></li><li><a href="#locate-the-reauthentication-decision">Locate the reauthentication decision</a></li><li><a href="#distinguish-local-logout-from-coordinated-logout">Distinguish local logout from coordinated logout</a></li><li><a href="#read-participation-identifiers-and-results-precisely">Read participation, identifiers and results precisely</a></li><li><a href="#separate-session-termination-from-account-lifecycle">Separate session termination from account lifecycle</a></li><li><a href="#explain-an-uncertain-sign-out-result">Explain an uncertain sign-out result</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

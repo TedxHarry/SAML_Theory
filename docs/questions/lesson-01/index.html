@@ -1,0 +1,250 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Practice Lesson 1 with independent scenarios and expandable explanations."><meta name="color-scheme" content="light"><title>Why SAML exists: questions | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/questions/lesson-01/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/" aria-current="page"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><nav class="reading-modes" aria-label="Lesson material"><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/">Lesson 1</a><a href="/SAML_Theory/questions/lesson-01/" aria-current="page">Questions <span>(15)</span></a></nav><article class="prose"><h1 id="lesson-1-how-saml-connects-okta-to-an-application">Lesson 1: How SAML connects Okta to an application</h1>
+<h2 id="1-what-responsibility-moves-to-okta">1. What responsibility moves to Okta?</h2>
+<p>Northstar Research uses Okta Identity Engine as its identity provider. Atlas is a web application that acts as the SAML service provider. Northstar wants employees to authenticate through Okta instead of maintaining a separate Atlas password for this sign-in path.</p>
+<p>A colleague says, “Once Okta handles authentication, Atlas no longer needs user accounts or access rules.” What part of the arrangement has the colleague misunderstood?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Okta supplies authentication and identity information that Atlas can evaluate. Atlas still needs to determine which application account the accepted identity represents and what that account may do.</p>
+<p>For example, Okta might authenticate Devi and supply her employee identifier. Atlas must connect that information to the intended Atlas account, apply its entry rules and decide whether she may open a project. A successful authentication does not establish permission to administer Atlas.</p>
+<p>Delegating authentication changes how Atlas obtains suitable authentication information. It does not transfer every application decision to Okta. An integration also needs agreement about account creation and maintenance, even when users no longer enter a separate application password.</p>
+</details>
+<h2 id="2-reconstruct-the-browser-sign-in">2. Reconstruct the browser sign-in</h2>
+<p>Devi opens <code>https://atlas.northstar.example/projects</code>. This address is fictional. Her browser has no usable Atlas or Okta session. Atlas and Northstar's Okta Identity Engine org have compatible SAML configuration and approved trust. Devi is assigned to Atlas in Okta, the applicable policies permit the attempt, and her enabled Atlas account may view projects.</p>
+<p>This selected flow uses a browser redirect to carry Atlas's authentication request to Okta and a browser form submission to return Okta's response to Atlas. Describe the journey from the first page request to the displayed projects page. Identify who creates each SAML message and who creates the Atlas session.</p>
+<details>
+<summary>Show explanation</summary>
+<ol>
+<li>Devi's browser requests the projects page from Atlas.</li>
+<li>Atlas finds no usable application session, prepares an authentication request and retains context for the pending sign-in. It returns a redirect directing the browser toward Okta.</li>
+<li>The browser delivers Atlas's request to the configured Okta sign-in endpoint.</li>
+<li>Okta authenticates Devi, satisfies the applicable requirements and establishes its own session in this successful example. Authentication can involve several browser interactions.</li>
+<li>Okta creates a SAML response and returns a page containing a form that carries it for Atlas.</li>
+<li>The browser submits that form to Atlas's Assertion Consumer Service, or ACS, which receives the SAML response.</li>
+<li>Atlas evaluates the response, matches the accepted identity to Devi's enabled account, applies its entry policy and creates an Atlas session.</li>
+<li>Atlas returns its session cookie and redirects the browser to projects. The browser requests projects with the applicable Atlas cookie, and Atlas returns the page after checking permission.</li>
+</ol>
+<p>Atlas creates the authentication request. Okta creates the response. The browser carries the messages along the selected delivery path. Atlas creates its own application session after its requirements succeed; it does not receive a ready-made Atlas session from Okta.</p>
+</details>
+<h2 id="3-delivery-local-processing-or-trust">3. Delivery, local processing or trust?</h2>
+<p>An engineer is explaining a SAML integration between Okta, the identity provider, and Atlas, the service provider. Consider these four descriptions:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Description</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>The browser submits a response form to Atlas's SAML receiving endpoint.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Atlas looks up the local account corresponding to accepted identity information.</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Atlas is configured to rely on the approved Okta issuer and verification information under defined rules.</td>
+</tr>
+<tr>
+<td>D</td>
+<td>Atlas establishes its own signed-in session after its entry requirements pass.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Which describe message movement, which describe local processing or state changes, and which describes trust? Why does the distinction matter when reading a diagram?</p>
+<details>
+<summary>Show explanation</summary>
+<p>A describes message movement from the browser to Atlas. B describes local account processing inside Atlas. C describes approved reliance, which is a trust relationship. D describes a local state change: Atlas creates its session.</p>
+<p>These relationships should not all be read as network requests. A trust arrow from Atlas toward Okta does not mean Atlas directly fetched this response from Okta. Likewise, a self-arrow for account lookup does not add another server to the exchange.</p>
+<p>Separating these meanings lets you explain both how information arrived and why a receiver is prepared to evaluate it. Neither delivery nor configured trust alone proves that a particular response will be accepted.</p>
+</details>
+<h2 id="4-does-the-browser-become-the-authority">4. Does the browser become the authority?</h2>
+<p>In an Okta-to-Atlas browser sign-in, Okta returns a form carrying a SAML response, and Devi's browser submits it to Atlas. An engineer proposes: “Because the response came from Devi's browser, Atlas should accept whatever employee identifier is inside it.”</p>
+<p>Explain why that proposal is unsafe. At introductory depth, what must Atlas establish before relying on the identity information?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The browser delivers the response, but delivery does not make its contents authoritative. Atlas must evaluate the received information under the applicable protocol rules and its approved integration configuration.</p>
+<p>Atlas needs to establish that it can rely on the relevant content from the expected provider, that the information is intended for Atlas, that it is timely and that it fits the sign-in context. Account matching and access decisions follow from information it has accepted.</p>
+<p>A digital signature can help verify content under a key. Atlas also needs an approved reason to trust that key for the expected issuer. A message cannot establish its own authority simply by claiming to come from Okta or including key information. This is why an approved integration and checks on the actual response are both necessary.</p>
+</details>
+<h2 id="5-which-identity-value-selects-the-account">5. Which identity value selects the account?</h2>
+<p>Devi has these records in a fictional Okta-to-Atlas integration:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Okta username</td>
+<td><code>devi@northstar.example</code></td>
+</tr>
+<tr>
+<td>Employee identifier</td>
+<td><code>E1042</code></td>
+</tr>
+<tr>
+<td>SAML NameID supplied for Atlas</td>
+<td><code>E1042</code></td>
+</tr>
+<tr>
+<td>Atlas internal account ID</td>
+<td><code>atlas-4821</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Atlas's approved matching rule selects the account whose employee-identifier field equals the accepted NameID. Account <code>atlas-4821</code> has employee identifier <code>E1042</code>, and no other Atlas account has that value.</p>
+<p>Which account should Atlas select after accepting the identity information? Must Atlas's internal account ID equal the Okta username or the NameID?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Atlas should select <code>atlas-4821</code> under the supplied matching rule. The accepted value <code>E1042</code> matches that account's employee-identifier field uniquely.</p>
+<p>The internal account ID does not need to equal either the Okta username or the NameID. These values have different roles and can refer to the same person through an explicit relationship. Here, the NameID is used as an employee identifier, while <code>atlas-4821</code> identifies Atlas's account record.</p>
+<p>The useful project question is which received value Atlas uses, in what context, and under which matching rule. Guessing that every application uses email would produce the wrong explanation for this integration. Selection also does not establish that the account is enabled or has a particular permission; those facts were not supplied.</p>
+</details>
+<h2 id="6-what-does-an-okta-assignment-prove">6. What does an Okta assignment prove?</h2>
+<p>Devi has an active Okta account and has been assigned to the Atlas integration. Atlas requires an existing enabled local account and has no just-in-time account creation configured. There is no evidence yet about whether a provisioning process created Devi's Atlas account.</p>
+<p>A project tracker marks “Atlas account ready” solely because the Okta assignment succeeded. Is that conclusion supported? What would you check next?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The assignment alone does not establish that the Atlas account is ready. It grants access to the integration under its configuration, while a usable downstream account is a separate requirement.</p>
+<p>Check whether the intended Atlas account exists, whether it is enabled and whether the configured identity mapping will select it. If provisioning is part of this integration, inspect the relevant provisioning result rather than infer completion from assignment. Depending on the setup, assignment can trigger lifecycle actions, but those actions still need to complete successfully. <a href="https://help.okta.com/oie/en-us/content/topics/provisioning/lcm/lcm-deploy-cloud.htm">Okta provisioning and assignment workflow</a></p>
+<p>Even a ready account does not prove permitted access to every Atlas resource. That requires the application's relevant permission decision.</p>
+</details>
+<h2 id="7-explain-three-different-atlas-outcomes">7. Explain three different Atlas outcomes</h2>
+<p>In three independent fictional sign-ins, Okta authenticates the employee and Atlas accepts the returned SAML identity information. Atlas's policy requires an enabled matched account before creating a session, then checks the requested resource's permission.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Employee</th>
+<th>Atlas account state</th>
+<th>Projects permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Devi</td>
+<td>Intended account matched and enabled</td>
+<td>Granted</td>
+</tr>
+<tr>
+<td>Jordan</td>
+<td>Intended account matched but disabled</td>
+<td>Irrelevant because entry is denied</td>
+</tr>
+<tr>
+<td>Noor</td>
+<td>Intended account matched and enabled</td>
+<td>Absent</td>
+</tr>
+</tbody>
+</table></div>
+<p>Where should each attempt stop? Would “Okta authentication failed” accurately describe either denied outcome?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Devi passes the supplied account and permission requirements. Atlas can create her session and return projects.</p>
+<p>Jordan stops at application entry. The matched account is disabled, so Atlas's stated policy denies entry without creating a usable session. Noor passes entry and can have an Atlas session, but the projects request is denied because the required permission is absent.</p>
+<p>Neither denied outcome establishes an Okta authentication failure. Successful Okta authentication and accepted SAML information are supplied facts in all three cases. The differing outcomes arise from Atlas's account and resource rules.</p>
+<p>This distinction directs investigation toward the relevant boundary. Changing an Okta authentication method would not address the disabled account or missing permission established here.</p>
+</details>
+<h2 id="8-why-can-a-second-application-ask-again">8. Why can a second application ask again?</h2>
+<p>Devi already has a usable Okta session after signing in to Atlas. She now opens Ledger, another SAML service provider, and has no Ledger session. She is assigned to Ledger in Okta. For this attempt, Ledger's applicable Okta app sign-in policy requires additional authentication that her existing session has not satisfied.</p>
+<p>Devi is prompted for another authentication step. Does this observation establish that SSO is broken? If the additional step succeeds, does Ledger inherit Atlas's session?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The additional prompt is consistent with the supplied policy requirement. Existing Okta state can reduce repeated authentication, but it does not guarantee that every application's requirements have already been met. Identity Engine evaluates the applicable global session and app sign-in requirements. <a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/about-policies.htm">Okta Identity Engine policies</a></p>
+<p>Ledger does not inherit Atlas's session. It needs its own successful exchange and its own acceptance, account and access decisions before establishing a Ledger session. The browser presents applicable Okta session information when contacting Okta; it does not copy an Atlas session into Ledger.</p>
+<p>SSO can make several sign-ins feel connected while the participating systems maintain separate sessions. A prompt is a useful observation, but its cause must be interpreted using the actual state and requirements.</p>
+</details>
+<h2 id="9-does-every-page-request-need-saml">9. Does every page request need SAML?</h2>
+<p>Atlas has accepted Devi's SAML sign-in, selected her enabled account and created an application session. Its opaque session cookie lets Atlas associate applicable browser requests with that session. The session remains usable, and its rules allow Atlas to handle the next page request without another federation exchange.</p>
+<p>When Devi opens another Atlas page, should the browser submit the original SAML assertion again? Explain the different jobs of the SAML response and the Atlas cookie.</p>
+<details>
+<summary>Show explanation</summary>
+<p>The browser does not need to submit the original assertion again in this arrangement. It sends the applicable Atlas cookie with the page request, and Atlas uses its session rules to process that request.</p>
+<p>The SAML response participated in the exchange through which Atlas obtained identity and authentication information it could evaluate. The opaque cookie supports subsequent requests associated with the application session. It is not Devi's password or a copy of the assertion.</p>
+<p>Atlas still decides whether the requested page is permitted. A usable session provides continuing signed-in state; it does not remove resource authorization. The supplied session rules explain this particular request, so there is no reason to infer a new Okta exchange merely because another page opens.</p>
+</details>
+<h2 id="10-what-does-the-return-to-atlas-establish">10. What does the return to Atlas establish?</h2>
+<p>An employee opens Atlas from a bookmark. The browser reaches Okta, the employee completes an authentication interaction, and the browser submits a SAML response to Atlas. Atlas then displays “Unable to sign in.” No Atlas processing logs have been inspected.</p>
+<p>Two colleagues suggest different causes: one says the signing certificate is wrong; the other says no local account exists. Does the evidence establish either cause? What is the most useful next observation?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Neither cause is established. The facts show browser movement and an observed authentication interaction, followed by an unsuccessful Atlas outcome. They do not show whether Atlas accepted the SAML information, found a matching account or reached session creation.</p>
+<p>The useful next observation is Atlas's processing result for this attempt, associated with the relevant browser and Okta evidence. An acceptance rejection would direct attention to the failed response check. Accepted information followed by no account match would direct attention to the supplied identifier and account mapping. An entry-policy denial would identify a different boundary again.</p>
+<p>Use approved procedures when examining message and log evidence. A browser return establishes delivery to a boundary, not the receiver's internal result. Starting with that result narrows the investigation without choosing a cause prematurely.</p>
+</details>
+<h2 id="11-do-these-three-pieces-of-evidence-prove-the-same-thing">11. Do these three pieces of evidence prove the same thing?</h2>
+<p>For a fictional Okta-to-Atlas integration, an engineer has:</p>
+<ol>
+<li>An Okta assertion preview showing the expected employee identifier.</li>
+<li>A normalized Okta System Log record indicating successful authentication for the relevant employee and attempt.</li>
+<li>A browser observation showing that a response was submitted to Atlas's receiving endpoint.</li>
+</ol>
+<p>There is no Atlas processing or page-access evidence. Which observations are useful, and can the engineer conclude that Atlas accepted the response and granted projects access?</p>
+<details>
+<summary>Show explanation</summary>
+<p>All three observations are useful, but none supplies Atlas's missing result. The preview helps inspect output from the integration settings. The Okta record supplies evidence about an Okta-side event. The browser observation supplies evidence of delivery to Atlas. <a href="https://help.okta.com/oie/en-us/content/topics/apps/apps_app_integration_wizard_saml.htm">Okta assertion preview</a>, <a href="https://help.okta.com/oie/en-us/content/topics/reports/reports_syslog.htm">Okta System Log</a></p>
+<p>The preview is not a record of Atlas accepting this live attempt. Successful authentication in Okta is not Atlas's acceptance or permission decision. Submission to the receiving endpoint does not establish what Atlas did with the response.</p>
+<p>To conclude that projects access succeeded, obtain the relevant Atlas acceptance, account, session and resource outcome. The evidence may come from appropriate application records and the observed permitted page response. Reading a message also does not independently verify its cryptographic validity.</p>
+</details>
+<h2 id="12-which-mechanism-addresses-which-requirement">12. Which mechanism addresses which requirement?</h2>
+<p>A project has two requirements for an Okta-integrated application:</p>
+<ul>
+<li>Employees should authenticate through federation when entering the application.</li>
+<li>Application accounts and group memberships should be created, updated and disabled through a supported lifecycle integration.</li>
+</ul>
+<p>The vendor supports SAML 2.0 browser sign-in and SCIM lifecycle operations. A colleague proposes enabling SCIM and removing SAML because “both move identity information.” Explain why that reasoning does not meet the stated requirements.</p>
+<details>
+<summary>Show explanation</summary>
+<p>The requirements concern different jobs. SAML provides the selected federated sign-in mechanism. SCIM provides operations for managing identity resources such as users and groups.</p>
+<p>Enabling account lifecycle operations does not itself supply the browser authentication exchange required here. Equally, enabling SAML does not automatically create and maintain application accounts. The project can need both mechanisms, with their respective configuration and evidence of success.</p>
+<p>The shared presence of identity information does not make two protocols interchangeable. The same care applies to other names encountered in projects: OpenID Connect provides an identity layer using OAuth 2.0, while an OAuth access token alone should not be assumed to be a universally suitable sign-in assertion. Identify the requirement and the supported mechanism before treating a protocol label as a complete solution.</p>
+</details>
+<h2 id="13-does-jit-finish-the-lifecycle-design">13. Does JIT finish the lifecycle design?</h2>
+<p>A vendor documents that its application can create an account during a successful federated sign-in when just-in-time provisioning, or JIT, is configured. Northstar has enabled that supported behavior. No evidence has been supplied about later attribute updates, account disablement or existing-session termination.</p>
+<p>An engineer says, “The account can be created at sign-in, so we have finished the joiner, mover and leaver design.” Is that conclusion justified? Name the missing decisions.</p>
+<details>
+<summary>Show explanation</summary>
+<p>The supplied JIT capability addresses account creation under configured sign-in rules. It does not establish how every later lifecycle event is handled.</p>
+<p>The project still needs to determine how account information and access change when a person's responsibilities change, how the downstream account or access is disabled when required, and what happens to existing application sessions. It also needs to know which system or team owns those actions and what evidence confirms completion.</p>
+<p>Do not infer these answers from the word JIT. The application may offer additional lifecycle features, but none has been established in this scenario. A documented creation path is useful; the remaining decisions still need documented behavior and an integration plan.</p>
+</details>
+<h2 id="14-is-removing-okta-access-enough-to-explain-every-session">14. Is removing Okta access enough to explain every session?</h2>
+<p>Devi has an existing Atlas application session. Northstar later deactivates her Okta account. The investigator has not inspected Atlas's lifecycle integration, logout arrangements or session policy, and has no later Atlas observations.</p>
+<p>Can the investigator conclude that Devi's Atlas account was disabled and her existing Atlas session ended immediately? What should the investigation distinguish?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Those downstream conclusions do not follow from the supplied information. The investigator needs evidence about Atlas's account and session behavior in this arrangement.</p>
+<p>Distinguish the ability to complete a new authentication through Okta, the downstream account's lifecycle state, and the usability of an already-created Atlas session. These are connected concerns, but observing an action in one system does not establish every result in another.</p>
+<p>Inspect the configured lifecycle actions and their actual results, together with supported logout or session-termination behavior and relevant Atlas observations. The scenario does not prove that the Atlas session survived either. It establishes that its result is still unknown, which is the reason to investigate rather than promise an immediate global outcome.</p>
+</details>
+<h2 id="15-explain-the-integration-to-a-new-teammate">15. Explain the integration to a new teammate</h2>
+<p>Northstar wants to connect a new web application to Okta Identity Engine using SAML 2.0. The application documentation says “SAML supported,” but the project has not yet agreed its message locations, identity mapping, account lifecycle or permission model.</p>
+<p>Give a short explanation of how the browser, Okta and the application will cooperate. Then identify the questions that must be answered before the team can claim that employees have working, appropriate access. Avoid treating the phrase “SAML supported” as proof of a completed integration.</p>
+<details>
+<summary>Show explanation</summary>
+<p>A useful explanation is: “In the selected browser sign-in, the application asks Okta for authentication through the browser. Okta supplies a response through the browser after its requirements are satisfied. The application checks that information, connects the accepted identity to an appropriate account, establishes its own session when entry is allowed, and checks permission for the requested resource.”</p>
+<p>The team then needs compatible SAML behavior and message locations, approved issuer and verification information, and an agreed identity value and account-matching rule. It must establish who has access to the Okta integration, how downstream accounts become and remain ready, and which application permissions those accounts receive. Session and termination expectations also need an owner and supported behavior.</p>
+<p>Evidence should cover the application outcome as well as the Okta and browser stages. A successful permitted-resource test establishes more than a preview or an authentication event alone. Relevant denial cases help confirm that the application also enforces its intended boundaries.</p>
+<p>The aim is to explain a complete working relationship. Recognizing a protocol name is the beginning of that conversation.</p>
+</details>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, assertions and responses: §§2.3 and 3.3.3</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, browser SSO: §4.1</a></li>
+<li><a href="https://pages.nist.gov/800-63-4/sp800-63c.html">NIST federation guidance, federation model and session management</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc6265.html">HTTP cookies: RFC 6265, §§3–5</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML settings, including application username and ACS configuration</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/about-policies.htm">Okta Identity Engine policies</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/provisioning/lcm/lcm-deploy-cloud.htm">Okta provisioning and assignment workflow</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/apps_app_integration_wizard_saml.htm">Okta SAML integration guidance and assertion preview</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/reports/reports_syslog.htm">Okta System Log</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc7644.html">SCIM protocol: RFC 7644, §§1 and 3</a></li>
+<li><a href="https://openid.net/specs/openid-connect-core-1_0.html">OpenID Connect Core, §1</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc6749.html">OAuth 2.0: RFC 6749, §1</a></li>
+</ul>
+</article><nav class="page-navigation" aria-label="Lesson sequence"><span></span><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><small>Next lesson →</small>Planning and metadata</a></nav></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#1-what-responsibility-moves-to-okta">1. What responsibility moves to Okta?</a></li><li><a href="#2-reconstruct-the-browser-sign-in">2. Reconstruct the browser sign-in</a></li><li><a href="#3-delivery-local-processing-or-trust">3. Delivery, local processing or trust?</a></li><li><a href="#4-does-the-browser-become-the-authority">4. Does the browser become the authority?</a></li><li><a href="#5-which-identity-value-selects-the-account">5. Which identity value selects the account?</a></li><li><a href="#6-what-does-an-okta-assignment-prove">6. What does an Okta assignment prove?</a></li><li><a href="#7-explain-three-different-atlas-outcomes">7. Explain three different Atlas outcomes</a></li><li><a href="#8-why-can-a-second-application-ask-again">8. Why can a second application ask again?</a></li><li><a href="#9-does-every-page-request-need-saml">9. Does every page request need SAML?</a></li><li><a href="#10-what-does-the-return-to-atlas-establish">10. What does the return to Atlas establish?</a></li><li><a href="#11-do-these-three-pieces-of-evidence-prove-the-same-thing">11. Do these three pieces of evidence prove the same thing?</a></li><li><a href="#12-which-mechanism-addresses-which-requirement">12. Which mechanism addresses which requirement?</a></li><li><a href="#13-does-jit-finish-the-lifecycle-design">13. Does JIT finish the lifecycle design?</a></li><li><a href="#14-is-removing-okta-access-enough-to-explain-every-session">14. Is removing Okta access enough to explain every session?</a></li><li><a href="#15-explain-the-integration-to-a-new-teammate">15. Explain the integration to a new teammate</a></li><li><a href="#sources">Sources</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

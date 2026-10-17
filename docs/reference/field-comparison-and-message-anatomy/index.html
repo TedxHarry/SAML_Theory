@@ -1,0 +1,490 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Find the right XML location and interpret its meaning."><meta name="color-scheme" content="light"><title>Fields and message anatomy | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/reference/field-comparison-and-message-anatomy/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/" aria-current="page">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><div class="eyebrow">Reference library</div><article class="prose"><h1 id="saml-with-okta-field-comparison-and-message-anatomy">SAML with Okta: field comparison and message anatomy</h1>
+<p>Atlas asks Okta for authentication information, but several values in the resulting documents can look alike while doing different jobs. The participant's entity ID, the receiving URL, the request ID and the user's identifier are four separate kinds of information.</p>
+<p>This reference follows the fictional Atlas exchange: request <code>_req_D03_01</code>, response <code>_resp_D03_01</code>, assertion <code>_assert_D03_01</code>, and employee identifier <code>E1042</code>, which maps to Atlas account <code>atlas-4821</code>. All example addresses and records are fictional. Obtain real Okta issuer, endpoint and certificate values from the identified integration's approved setup information.</p>
+<h2 id="find-the-structure-you-need">Find the structure you need</h2>
+<ul>
+<li><a href="#read-the-path-notation">Read the path notation</a></li>
+<li><a href="#distinguish-the-documents">Distinguish the documents</a></li>
+<li><a href="#read-the-authentication-request">Read the authentication request</a></li>
+<li><a href="#read-the-response-and-assertion">Read the response and assertion</a></li>
+<li><a href="#compare-the-fields-that-look-alike">Compare the fields that look alike</a></li>
+<li><a href="#connect-protocol-meaning-to-okta-settings">Connect protocol meaning to Okta settings</a></li>
+<li><a href="#keep-protection-and-acceptance-separate">Keep protection and acceptance separate</a></li>
+</ul>
+<h2 id="read-the-path-notation">Read the path notation</h2>
+<p><code>Response/Assertion/Subject/NameID</code> means follow those nested elements from outside inward. <code>Response@InResponseTo</code> means the InResponseTo XML attribute on Response. In <code>Conditions/AudienceRestriction/Audience</code>, the audience value is element content, rather than an XML attribute.</p>
+<p>Paths below omit namespace prefixes for readability. In the XML, <code>samlp</code> is bound to the protocol namespace and <code>saml</code> to the assertion namespace. The namespace identifies the vocabulary; these prefix letters are local labels.</p>
+<p>An XML attribute such as Recipient is different from a SAML user attribute such as department. Always identify the element owning a value before deciding what the value means.</p>
+<h2 id="distinguish-the-documents">Distinguish the documents</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Structure</th>
+<th>Main purpose</th>
+<th>What its presence does not establish</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Metadata</td>
+<td>Describe participants, roles, endpoints, keys and capabilities or expectations.</td>
+<td>That a user authenticated, a receiver adopted the document or a runtime message was accepted.</td>
+</tr>
+<tr>
+<td>AuthnRequest</td>
+<td>Ask the IdP to perform the authentication exchange under applicable requirements.</td>
+<td>That authentication happened or every requested value was approved.</td>
+</tr>
+<tr>
+<td>Response</td>
+<td>Report the protocol result and carry applicable assertions.</td>
+<td>That the SP verified the message, found an account or granted a resource.</td>
+</tr>
+<tr>
+<td>Assertion</td>
+<td>Supply statements about the subject, with restrictions on their use.</td>
+<td>That every readable field is trusted or suitable for the current attempt.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Metadata advertises configuration information. A message shows what was supplied in an attempt. Receiver diagnostics establish the decisions actually recorded. Keep declared, configured, observed and enforced facts distinct.</p>
+<h2 id="read-the-authentication-request">Read the authentication request</h2>
+<p>Atlas creates this request before Devi has an Atlas session. It retains protected pending context, including the expected provider, browser association and approved return target. The selected journey delivers the request through Redirect and asks for a POST response.</p>
+<p>This is the same <strong>reading copy</strong> used in Lesson 3. The actual Okta Destination and request-protection material are omitted. It is not a complete deployment example or evidence of successful request verification. The response address and issuer belong to Atlas; neither is the Okta request-receiving endpoint.</p>
+<pre><code class="language-xml">&lt;samlp:AuthnRequest
+    xmlns:samlp=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;
+    xmlns:saml=&quot;urn:oasis:names:tc:SAML:2.0:assertion&quot;
+    ID=&quot;_req_D03_01&quot;
+    Version=&quot;2.0&quot;
+    IssueInstant=&quot;2026-10-16T15:00:00Z&quot;
+    AssertionConsumerServiceURL=&quot;https://atlas.northstar.example/saml/acs&quot;
+    ProtocolBinding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&quot;
+    ForceAuthn=&quot;false&quot;
+    IsPassive=&quot;false&quot;&gt;
+  &lt;saml:Issuer&gt;https://atlas.northstar.example/saml&lt;/saml:Issuer&gt;
+  &lt;samlp:NameIDPolicy
+      Format=&quot;urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified&quot;
+      AllowCreate=&quot;true&quot; /&gt;
+&lt;/samlp:AuthnRequest&gt;
+</code></pre>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Request location</th>
+<th>Meaning in this example</th>
+<th>Important distinction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AuthnRequest@ID</code></td>
+<td><code>_req_D03_01</code> identifies this request.</td>
+<td>It is not Atlas's entity ID or Devi's user identifier.</td>
+</tr>
+<tr>
+<td><code>AuthnRequest/Issuer</code></td>
+<td>Atlas's SP entity ID.</td>
+<td>The returning assertion identifies the provider as its issuer.</td>
+</tr>
+<tr>
+<td><code>AuthnRequest@IssueInstant</code></td>
+<td>Request creation at 15:00:00 UTC.</td>
+<td>Not an authentication result or a universal timeout.</td>
+</tr>
+<tr>
+<td><code>AuthnRequest@AssertionConsumerServiceURL</code></td>
+<td>Requested response location: Atlas ACS.</td>
+<td>The IdP must establish an approved association, rather than accept any supplied URL automatically.</td>
+</tr>
+<tr>
+<td><code>AuthnRequest@ProtocolBinding</code></td>
+<td>Requests the response through HTTP-POST.</td>
+<td>Does not describe this request's Redirect delivery.</td>
+</tr>
+<tr>
+<td><code>AuthnRequest/NameIDPolicy@Format</code></td>
+<td>Requested identifier format.</td>
+<td>Unspecified does not itself choose an employee number.</td>
+</tr>
+<tr>
+<td><code>AuthnRequest/NameIDPolicy@AllowCreate</code></td>
+<td>Identifier-related creation/association permission at the IdP.</td>
+<td>Does not enable Atlas JIT or establish that an account was created.</td>
+</tr>
+<tr>
+<td><code>AuthnRequest@ForceAuthn</code></td>
+<td>False in this copy: no forced-freshness request from this flag.</td>
+<td>Policy may still require fresh authentication.</td>
+</tr>
+<tr>
+<td><code>AuthnRequest@IsPassive</code></td>
+<td>False in this copy: passive-only processing is not requested.</td>
+<td>This does not force a visible prompt.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="related-request-choices">Related request choices</h3>
+<p><code>Destination</code>, where present and required by the selected arrangement, identifies the intended request-receiving endpoint at the IdP. It does not identify the ACS to which the response should return.</p>
+<p><code>AssertionConsumerServiceIndex</code> is an alternative way to select an ACS through approved configuration. It is mutually exclusive with <code>AssertionConsumerServiceURL</code> and <code>ProtocolBinding</code>. An index has no universal URL meaning. <code>AttributeConsumingServiceIndex</code> instead selects information about requested attributes; it does not select the ACS.</p>
+<p><code>RequestedAuthnContext</code>, when included, expresses authentication-context requirements. It is separate from the reported AuthnContext in the response. A requested class or ForceAuthn flag does not establish which authentication actually occurred. Okta's applicable configuration and the returned evidence still matter. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §3.4.1</a></p>
+<p>RelayState is not shown inside the XML because it is a separate binding-level value. In this example, <code>rs_D03_01</code> refers to protected local context and an approved navigation target. It does not replace the required request-correlation checks.</p>
+<h2 id="read-the-response-and-assertion">Read the response and assertion</h2>
+<h3 id="start-with-the-envelope">Start with the envelope</h3>
+<p><strong>Figure RF-M1: Response envelope.</strong> Arrows mean containment, not traffic, trust or execution order. The response has its own attributes, an issuer and a reported result. The assertion inside it is a separate object.</p>
+<!-- mermaid:id=RF-M1 -->
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/RF-M1.svg" alt="RF-M1: Response envelope" width="896" height="222" loading="lazy"><figcaption><span>RF-M1</span><a href="/SAML_Theory/assets/diagrams/RF-M1.svg" data-diagram="RF-M1: Response envelope">Open full diagram</a></figcaption></figure><p>Read the reply's issuer and status, then identify the assertion the implementation is permitted to use. A successful status is the provider's reported protocol result. Non-success responses need their appropriate failure handling; they do not justify searching for any convenient identifier to sign in.</p>
+<p>This compact view shows one assertion for the chosen example. SAML can carry different supported structures, including multiple or encrypted assertions. A generic search for the first NameID does not establish that the selected identity is protected and appropriate.</p>
+<h3 id="expand-the-assertion">Expand the assertion</h3>
+<p><strong>Figure RF-M2: Inside the assertion.</strong> This expands the Assertion box in RF-M1. Arrows still mean containment. Subject leads to the identifier and confirmation data; Conditions, authentication information and user attributes remain separate branches.</p>
+<!-- mermaid:id=RF-M2 -->
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/RF-M2.svg" alt="RF-M2: Inside the assertion" width="1011" height="454" loading="lazy"><figcaption><span>RF-M2</span><a href="/SAML_Theory/assets/diagrams/RF-M2.svg" data-diagram="RF-M2: Inside the assertion">Open full diagram</a></figcaption></figure><p>NameID identifies the subject under its agreed format and scope. SubjectConfirmationData constrains presentation of the selected confirmation. Conditions restrict use of the assertion. AuthnStatement reports authentication information; AttributeStatement supplies additional subject data. These branches answer different questions even when some values happen to match.</p>
+<h3 id="locate-those-branches-in-xml">Locate those branches in XML</h3>
+<p>The following is the same fictional reading copy as Lesson 4. <strong>The assertion signature is omitted</strong>, so this copy fails Atlas's signed-assertion requirement and is not a message to submit to an application. <code>urn:example:northstar:okta-idp</code> is a conspicuous issuer placeholder, not a real Okta issuer pattern. Schema validity would not make this a cryptographically valid or accepted response.</p>
+<pre><code class="language-xml">&lt;samlp:Response
+    xmlns:samlp=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;
+    xmlns:saml=&quot;urn:oasis:names:tc:SAML:2.0:assertion&quot;
+    ID=&quot;_resp_D03_01&quot;
+    Version=&quot;2.0&quot;
+    IssueInstant=&quot;2026-10-16T15:00:20Z&quot;
+    Destination=&quot;https://atlas.northstar.example/saml/acs&quot;
+    InResponseTo=&quot;_req_D03_01&quot;&gt;
+  &lt;saml:Issuer&gt;urn:example:northstar:okta-idp&lt;/saml:Issuer&gt;
+  &lt;samlp:Status&gt;
+    &lt;samlp:StatusCode Value=&quot;urn:oasis:names:tc:SAML:2.0:status:Success&quot; /&gt;
+  &lt;/samlp:Status&gt;
+  &lt;saml:Assertion
+      ID=&quot;_assert_D03_01&quot;
+      Version=&quot;2.0&quot;
+      IssueInstant=&quot;2026-10-16T15:00:20Z&quot;&gt;
+    &lt;saml:Issuer&gt;urn:example:northstar:okta-idp&lt;/saml:Issuer&gt;
+    &lt;saml:Subject&gt;
+      &lt;saml:NameID Format=&quot;urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified&quot;&gt;E1042&lt;/saml:NameID&gt;
+      &lt;saml:SubjectConfirmation Method=&quot;urn:oasis:names:tc:SAML:2.0:cm:bearer&quot;&gt;
+        &lt;saml:SubjectConfirmationData
+            Recipient=&quot;https://atlas.northstar.example/saml/acs&quot;
+            InResponseTo=&quot;_req_D03_01&quot;
+            NotOnOrAfter=&quot;2026-10-16T15:02:00Z&quot; /&gt;
+      &lt;/saml:SubjectConfirmation&gt;
+    &lt;/saml:Subject&gt;
+    &lt;saml:Conditions
+        NotBefore=&quot;2026-10-16T14:59:50Z&quot;
+        NotOnOrAfter=&quot;2026-10-16T15:05:00Z&quot;&gt;
+      &lt;saml:AudienceRestriction&gt;
+        &lt;saml:Audience&gt;https://atlas.northstar.example/saml&lt;/saml:Audience&gt;
+      &lt;/saml:AudienceRestriction&gt;
+    &lt;/saml:Conditions&gt;
+    &lt;saml:AuthnStatement
+        AuthnInstant=&quot;2026-10-16T15:00:15Z&quot;
+        SessionIndex=&quot;_session_D04_01&quot;&gt;
+      &lt;saml:AuthnContext&gt;
+        &lt;saml:AuthnContextClassRef&gt;urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport&lt;/saml:AuthnContextClassRef&gt;
+      &lt;/saml:AuthnContext&gt;
+    &lt;/saml:AuthnStatement&gt;
+    &lt;saml:AttributeStatement&gt;
+      &lt;saml:Attribute Name=&quot;department&quot;
+          NameFormat=&quot;urn:oasis:names:tc:SAML:2.0:attrname-format:basic&quot;&gt;
+        &lt;saml:AttributeValue&gt;Research&lt;/saml:AttributeValue&gt;
+      &lt;/saml:Attribute&gt;
+      &lt;saml:Attribute Name=&quot;groups&quot;
+          NameFormat=&quot;urn:oasis:names:tc:SAML:2.0:attrname-format:basic&quot;&gt;
+        &lt;saml:AttributeValue&gt;Atlas-Readers&lt;/saml:AttributeValue&gt;
+        &lt;saml:AttributeValue&gt;Research-Staff&lt;/saml:AttributeValue&gt;
+      &lt;/saml:Attribute&gt;
+    &lt;/saml:AttributeStatement&gt;
+  &lt;/saml:Assertion&gt;
+&lt;/samlp:Response&gt;
+</code></pre>
+<p>The response answers <code>_req_D03_01</code>; its own ID is <code>_resp_D03_01</code>. The assertion's ID is <code>_assert_D03_01</code>, and its subject value is <code>E1042</code>. Their different names reflect different roles rather than values to make identical.</p>
+<p>Both Issuer elements name the same conceptual provider in this direct example. That visible equality is not an authentication mechanism and is not a rule that every federation topology must have identical issuers at every layer. Required trust and protection apply to the actual content relied on.</p>
+<h2 id="compare-the-fields-that-look-alike">Compare the fields that look alike</h2>
+<h3 id="message-participant-subject-and-local-session-identifiers">Message, participant, subject and local-session identifiers</h3>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Value and location</th>
+<th>Identifies</th>
+<th>Example or source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AuthnRequest@ID</code></td>
+<td>A particular authentication request.</td>
+<td><code>_req_D03_01</code></td>
+</tr>
+<tr>
+<td><code>Response@ID</code></td>
+<td>A particular protocol reply.</td>
+<td><code>_resp_D03_01</code></td>
+</tr>
+<tr>
+<td><code>Assertion@ID</code></td>
+<td>A particular assertion.</td>
+<td><code>_assert_D03_01</code></td>
+</tr>
+<tr>
+<td><code>AuthnRequest/Issuer</code></td>
+<td>Requesting SP entity.</td>
+<td><code>https://atlas.northstar.example/saml</code></td>
+</tr>
+<tr>
+<td><code>Response/Issuer</code></td>
+<td>Claimed reply issuer.</td>
+<td>Approved provider information; placeholder in the reading copy.</td>
+</tr>
+<tr>
+<td><code>Assertion/Issuer</code></td>
+<td>Authority making the assertion's statements.</td>
+<td>Approved provider information; placeholder in the reading copy.</td>
+</tr>
+<tr>
+<td><code>Assertion/Subject/NameID</code></td>
+<td>Subject under the agreed identifier relationship.</td>
+<td>Employee value <code>E1042</code> in this example.</td>
+</tr>
+<tr>
+<td><code>Assertion/AuthnStatement@SessionIndex</code></td>
+<td>Issuer-provided authentication-session reference.</td>
+<td><code>_session_D04_01</code></td>
+</tr>
+<tr>
+<td>Atlas internal account ID</td>
+<td>Atlas's account record selected after acceptance.</td>
+<td><code>atlas-4821</code>; not a field in this assertion.</td>
+</tr>
+<tr>
+<td>Atlas session cookie</td>
+<td>Browser information for Atlas's local session implementation.</td>
+<td>Issued separately by Atlas; not the SAML SessionIndex or assertion.</td>
+</tr>
+</tbody>
+</table></div>
+<p>An identical NameID string from two approved issuers need not identify the same person. Atlas's lookup uses the approved identity relationship and employee identifier, not a global bare-string assumption.</p>
+<h3 id="targeting-correlation-and-navigation">Targeting, correlation and navigation</h3>
+<p>The following assertion paths are relative to the selected Assertion, while the response path begins at Response.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Question answered</th>
+<th>Example value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Response@Destination</code></td>
+<td>Where is this reply addressed?</td>
+<td><code>https://atlas.northstar.example/saml/acs</code></td>
+</tr>
+<tr>
+<td><code>Subject/SubjectConfirmation/SubjectConfirmationData@Recipient</code></td>
+<td>Where may this bearer confirmation be presented?</td>
+<td>The same Atlas ACS in this example.</td>
+</tr>
+<tr>
+<td><code>Conditions/AudienceRestriction/Audience</code></td>
+<td>Which relying party is an intended audience?</td>
+<td><code>https://atlas.northstar.example/saml</code></td>
+</tr>
+<tr>
+<td><code>Response@InResponseTo</code></td>
+<td>Which authentication request does this reply answer?</td>
+<td><code>_req_D03_01</code></td>
+</tr>
+<tr>
+<td><code>Subject/SubjectConfirmation/SubjectConfirmationData@InResponseTo</code></td>
+<td>Which request does this requested bearer presentation answer?</td>
+<td><code>_req_D03_01</code></td>
+</tr>
+<tr>
+<td>RelayState, outside XML</td>
+<td>Which agreed state value accompanies this binding exchange?</td>
+<td><code>rs_D03_01</code>, used here as a protected lookup.</td>
+</tr>
+<tr>
+<td>Approved local return target</td>
+<td>Where should Atlas direct the browser after successful processing?</td>
+<td><code>/projects</code>; permission is checked separately.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Correct arrival does not establish a correct audience or recipient. Matching RelayState does not excuse a wrong InResponseTo. A signature result does not remove any applicable target or request-association check.</p>
+<p>For a genuinely unsolicited response, there is no initiating SP request to name: Response and bearer-confirmation InResponseTo are absent under the applicable browser SSO rules. This is a separate supported path, rather than an excuse to accept any unmatched requested response. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, §§4.1.4–4.1.5</a></p>
+<h3 id="issuance-authentication-presentation-and-continuing-sessions">Issuance, authentication, presentation and continuing sessions</h3>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Meaning</th>
+<th>Reading-copy value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Response@IssueInstant</code></td>
+<td>When the reply was issued.</td>
+<td>15:00:20 UTC</td>
+</tr>
+<tr>
+<td><code>Assertion@IssueInstant</code></td>
+<td>When the assertion was issued.</td>
+<td>15:00:20 UTC</td>
+</tr>
+<tr>
+<td><code>Assertion/AuthnStatement@AuthnInstant</code></td>
+<td>Reported authentication time.</td>
+<td>15:00:15 UTC</td>
+</tr>
+<tr>
+<td><code>Assertion/Conditions@NotBefore</code></td>
+<td>Inclusive start of this assertion-use interval.</td>
+<td>14:59:50 UTC</td>
+</tr>
+<tr>
+<td><code>Assertion/Conditions@NotOnOrAfter</code></td>
+<td>Exclusive end of that interval.</td>
+<td>15:05:00 UTC</td>
+</tr>
+<tr>
+<td><code>Assertion/Subject/SubjectConfirmation/SubjectConfirmationData@NotOnOrAfter</code></td>
+<td>Exclusive bearer-presentation deadline.</td>
+<td>15:02:00 UTC</td>
+</tr>
+<tr>
+<td><code>Assertion/AuthnStatement@SessionNotOnOrAfter</code>, when supplied</td>
+<td>Upper bound for derived sessions under applicable processing.</td>
+<td>Not present in this copy.</td>
+</tr>
+</tbody>
+</table></div>
+<p>All displayed times are on 16 October 2026. With zero clock tolerance, an arrival at 15:00:21 passes these illustrated time limits. At 15:02:00 exactly, the bearer deadline has been reached. At 15:03:00, Conditions is still open but the bearer presentation is too late. Neither timely arrival nor a recent IssueInstant establishes every other acceptance requirement.</p>
+<p>The bearer confirmation has no NotBefore in this copy; the selected browser bearer rules prohibit that attribute there. Do not move the Conditions start into confirmation data to make the structures look alike. A session created after acceptance has separate local policy and any applicable supplied bound, rather than an automatically inherited five-minute lifetime. <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E79</a></p>
+<p>Metadata <code>validUntil</code> and <code>cacheDuration</code> concern another object again: configuration validity and refresh. They do not set the assertion or application-session lifetime. Cache staleness is distinct from expiry under validUntil. <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E94</a></p>
+<h3 id="identifier-formats-and-attribute-values">Identifier formats and attribute values</h3>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Meaning</th>
+<th>What to check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Subject/NameID@Format</code></td>
+<td>Identifier semantics.</td>
+<td>Unspecified here requires the agreed employee-key interpretation; it does not choose the source value.</td>
+</tr>
+<tr>
+<td><code>Subject/NameID@NameQualifier</code> or <code>@SPNameQualifier</code>, where applicable</td>
+<td>Further naming scope under the format's rules.</td>
+<td>Neither is supplied here. Do not invent or discard scope to force a match.</td>
+</tr>
+<tr>
+<td><code>AttributeStatement/Attribute@Name</code></td>
+<td>Technical attribute identifier.</td>
+<td><code>department</code> or <code>groups</code> in this example.</td>
+</tr>
+<tr>
+<td><code>AttributeStatement/Attribute@NameFormat</code></td>
+<td>Convention used for the attribute name.</td>
+<td>Basic name format here; not a declaration of the value's data type.</td>
+</tr>
+<tr>
+<td><code>AttributeStatement/Attribute@FriendlyName</code>, when supplied</td>
+<td>Human-readable label.</td>
+<td>Not present here; it does not replace the agreed technical name.</td>
+</tr>
+<tr>
+<td><code>AttributeStatement/Attribute/AttributeValue</code></td>
+<td>One supplied value.</td>
+<td>Department has <code>Research</code>; groups has two separate values.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The two group values are <code>Atlas-Readers</code> and <code>Research-Staff</code>. One comma-joined string is not automatically equivalent to those two XML values. Atlas must interpret the names and values under its contract; the standard does not turn either group into a universal role.</p>
+<p>Source data, configured output and received content are separate evidence. After SAML acceptance, Atlas still needs usable application data, the intended unique account match, permitted entry and the requested resource permission.</p>
+<h2 id="connect-protocol-meaning-to-okta-settings">Connect protocol meaning to Okta settings</h2>
+<p>These labels concern the outbound Okta-to-Atlas SAML app integration. Inbound external-IdP settings belong to a different relationship, with Okta as receiving SP.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Okta setting or supplied information</th>
+<th>Protocol relationship</th>
+<th>Verify with the application</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single sign-on URL</td>
+<td>Default application ACS.</td>
+<td>Correct environment and supported response delivery.</td>
+</tr>
+<tr>
+<td>Audience URI (SP Entity ID)</td>
+<td>Intended assertion audience.</td>
+<td>Exact expected Atlas entity ID.</td>
+</tr>
+<tr>
+<td>Recipient URL and Destination URL, where separately configured</td>
+<td>Related receiving locations with distinct roles.</td>
+<td>The documented values; do not assume every deployment requires one shared string.</td>
+</tr>
+<tr>
+<td>Provider SSO endpoint from setup information</td>
+<td>Destination for the application's authentication request.</td>
+<td>Use the identified integration's approved value, not Atlas's ACS.</td>
+</tr>
+<tr>
+<td>Provider issuer from setup information</td>
+<td>Identity of the expected issuer.</td>
+<td>Approved trust for the correct relationship.</td>
+</tr>
+<tr>
+<td>Name ID format</td>
+<td>Identifier semantics.</td>
+<td>Required format and scope.</td>
+</tr>
+<tr>
+<td>Application username</td>
+<td>App-specific identity value used by the configured output.</td>
+<td>Source authority, emitted NameID and intended account match.</td>
+</tr>
+<tr>
+<td>Authentication context class</td>
+<td>Configuration concerning reported authentication context.</td>
+<td>Actual request requirements and observed authentication evidence.</td>
+</tr>
+<tr>
+<td>Honor Force Authentication</td>
+<td>Product handling of incoming ForceAuthn.</td>
+<td>Effective setting and actual freshness result, not the flag alone.</td>
+</tr>
+<tr>
+<td>Response and Assertion Signature</td>
+<td>Separate signed-layer choices.</td>
+<td>Required scope and complete receiver verification.</td>
+</tr>
+<tr>
+<td>Assertion Encryption and Encryption Certificate</td>
+<td>Encrypted assertion output and Atlas recipient public material.</td>
+<td>Corresponding Atlas decryption capability and required protection.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The settings describe configuration, not verified outcomes. For example, selecting assertion signing does not establish successful runtime reference and signature validation at Atlas. Generating an assertion preview does not prove the receiver accepted a live submission. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference</a></p>
+<h2 id="keep-protection-and-acceptance-separate">Keep protection and acceptance separate</h2>
+<p>In Atlas's required assertion-signing arrangement, the receiver must verify the actual intended assertion under approved trust and use that same protected object for identity and restriction decisions. The missing signature in the reading copy is a deliberate limitation, not an exception to that requirement.</p>
+<p>A signature on the assertion does not automatically cover the outer response's fields or a separate RelayState parameter. A response signature has its own reference scope. Encryption can replace the readable assertion with EncryptedAssertion; authorized recovery exposes the inner content for required processing rather than proving the sender or granting access. Secure processing dependencies depend on the actual layers and supported construction.</p>
+<p>The practical reading order is to identify the document, locate the owning element, understand the value's role and compare the relevant requirement and receiver evidence. That is a reading method, not a universal cryptographic execution algorithm.</p>
+<p>For the connected explanations, see <a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/">planning and metadata</a>, <a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/">the requested exchange</a>, <a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/">responses and identity</a>, <a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/">trust and protection</a> and <a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/">response acceptance</a>. Short definitions are in the <a href="/SAML_Theory/reference/glossary/">glossary</a>.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, AuthnRequest, responses, subjects, conditions and statements</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, browser SSO processing: §4.1, as amended</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf">SAML Metadata, entity and service descriptions</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, identifier, session, protection and metadata clarifications</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/apps_app_integration_wizard_saml.htm">Okta assertion preview guidance</a></li>
+</ul>
+</article></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#find-the-structure-you-need">Find the structure you need</a></li><li><a href="#read-the-path-notation">Read the path notation</a></li><li><a href="#distinguish-the-documents">Distinguish the documents</a></li><li><a href="#read-the-authentication-request">Read the authentication request</a></li><li><a href="#read-the-response-and-assertion">Read the response and assertion</a></li><li><a href="#compare-the-fields-that-look-alike">Compare the fields that look alike</a></li><li><a href="#connect-protocol-meaning-to-okta-settings">Connect protocol meaning to Okta settings</a></li><li><a href="#keep-protection-and-acceptance-separate">Keep protection and acceptance separate</a></li><li><a href="#sources">Sources</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

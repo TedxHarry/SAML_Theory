@@ -1,0 +1,253 @@
+{
+  "base": "/SAML_Theory/",
+  "documents": [
+    {
+      "source": "lessons/lesson-01-why-saml-exists.md",
+      "route": "lessons/lesson-01-why-saml-exists/",
+      "title": "Why SAML exists",
+      "description": "Understand authentication, accounts, access and the browser journey.",
+      "kind": "Lesson",
+      "number": 1
+    },
+    {
+      "source": "question-bank/lesson-01.md",
+      "route": "questions/lesson-01/",
+      "title": "Why SAML exists: questions",
+      "description": "Practice Lesson 1 with independent scenarios and expandable explanations.",
+      "kind": "Questions",
+      "number": 1,
+      "questions": 15
+    },
+    {
+      "source": "lessons/lesson-02-planning-and-metadata.md",
+      "route": "lessons/lesson-02-planning-and-metadata/",
+      "title": "Planning and metadata",
+      "description": "Read the agreement, endpoints, entity IDs and trusted configuration.",
+      "kind": "Lesson",
+      "number": 2
+    },
+    {
+      "source": "question-bank/lesson-02.md",
+      "route": "questions/lesson-02/",
+      "title": "Planning and metadata: questions",
+      "description": "Practice Lesson 2 with independent scenarios and expandable explanations.",
+      "kind": "Questions",
+      "number": 2,
+      "questions": 15
+    },
+    {
+      "source": "lessons/lesson-03-sp-initiated-sso.md",
+      "route": "lessons/lesson-03-sp-initiated-sso/",
+      "title": "SP-initiated sign-in",
+      "description": "Follow requests, responses and the context that connects them.",
+      "kind": "Lesson",
+      "number": 3
+    },
+    {
+      "source": "question-bank/lesson-03.md",
+      "route": "questions/lesson-03/",
+      "title": "SP-initiated sign-in: questions",
+      "description": "Practice Lesson 3 with independent scenarios and expandable explanations.",
+      "kind": "Questions",
+      "number": 3,
+      "questions": 16
+    },
+    {
+      "source": "lessons/lesson-04-responses-assertions-and-identity.md",
+      "route": "lessons/lesson-04-responses-assertions-and-identity/",
+      "title": "Responses and identity",
+      "description": "Read assertions, identifiers, attributes and account matching.",
+      "kind": "Lesson",
+      "number": 4
+    },
+    {
+      "source": "question-bank/lesson-04.md",
+      "route": "questions/lesson-04/",
+      "title": "Responses and identity: questions",
+      "description": "Practice Lesson 4 with independent scenarios and expandable explanations.",
+      "kind": "Questions",
+      "number": 4,
+      "questions": 16
+    },
+    {
+      "source": "lessons/lesson-05-bindings-relaystate-and-alternative-paths.md",
+      "route": "lessons/lesson-05-bindings-relaystate-and-alternative-paths/",
+      "title": "Bindings and alternative paths",
+      "description": "Compare browser delivery, RelayState, artifacts and brokered sign-in.",
+      "kind": "Lesson",
+      "number": 5
+    },
+    {
+      "source": "question-bank/lesson-05.md",
+      "route": "questions/lesson-05/",
+      "title": "Bindings and alternative paths: questions",
+      "description": "Practice Lesson 5 with independent scenarios and expandable explanations.",
+      "kind": "Questions",
+      "number": 5,
+      "questions": 16
+    },
+    {
+      "source": "lessons/lesson-06-trust-signatures-and-encryption.md",
+      "route": "lessons/lesson-06-trust-signatures-and-encryption/",
+      "title": "Trust and protection",
+      "description": "Connect signatures and encryption to trusted keys and actual content.",
+      "kind": "Lesson",
+      "number": 6
+    },
+    {
+      "source": "question-bank/lesson-06.md",
+      "route": "questions/lesson-06/",
+      "title": "Trust and protection: questions",
+      "description": "Practice Lesson 6 with independent scenarios and expandable explanations.",
+      "kind": "Questions",
+      "number": 6,
+      "questions": 16
+    },
+    {
+      "source": "lessons/lesson-07-response-acceptance-and-access.md",
+      "route": "lessons/lesson-07-response-acceptance-and-access/",
+      "title": "Response acceptance",
+      "description": "Explain each acceptance boundary and the application decisions after it.",
+      "kind": "Lesson",
+      "number": 7
+    },
+    {
+      "source": "question-bank/lesson-07.md",
+      "route": "questions/lesson-07/",
+      "title": "Response acceptance: questions",
+      "description": "Practice Lesson 7 with independent scenarios and expandable explanations.",
+      "kind": "Questions",
+      "number": 7,
+      "questions": 15
+    },
+    {
+      "source": "lessons/lesson-08-sessions-reauthentication-and-logout.md",
+      "route": "lessons/lesson-08-sessions-reauthentication-and-logout/",
+      "title": "Sessions and logout",
+      "description": "Separate session clocks, reauthentication and supported logout scope.",
+      "kind": "Lesson",
+      "number": 8
+    },
+    {
+      "source": "question-bank/lesson-08.md",
+      "route": "questions/lesson-08/",
+      "title": "Sessions and logout: questions",
+      "description": "Practice Lesson 8 with independent scenarios and expandable explanations.",
+      "kind": "Questions",
+      "number": 8,
+      "questions": 16
+    },
+    {
+      "source": "lessons/lesson-09-integration-design-and-change-planning.md",
+      "route": "lessons/lesson-09-integration-design-and-change-planning/",
+      "title": "Integration design and changes",
+      "description": "Review requirements, plan tests and prepare a useful handover.",
+      "kind": "Lesson",
+      "number": 9
+    },
+    {
+      "source": "question-bank/lesson-09.md",
+      "route": "questions/lesson-09/",
+      "title": "Integration design and changes: questions",
+      "description": "Practice Lesson 9 with independent scenarios and expandable explanations.",
+      "kind": "Questions",
+      "number": 9,
+      "questions": 15
+    },
+    {
+      "source": "lessons/lesson-10-troubleshooting-and-engineering-casework.md",
+      "route": "lessons/lesson-10-troubleshooting-and-engineering-casework/",
+      "title": "Troubleshooting and casework",
+      "description": "Investigate evidence, distinguish causes and defend a correction.",
+      "kind": "Lesson",
+      "number": 10
+    },
+    {
+      "source": "question-bank/lesson-10.md",
+      "route": "questions/lesson-10/",
+      "title": "Troubleshooting and casework: questions",
+      "description": "Practice Lesson 10 with independent scenarios and expandable explanations.",
+      "kind": "Questions",
+      "number": 10,
+      "questions": 15
+    },
+    {
+      "source": "reference/glossary.md",
+      "route": "reference/glossary/",
+      "title": "Glossary",
+      "description": "Look up a term and the distinction that matters.",
+      "kind": "Reference"
+    },
+    {
+      "source": "reference/field-comparison-and-message-anatomy.md",
+      "route": "reference/field-comparison-and-message-anatomy/",
+      "title": "Fields and message anatomy",
+      "description": "Find the right XML location and interpret its meaning.",
+      "kind": "Reference"
+    },
+    {
+      "source": "reference/binding-comparison.md",
+      "route": "reference/binding-comparison/",
+      "title": "Bindings and message delivery",
+      "description": "Compare Redirect, POST, Artifact and RelayState.",
+      "kind": "Reference"
+    },
+    {
+      "source": "reference/trust-and-protection.md",
+      "route": "reference/trust-and-protection/",
+      "title": "Trust and protection",
+      "description": "Signing, encryption, key ownership and lifecycle.",
+      "kind": "Reference"
+    },
+    {
+      "source": "reference/response-validation-and-acceptance.md",
+      "route": "reference/response-validation-and-acceptance/",
+      "title": "Response acceptance",
+      "description": "Trust, targets, time, correlation and application entry.",
+      "kind": "Reference"
+    },
+    {
+      "source": "reference/sessions-reauthentication-and-logout.md",
+      "route": "reference/sessions-reauthentication-and-logout/",
+      "title": "Sessions and logout",
+      "description": "Independent state, reauthentication and confirmed outcomes.",
+      "kind": "Reference"
+    },
+    {
+      "source": "reference/common-misconceptions.md",
+      "route": "reference/common-misconceptions/",
+      "title": "Common misconceptions",
+      "description": "Revisit assumptions that lead to the wrong diagnosis.",
+      "kind": "Reference"
+    },
+    {
+      "source": "reference/troubleshooting-evidence.md",
+      "route": "reference/troubleshooting-evidence/",
+      "title": "Troubleshooting evidence",
+      "description": "Associate records without confusing what they establish.",
+      "kind": "Reference"
+    },
+    {
+      "source": "reference/integration-planning-changes-and-handover.md",
+      "route": "reference/integration-planning-changes-and-handover/",
+      "title": "Planning and handover",
+      "description": "Reuse the test matrix and integration handover template.",
+      "kind": "Reference"
+    },
+    {
+      "source": "reference/sources-and-further-reading.md",
+      "route": "reference/sources-and-further-reading/",
+      "title": "Sources and further reading",
+      "description": "Find official documentation for the question at hand.",
+      "kind": "Reference"
+    },
+    {
+      "source": "reference/specialized-awareness.md",
+      "route": "reference/specialized-awareness/",
+      "title": "Specialized capabilities",
+      "description": "Recognize less common features and know when to investigate.",
+      "kind": "Reference"
+    }
+  ],
+  "diagrams": 61
+}

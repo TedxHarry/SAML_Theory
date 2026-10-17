@@ -1,0 +1,338 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Reuse the test matrix and integration handover template."><meta name="color-scheme" content="light"><title>Planning and handover | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/reference/integration-planning-changes-and-handover/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/" aria-current="page">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><div class="eyebrow">Reference library</div><article class="prose"><h1 id="saml-with-okta-integration-planning-changes-and-handover">SAML with Okta: integration planning, changes and handover</h1>
+<p>A useful integration agreement explains what should happen, who owns each decision and what evidence will establish the result. Daniel configures the Okta side; Priya coordinates Atlas's receiving and application requirements. Their work connects at the agreed identity, trust and access boundaries.</p>
+<p>The examples use fictional Northstar Research environments, accounts and key labels. <code>.example</code> addresses are illustrative. Obtain real Okta issuer, endpoint and certificate information from the identified integration's approved setup information.</p>
+<h2 id="agree-on-the-relationship-before-entering-settings">Agree on the relationship before entering settings</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Agreement item</th>
+<th>Record explicitly</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Purpose and population</td>
+<td>Application, users, intended resources and business outcome.</td>
+</tr>
+<tr>
+<td>Product and scope</td>
+<td>Okta org/engine, application instance/edition, environment and supported integration.</td>
+</tr>
+<tr>
+<td>Protocol path</td>
+<td>Initiation, binding on each leg, receiving services and any separately supported alternative.</td>
+</tr>
+<tr>
+<td>Participant identity and targets</td>
+<td>Expected issuer, SP entity ID, ACS, audience and other applicable receiving values.</td>
+</tr>
+<tr>
+<td>Subject and account relationship</td>
+<td>NameID format, authoritative source, scope, unique lookup and account continuity.</td>
+</tr>
+<tr>
+<td>Required application data</td>
+<td>Attribute names, usable values/cardinality, group filtering and app interpretation.</td>
+</tr>
+<tr>
+<td>Protection and acceptance</td>
+<td>Required signed/encrypted layers, approved keys, permitted processing and remaining acceptance controls.</td>
+</tr>
+<tr>
+<td>Authentication and assignment</td>
+<td>Intended assignments and applicable authentication requirements.</td>
+</tr>
+<tr>
+<td>Account lifecycle</td>
+<td>Creation/update/disablement mechanism, owner and downstream results.</td>
+</tr>
+<tr>
+<td>Sessions and logout</td>
+<td>Local limits, reauthentication boundaries, participants and per-service termination scope.</td>
+</tr>
+<tr>
+<td>Operations</td>
+<td>Test criteria, effective configuration evidence, support owners, monitoring and recovery.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Check the selected OIN integration's capabilities and application guidance, or the supported custom integration requirements. A product name or a SAML checkbox does not establish support for every protocol path. Test and production need explicit review even when many settings look alike. <a href="https://help.okta.com/oie/en-us/content/topics/apps/apps-add-applications.htm">Okta existing integrations</a>, <a href="https://help.okta.com/oie/en-us/content/topics/apps/apps_app_integration_wizard_saml.htm">custom SAML integrations</a></p>
+<p>For each important value, record its authoritative source, owner, environment and effective use. A metadata declaration, saved setting, emitted message and enforced receiver rule are different evidence. The <a href="/SAML_Theory/reference/field-comparison-and-message-anatomy/">field comparison</a> connects the protocol meanings to Okta labels.</p>
+<h3 id="keep-ownership-visible">Keep ownership visible</h3>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Owner</th>
+<th>Decisions to maintain</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Okta integration/policy owners</td>
+<td>Integration selection, assignments, policy, emitted identity/claims and provider key use.</td>
+</tr>
+<tr>
+<td>Atlas owners</td>
+<td>Approved targets, runtime trust, acceptance, account lookup, local sessions and resource permissions.</td>
+</tr>
+<tr>
+<td>Identity/lifecycle owners</td>
+<td>Authoritative identifiers, account continuity and supported downstream lifecycle results.</td>
+</tr>
+<tr>
+<td>Change and support owners</td>
+<td>Release decision, monitoring, supported recovery, escalation and maintained records.</td>
+</tr>
+</tbody>
+</table></div>
+<p>One engineer may fill several roles, but the decisions remain separate. Assignment is not downstream readiness, and account creation is not resource permission. Provisioning needs its own supported configuration and result. <a href="https://help.okta.com/oie/en-us/content/topics/provisioning/lcm/lcm-deploy-cloud.htm">Okta provisioning workflow</a></p>
+<h2 id="review-a-concrete-environment-contract">Review a concrete environment contract</h2>
+<p>Consider an independent Atlas test proposal. The agreed path is requested Redirect/POST. Devi's employee value remains <code>E1042</code>; its test account is a distinct fictional record, <code>atlas-test-4821</code>. Production's <code>atlas-4821</code> is not automatically the same account.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Contract item</th>
+<th>Agreed test requirement</th>
+<th>Review implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SP entity ID</td>
+<td><code>https://atlas-test.northstar.example/saml</code></td>
+<td>Preserve the exact approved test identity.</td>
+</tr>
+<tr>
+<td>ACS</td>
+<td><code>https://atlas-test.northstar.example/saml/acs</code></td>
+<td>A production ACS is not an equivalent target.</td>
+</tr>
+<tr>
+<td>Provider information</td>
+<td>Approved issuer, endpoint and verification material for this integration.</td>
+<td>Obtain and adopt the actual values; do not manufacture an Okta URL pattern.</td>
+</tr>
+<tr>
+<td>Identity</td>
+<td>Scoped employee identifier selects <code>atlas-test-4821</code>.</td>
+<td>Replacing it with email changes the account-selection contract.</td>
+</tr>
+<tr>
+<td>Claims</td>
+<td>Required <code>department</code> and only the agreed group values.</td>
+<td>Verify names, sources, emitted values and Atlas's interpretation.</td>
+</tr>
+<tr>
+<td>Protection</td>
+<td>Atlas requires a signed assertion.</td>
+<td>A different supported signed layer does not waive this requirement.</td>
+</tr>
+<tr>
+<td>Access</td>
+<td>Enabled test reader can open projects; administrative changes remain denied.</td>
+<td>Test both intended permission and intended denial.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Okta's ACS, audience, application username, Name ID format and protection settings serve different purposes. Compare each with the contract. For claims, current and legacy configurations need the applicable source/expression review; a correct profile value alone does not establish correct output. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference</a>, <a href="https://help.okta.com/oie/en-us/content/topics/apps/federated-claims-overview.htm">custom claims</a></p>
+<h2 id="define-tests-before-interpreting-results">Define tests before interpreting results</h2>
+<p>The following is a proposed matrix for approved isolated test conditions, not completed test evidence. Controlled invalid-message cases need a supported test facility and the responsible owners. Each case must specify its own session state so an existing Atlas session cannot silently bypass the intended new exchange.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Starting condition or controlled difference</th>
+<th>Expected outcome and evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1: permitted baseline</td>
+<td>Devi assigned, policy satisfied, expected enabled test account and projects role; no app session</td>
+<td>Correct test delivery, accepted identity, intended account, new session and permitted projects</td>
+</tr>
+<tr>
+<td>T2: assignment boundary</td>
+<td>Separate unassigned test user; no app session</td>
+<td>Relevant Okta denial and no successful downstream session from this attempt</td>
+</tr>
+<tr>
+<td>T3: authentication-policy boundary</td>
+<td>Assigned test user cannot meet the applicable policy; no app session</td>
+<td>Correct policy outcome; no successful assertion-to-session completion</td>
+</tr>
+<tr>
+<td>T4: identity mapping</td>
+<td>Authoritative employee identifier available</td>
+<td>Actual NameID and unique test-account match agree with the contract</td>
+</tr>
+<tr>
+<td>T5: missing required application claim</td>
+<td>Supported fixture omits department; SAML otherwise accepted</td>
+<td>Application rejects entry for the stated missing data, without creating a session</td>
+</tr>
+<tr>
+<td>T6: permission boundary</td>
+<td>Correct enabled reader account; attempt an agreed restricted operation</td>
+<td>Session works for permitted resources; restricted operation denied by Atlas</td>
+</tr>
+<tr>
+<td>T7: target mismatch</td>
+<td>Supported fixture targets another SP/environment</td>
+<td>Receiver rejects the unacceptable target; no new session</td>
+</tr>
+<tr>
+<td>T8: correlation and replay</td>
+<td>Separate supported mismatched-request and repeated-assertion cases</td>
+<td>Each rejected at the appropriate boundary; no successful reuse</td>
+</tr>
+<tr>
+<td>T9: time boundary</td>
+<td>Controlled expired bearer presentation with known clocks/tolerance</td>
+<td>Rejection consistent with the actual deadline and configured tolerance</td>
+</tr>
+<tr>
+<td>T10: key transition</td>
+<td>Approved K2 adopted by receiver before selected sender cutover, where supported</td>
+<td>New signed output verifies under intended trust on all relevant receiving instances</td>
+</tr>
+<tr>
+<td>T11: session and logout scope</td>
+<td>Documented active sessions and selected supported logout path</td>
+<td>Targeted services’ outcomes confirmed; unconfirmed participants recorded honestly</td>
+</tr>
+</tbody>
+</table></div>
+<p>Add separate missing-account and disabled-account cases where relevant. Each follows the agreed lookup/creation or rejection behavior. Include identifier changes when the source can change, preserving the intended existing account rather than treating a duplicate as success. Run T8’s correlation and replay cases separately, including reuse across relevant receiving instances.</p>
+<p>Record <strong>Pass</strong>, <strong>Fail</strong> or <strong>Unresolved</strong> against the stated criterion and evidence. An intended denial can be a pass. A generic error without evidence of the required rejection can remain unresolved. An incorrect acceptance is a failure even if the permitted baseline works. The <a href="/SAML_Theory/reference/response-validation-and-acceptance/">acceptance</a> and <a href="/SAML_Theory/reference/sessions-reauthentication-and-logout/">session/logout</a> references explain those outcome boundaries.</p>
+<p>Okta global and app sign-in policy requirements also need the correct starting context. Changing a provider rule does not prove that an existing local Atlas session consults it on the next page request. <a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/about-policies.htm">Okta policies and rules</a></p>
+<h2 id="sequence-the-change-around-dependencies">Sequence the change around dependencies</h2>
+<p><strong>Figure RF-P1: Readiness, release and post-change decisions.</strong> Arrows show a change process, not SAML messages. Prerequisites include ownership, support, evidence access, monitoring and recovery readiness. Failed or unresolved required criteria hold progression.</p>
+<!-- mermaid:id=RF-P1 -->
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/RF-P1.svg" alt="RF-P1: Readiness, release and post-change decisions" width="746" height="1493" loading="lazy"><figcaption><span>RF-P1</span><a href="/SAML_Theory/assets/diagrams/RF-P1.svg" data-diagram="RF-P1: Readiness, release and post-change decisions">Open full diagram</a></figcaption></figure><p>Agree on the scope and expected behavior first. Establish supported prerequisites, then collect the required test evidence. Release authorization belongs to the responsible decision owner. After applying the supported change, compare observed outcomes with the criteria; use the agreed recovery or containment decision if they do not meet them. Record the effective state and any remaining limits for handover.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Change</th>
+<th>Dependency to resolve first</th>
+<th>Evidence after the change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Endpoint or entity identity</td>
+<td>Correct environment, routing, approved receiving values and trust context.</td>
+<td>Actual message delivery, intended target and receiver acceptance.</td>
+</tr>
+<tr>
+<td>NameID or account mapping</td>
+<td>Source authority, scope, existing links and account continuity.</td>
+<td>Actual emitted value and intended unique account, without unintended duplicate creation.</td>
+</tr>
+<tr>
+<td>Attribute/group output</td>
+<td>Required names, cardinality, filtering and application interpretation.</td>
+<td>Usable emitted data and intended allowed/denied permissions.</td>
+</tr>
+<tr>
+<td>Signing key</td>
+<td>Authoritative new material and every relevant receiver's supported adoption.</td>
+<td>Observed sender key, required verification and per-instance acceptance.</td>
+</tr>
+<tr>
+<td>Assignment or authentication policy</td>
+<td>Intended access decision and test session state.</td>
+<td>Correct new-attempt policy result; local-session behavior assessed separately.</td>
+</tr>
+<tr>
+<td>Session or logout behavior</td>
+<td>Supported participants, targeted session associations and expected scope.</td>
+<td>Per-service processing and fresh protected-resource results.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Avoid combining unrelated changes when it makes their outcomes hard to distinguish. A key change and an identifier change can fail independently. The <a href="/SAML_Theory/reference/trust-and-protection/#separate-generation-activation-and-receiver-adoption">trust reference</a> distinguishes available material, sender use and receiver adoption. Okta certificate activation does not update a partner's effective trust automatically. <a href="https://help.okta.com/oie/en-us/content/topics/apps/manage-signing-certificates.htm">Okta signing certificate management</a></p>
+<h3 id="judge-a-cutover-from-supplied-evidence">Judge a cutover from supplied evidence</h3>
+<p>In this independent fictional proposal, Okta still signs with K1. K2 is approved, and Atlas supports controlled multi-key trust. Receiver A trusts K1 and K2; receiver B trusts only K1. A fresh baseline succeeds at A under K1. No K2-based runtime result is supplied. K1 remains uncompromised and permitted for this proposed planned transition.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Question</th>
+<th>What this packet establishes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Does a permitted baseline currently work at A?</td>
+<td>Yes, for the recorded K1 attempt and its stated outcome.</td>
+</tr>
+<tr>
+<td>Is B prepared to verify K2?</td>
+<td>No; its effective trust lacks K2.</td>
+</tr>
+<tr>
+<td>Has runtime K2-based acceptance been demonstrated?</td>
+<td>No. Trust inventory alone is not that result.</td>
+</tr>
+<tr>
+<td>Is the proposed K2 sender switch ready on this packet?</td>
+<td>No. Receiver preparation and required verification evidence remain incomplete.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Prepare B through its supported approved process and obtain K2-based verification evidence in the agreed test arrangement before changing the readiness conclusion. A successful K1 attempt at A does not settle either gap. This packet does not establish why B is unprepared or that every later acceptance/account check would pass under K2.</p>
+<h2 id="define-stopping-and-recovery-criteria">Define stopping and recovery criteria</h2>
+<p>State concrete reasons to stop progression: an unexpected sender key, an unprepared required receiver, a wrong account match, a required claim becoming unusable, or a rejection test creating a session. A working user elsewhere does not erase that failure.</p>
+<p>Recovery needs a supported, permitted state on both sides. Define who decides, what configuration can be restored, what verification is required and how administrative access remains recoverable if federation fails. An approved recovery route should have an owner, allowed use and monitoring; it is not an undocumented policy bypass.</p>
+<p>A rollback does not automatically reverse account creation, disclosed data, established sessions or partner caches. Restoring K1 is not a normal availability remedy if K1 is compromised or prohibited. An incident can require containment rather than restoration of the earlier state. <a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/#94-plan-tests-and-a-controlled-change">Lesson 9</a> connects recovery scope to the change decision.</p>
+<h2 id="hand-over-the-maintained-state">Hand over the maintained state</h2>
+<p>Use this table as a handover template. <a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/#write-the-decision-its-evidence-and-its-limits">Lesson 9’s filled proposal</a> shows how to record the decision, evidence and unresolved items without claiming completed tests.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Handover item</th>
+<th>Useful contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Relationship and support</td>
+<td>Org/integration, environment, supported app/version or edition, agreed path and owners.</td>
+</tr>
+<tr>
+<td>Authoritative configuration</td>
+<td>Entity IDs, endpoints, approved metadata/key sources, effective values and refresh/import behavior.</td>
+</tr>
+<tr>
+<td>Identity and lifecycle</td>
+<td>NameID source/format/scope, actual account lookup, required claims, creation/update/disablement owners.</td>
+</tr>
+<tr>
+<td>Trust and key lifecycle</td>
+<td>Required layers, approved algorithms/keys, sender use, receiver inventories and replacement ownership.</td>
+</tr>
+<tr>
+<td>Policy and access</td>
+<td>Assignment, authentication requirements, intended roles and allowed/denied resources.</td>
+</tr>
+<tr>
+<td>Sessions and logout</td>
+<td>Local limits, relevant supplied session bounds, reauthentication, participating services and known exclusions.</td>
+</tr>
+<tr>
+<td>Test and release evidence</td>
+<td>Starting states, message/attempt references, per-instance results, unresolved items and release decision.</td>
+</tr>
+<tr>
+<td>Operations and recovery</td>
+<td>Diagnostic sources, monitoring ownership, escalation, approved evidence locations and supported recovery criteria.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Keep secrets and private keys out of ordinary handover material. Reference their approved custody arrangements where needed. Diagnostic records should preserve useful associations without unnecessarily distributing raw assertions or cookies; the <a href="/SAML_Theory/reference/troubleshooting-evidence/#write-a-handoff-that-another-engineer-can-use">evidence reference</a> gives a practical reporting structure.</p>
+<p>For the cutover proposal above, a precise readiness note is:</p>
+<blockquote>
+<p>K2 is approved and Atlas supports multi-key trust. A currently trusts K1/K2, while B still trusts only K1. The supplied successful attempt used K1 at A; K2-based runtime acceptance has not been demonstrated. Hold the proposed sender switch while B is prepared and the agreed verification is completed. The packet does not establish the cause of B's missing adoption or readiness for the remaining release criteria.</p>
+</blockquote>
+<p>After a verified change, update the record with what actually became effective, where it was observed and which permissions and rejection behaviors remained correct. Another engineer should be able to distinguish a completed result from a proposal or unresolved dependency without reconstructing the entire ticket history.</p>
+</article></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#agree-on-the-relationship-before-entering-settings">Agree on the relationship before entering settings</a></li><li><a href="#review-a-concrete-environment-contract">Review a concrete environment contract</a></li><li><a href="#define-tests-before-interpreting-results">Define tests before interpreting results</a></li><li><a href="#sequence-the-change-around-dependencies">Sequence the change around dependencies</a></li><li><a href="#define-stopping-and-recovery-criteria">Define stopping and recovery criteria</a></li><li><a href="#hand-over-the-maintained-state">Hand over the maintained state</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

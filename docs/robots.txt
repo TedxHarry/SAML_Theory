@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://tedxharry.github.io/SAML_Theory/sitemap.xml

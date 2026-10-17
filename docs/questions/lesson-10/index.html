@@ -1,0 +1,317 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Practice Lesson 10 with independent scenarios and expandable explanations."><meta name="color-scheme" content="light"><title>Troubleshooting and casework: questions | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/questions/lesson-10/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/" aria-current="page"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><nav class="reading-modes" aria-label="Lesson material"><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/">Lesson 10</a><a href="/SAML_Theory/questions/lesson-10/" aria-current="page">Questions <span>(15)</span></a></nav><article class="prose"><h1 id="lesson-10-troubleshooting-and-engineering-casework">Lesson 10: Troubleshooting and engineering casework</h1>
+<h2 id="1-choose-the-observation-that-narrows-the-failure">1. Choose the observation that narrows the failure</h2>
+<p>Devi opens Atlas projects in a browser without an Atlas session. The browser reaches Okta, she completes an authentication interaction, and a response form is submitted to Atlas. Atlas displays “Unable to sign in.” No Atlas processing result or actual matched-account evidence has been collected. A certificate change happened recently, but its relevance to this attempt is unknown.</p>
+<p>Would replacing a certificate be a justified first correction? What is the smallest useful next observation, and which context should accompany it?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The supplied observations do not establish a certificate failure. They establish movement through authentication and response delivery, followed by an unsuccessful application outcome.</p>
+<p>Obtain Atlas's processing result for this exact return. It can distinguish rejection during SAML acceptance from account selection, entry or later session handling. Associate it with the user, environment, receiving instance, browser context, time and relevant request/response evidence.</p>
+<p>The recent certificate change is a lead, not a cause established by the packet. If Atlas reports an approved-key mismatch, investigate trust adoption. If it reports accepted SAML followed by no matching account, investigate identity output and account lookup. Choose the correction after the evidence identifies its boundary.</p>
+</details>
+<h2 id="2-can-these-records-be-treated-as-one-attempt">2. Can these records be treated as one attempt?</h2>
+<p>An engineer has a normalized Okta success summary for Devi, a browser trace for an Atlas test return, and a generic Atlas error from production. They share a date but have no documented request association, receiving node or aligned time zone. A filtered System Log search for a presumed SAML request ID finds nothing.</p>
+<p>These are fictional evidence summaries, not literal vendor event names or schemas. What can the engineer conclude now? How should the packet be repaired before a diagnosis is made?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The records have not been established as one transaction. In particular, the production error cannot silently become the receiving result for the test trace. Shared date and username are insufficient association.</p>
+<p>Establish the correct org, integration/environment, browser context, user, receiving instance, times and supported message/diagnostic relationships. Product event or request IDs need not equal SAML message IDs. Document the actual connections between records.</p>
+<p>The empty search also needs its filters, time range, target and logging scope checked. It does not alone prove that no authentication occurred. Okta records supply org-side evidence; receiver acceptance and application decisions need their own evidence. <a href="https://help.okta.com/oie/en-us/content/topics/reports/reports_syslog.htm">Okta System Log</a></p>
+</details>
+<h2 id="3-identify-the-path-and-the-missing-outcome">3. Identify the path and the missing outcome</h2>
+<p>Three independent fictional packets describe new sign-ins, each without a usable application session at its start:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Packet</th>
+<th>Established movement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Atlas creates an AuthnRequest; Okta returns a correlated browser POST response to Atlas's ACS.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>A deliberately configured supported launch sends an unsolicited Okta POST response to Atlas; no initiating Atlas AuthnRequest exists.</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Generic providers with documented artifact support deliver a reference through the browser; the SP successfully retrieves an authentication response through protected SOAP resolution. No Okta artifact support is claimed.</td>
+</tr>
+</tbody>
+</table></div>
+<p>None supplies the receiving application's acceptance, account, session or resource result. Describe each path and the next evidence needed. Does C's retrieval result establish sign-in success?</p>
+<details>
+<summary>Show explanation</summary>
+<p>A is a requested SP-initiated exchange with a POST response. B is an explicitly unsolicited POST path, which must be evaluated under its supported acceptance policy without inventing a missing request. C uses artifact response delivery and a separate server-side resolution exchange.</p>
+<p>For each, obtain receiver processing of the intended authentication information, actual account selection, entry/session result and the protected resource outcome. C additionally needs to preserve the distinction between resolution-reply correlation and the original authentication exchange.</p>
+<p>Successful resolution obtains a message. It does not establish that the recovered message satisfies all acceptance and application requirements. Likewise, response delivery in A or B is an important boundary but not the final resource result.</p>
+</details>
+<h2 id="4-diagnose-the-target-field-that-actually-differs">4. Diagnose the target field that actually differs</h2>
+<p>Atlas test expects SP entity ID <code>https://atlas-test.northstar.example/saml</code> and ACS <code>https://atlas-test.northstar.example/saml/acs</code>. The <code>.example</code> addresses are fictional. Each packet below is an independent attempt:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Packet</th>
+<th>Supplied evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Effective provider configuration and browser delivery use the production ACS instead of the approved test ACS. No production acceptance result is supplied.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Delivery reaches the correct test ACS; required signature checks pass; Audience contains the test ACS URL instead of the test entity ID.</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Delivery reaches the correct test ACS; required signature checks pass; the selected bearer's Recipient names a different receiving endpoint.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Name the established mismatch and relevant next comparison in each. Would making every target-related value equal to the receiving URL solve the design?</p>
+<details>
+<summary>Show explanation</summary>
+<p>A establishes wrong-environment delivery. Compare the approved test ACS with the selected provider output and effective routing/delivery configuration. It does not establish that production accepted anything.</p>
+<p>B establishes an audience mismatch. Compare the actual assertion audience, the approved test entity ID and the relevant Audience URI setting. C establishes a bearer-presentation recipient mismatch; compare the selected confirmation with the approved receiving endpoint.</p>
+<p>These fields answer different questions. Making them all equal would erase the participant-identifier versus service-location distinction rather than repair it. A successful signature does not make a wrong target acceptable, and correcting one known mismatch does not prove all remaining checks will pass. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference</a></p>
+</details>
+<h2 id="5-choose-a-correction-for-a-known-late-bearer-arrival">5. Choose a correction for a known late bearer arrival</h2>
+<p>On 16 October 2026, a fictional Atlas assertion has Conditions NotOnOrAfter at 12:10:00 UTC and selected bearer NotOnOrAfter at 12:06:00 UTC. Atlas receives it at 12:06:45 UTC. The clocks are independently confirmed to agree, and the test uses zero tolerance. Atlas reports a bearer-deadline rejection. An application session, if created, would have a one-hour maximum, but none was created here.</p>
+<p>Does the later Conditions limit or proposed session maximum rescue the presentation? Should the incident be labeled clock skew? What evidence should the engineer inspect next?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The bearer presentation is 45 seconds too late under the supplied clocks and policy. Conditions still permits its illustrated time interval, but that does not override the separate bearer deadline. A proposed application-session duration is irrelevant to accepting an already-late presentation.</p>
+<p>Clock disagreement is explicitly ruled out by the supplied evidence. Inspect the actual issuance and delivery timeline, browser interruption or delay, and the intended presentation-window requirement. Do not increase tolerance merely to hide a delay that the packet already distinguishes from skew.</p>
+<p>A justified correction addresses the confirmed timing cause and supported requirement. Retest the appropriate timely and late cases, then verify the remaining acceptance and application outcomes.</p>
+</details>
+<h2 id="6-distinguish-wrong-correlation-from-replay">6. Distinguish wrong correlation from replay</h2>
+<p>Both independent Atlas packets have passing required signature checks and arrivals within the applicable time limits:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Packet</th>
+<th>Supplied state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Atlas retains <code>_req_Q10_EXPECTED</code> for the correct browser and provider. The required returned correlation values name <code>_req_Q10_OTHER</code>. RelayState resolves to the expected pending context.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Atlas identifies assertion <code>_assert_Q10_USED</code> as already accepted during an earlier completed attempt. The same assertion is presented again before its deadline.</td>
+</tr>
+</tbody>
+</table></div>
+<p>What protection rejects each packet? What evidence would help explain the cause without weakening either protection?</p>
+<details>
+<summary>Show explanation</summary>
+<p>A fails requested association: the return does not answer the retained request. RelayState cannot authorize a different InResponseTo. Inspect the outgoing request, returned fields, browser/provider association, relevant retries and pending-state transitions.</p>
+<p>B fails permitted-reuse requirements. An open time window does not authorize another acceptance of an already-used bearer assertion. Inspect the earlier acceptance and how the new submission occurred, including any client retry or node/state behavior.</p>
+<p>These are distinct failures even though both can occur after a browser returns. The packet does not prove whether either arose from a user action, defect or unwanted submission. Disabling correlation or replay checks would remove the relevant control rather than establish a safe correction.</p>
+</details>
+<h2 id="7-did-the-encryption-failure-identify-a-signing-certificate-problem">7. Did the encryption failure identify a signing-certificate problem?</h2>
+<p>An approved Atlas integration encrypts assertions for the application's recipient key. Effective provider configuration identifies recipient encryption key E2, but Atlas has only the private decryption capability for E1. The application reports failure recovering the encrypted assertion. It has not reached inner signature validation or account matching.</p>
+<p>E1 and E2 are symbolic labels. A colleague proposes replacing Okta's signing certificate in Atlas. Does the evidence support that correction? Which material and outcomes need reconciliation?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The established mismatch concerns the encryption recipient and available decryption capability. It does not establish a signing-key failure. The inner signature and account boundaries have not been reached.</p>
+<p>Confirm the approved Atlas encryption material, the provider's effective recipient selection and Atlas's supported key adoption. Reconcile those under the intended agreement rather than exchanging private keys or replacing unrelated verification material.</p>
+<p>After recovery succeeds, verify required signature/trust processing, message restrictions, identity selection and the resource result. Decryption is an intermediate result. The packet does not establish that the message would pass those later decisions once the known encryption mismatch is corrected.</p>
+</details>
+<h2 id="8-what-does-a-recent-certificate-change-add-to-a-generic-error">8. What does a recent certificate change add to a generic error?</h2>
+<p>Atlas displays a generic signature-verification failure for a fresh attempt. A signing change occurred recently, but the packet has no effective receiver key inventory, actual signed-object reference, algorithm result or detailed failure stage. No receiver instance has been identified.</p>
+<p>Give a short list of competing explanations and choose useful discriminating evidence. Can the engineer already report that stale trust caused the failure?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Stale trust is one possibility, alongside altered referenced content, rejected or unsupported algorithms and incorrect signature/reference processing. The timing of the change does not select among them.</p>
+<p>Identify the integration and receiver instance, approved effective keys, actual signing material, required protection layer, selected reference and permitted methods. Obtain the relevant reference-validation and signature-value failure evidence through supported diagnostics.</p>
+<p>A specific result that no approved key matches the intended new key would support a trust-adoption diagnosis. Without that result or equivalent evidence, keep the cause unresolved. Do not disable verification or import an arbitrary certificate from the failed message merely to obtain a different screen.</p>
+</details>
+<h2 id="9-find-the-first-established-application-failure">9. Find the first established application failure</h2>
+<p>Atlas's approved rule selects an existing account using employee identifier <code>E1042</code> within the trusted issuer relationship. In a fictional attempt, SAML acceptance succeeds, but the actual NameID is <code>devi@northstar.example</code>. Atlas reports no matching account and creates no session. The application username snapshot also contains that email. The captured assertion additionally lacks a department attribute required for entry, but Atlas has not evaluated that later application requirement.</p>
+<p>What failure is established first? Does correcting the identity output alone establish completed access? What should the investigation preserve?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The reported application failure is the mismatch between emitted identity and the agreed employee-key lookup. The username snapshot corroborates the unexpected output, but it does not establish which source, mapping or update decision caused it.</p>
+<p>Inspect that identity relationship and correct the confirmed cause under the approved design, preserving the intended existing account rather than automatically creating a duplicate for the email. The missing department is also observed, so correcting identity alone cannot justify claiming all entry requirements have passed.</p>
+<p>Retest the actual NameID, intended account, required claim output, entry/session decision and resource permission. A later failure can emerge after an earlier one is corrected. That does not make the original evidence wrong; it means the whole path was never established by a single correction.</p>
+</details>
+<h2 id="10-are-assignment-denial-and-an-extra-prompt-the-same-failure">10. Are assignment denial and an extra prompt the same failure?</h2>
+<p>Consider three independent Atlas cases:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Supplied evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>No app session; relevant Okta processing reports the identified user is not assigned to the selected integration.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>No app session; assignment is established, but relevant policy evidence reports an unsatisfied authentication requirement.</td>
+</tr>
+<tr>
+<td>C</td>
+<td>No app session; an authentication prompt appears, but no final policy, issuance or receiver outcome is supplied.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Which cases identify an established stopping boundary? Does C establish either failure? What must precede a proposal to grant assignment or reduce a requirement?</p>
+<details>
+<summary>Show explanation</summary>
+<p>A identifies assignment at the selected integration. B identifies the applicable authentication-policy requirement. C supplies an interaction observation but no established failure result; the prompt may be the expected way to meet a requirement.</p>
+<p>Use the actual processing evidence for the intended user and integration. Do not infer assignment from a dashboard icon or infer policy failure solely from a challenge appearing.</p>
+<p>Before proposing changed access or reduced authentication, establish the intended assignment and security requirement with their owners. A denial can be correct. Investigating a reported SSO problem is not by itself authority to grant access or weaken policy. <a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/about-app-sign-on-policies.htm">Okta app sign-in policies</a></p>
+</details>
+<h2 id="11-which-observation-would-explain-a-loop">11. Which observation would explain a loop?</h2>
+<p>Devi's new Atlas attempt repeatedly travels to Okta, returns to Atlas and is redirected to Okta again. The approved user and integration are identified, but there is no Atlas processing result for each return and no reliable record of session creation or use. Another browser profile can open a page under an existing Atlas session.</p>
+<p>Should the engineer immediately change cookie attributes? What next observation separates response rejection from failure to use a newly created local session? Does the other profile prove fresh SSO works?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Obtain Atlas's receiving and session-transition result at each return, together with the next protected request. If Atlas rejects the response, investigate that acceptance boundary. If it creates a session but the next request does not present or use it, investigate supported cookie scope, browser policy, proxy/application behavior and session handling as the evidence directs.</p>
+<p>The loop alone does not establish a cookie defect, so changing cookie attributes immediately would be speculative. A navigation or local-state problem also requires evidence rather than a prescribed fix from the symptom.</p>
+<p>The other profile's existing-session access does not prove that it performed a successful new federation exchange. Compare the actual starting states and message path before treating it as a working SSO baseline.</p>
+</details>
+<h2 id="12-locate-the-broker-leg-before-changing-a-certificate">12. Locate the broker leg before changing a certificate</h2>
+<p>Two independent external-provider journeys supply these normalized records:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>The external response reaches Okta; Okta rejects it under the configured inbound issuer/key relationship. No downstream Atlas response is issued.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Okta accepts the external response and resolves the intended Okta user; it issues a separate downstream response, and Atlas rejects that response's audience.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Which relationship owns each failure? Would changing Atlas's audience fix A, or replacing the external provider certificate fix B?</p>
+<details>
+<summary>Show explanation</summary>
+<p>A concerns external IdP to Okta, where Okta is the receiving SP. Compare the inbound expected issuer, approved verification material, required protection and actual upstream result. Atlas's audience does not repair an upstream return rejected before downstream issuance.</p>
+<p>B concerns Okta to Atlas, where Okta issues a new statement and Atlas receives it. Compare the downstream audience output and approved Atlas requirement. Replacing an external-provider certificate would not correct that audience mismatch.</p>
+<p>Keep separate request context, issuer/audience relationships and identity mappings on both legs. Upstream success does not guarantee downstream success, and a downstream failure does not erase the upstream result already supplied. <a href="https://help.okta.com/oie/en-us/content/topics/security/idp-add-saml.htm">Okta external SAML IdP settings</a></p>
+</details>
+<h2 id="13-does-successful-access-after-logout-show-which-session-survived">13. Does successful access after logout show which session survived?</h2>
+<p>In a supported front-channel arrangement, Atlas confirms invalidation of its initiating session and Okta confirms the targeted global-session termination. Ledger notification was scheduled, but no completed participant callback or application-processing record is supplied. A later report says Ledger opens, without showing whether it contacted the server, used an old session or completed a new sign-in.</p>
+<p>Can the engineer mark Ledger logout passed or failed? What evidence would distinguish the possible outcomes?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Ledger's outcome remains unresolved. A scheduled notification is not confirmed processing, while a missing callback does not prove the session survived. The later phrase “Ledger opens” is also insufficient to establish current old-session access.</p>
+<p>Obtain notification delivery, Ledger's associated logout/session processing and a fresh protected request in the relevant browser context. Determine whether any permitted result used the targeted old session, followed a new sign-in or merely displayed cached content.</p>
+<p>Report Atlas and the targeted Okta session as confirmed, with Ledger unconfirmed on the current packet. The supported feature and participation determine intended scope; they do not replace per-service outcomes. <a href="https://developer.okta.com/docs/guides/single-logout/saml2/main/">Okta front-channel SAML SLO guide</a></p>
+</details>
+<h2 id="14-defend-a-conclusion-from-several-post-change-symptoms">14. Defend a conclusion from several post-change symptoms</h2>
+<p>Northstar reports intermittent Atlas test failures after an approved K2 signing-key activation. Treat this as a new fictional investigation. Its contract requires the test ACS and audience, approved signed assertions, scoped employee identifiers, department for entry, and reader access to projects without administrative-change permission.</p>
+<p>Devi's intended identifier is <code>E1042</code>; Noor's is <code>E2087</code>. Both have assigned Okta users, satisfied authentication policy and enabled intended Atlas test accounts. Every sign-in below has fresh request/assertion context and no usable Atlas session at its start. These are normalized facts, not real vendor log records:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Observation</th>
+<th>Supplied result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Effective trust</td>
+<td>Node A trusts approved K1 and K2; node B trusts only K1.</td>
+</tr>
+<tr>
+<td>Devi at A</td>
+<td>Fresh K2 assertion passes required SAML acceptance and matches <code>E1042</code> to her intended account. Department is absent; entry is denied and no session is created.</td>
+</tr>
+<tr>
+<td>Source snapshot</td>
+<td>Devi's authoritative Okta profile contains department <code>Research</code>; claim-source/expression evaluation has not been inspected.</td>
+</tr>
+<tr>
+<td>Devi at B</td>
+<td>A separate fresh K2 response reaches the correct ACS. B reports no configured approved verification key for K2 and creates no session.</td>
+</tr>
+<tr>
+<td>Noor at A</td>
+<td>Fresh accepted <code>E2087</code> and required department select the intended enabled account. A session is created, projects succeeds and an administrative change is denied under the agreed reader role.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Identify the independent failures, the expected denial and the remaining unknown causes. Propose corrections and verification. Would rolling back signing alone establish a completed Devi sign-in?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Node B has a known K2 trust-adoption mismatch. Confirm the authorized material and reconcile B's effective trust through the supported process. The packet does not establish why B missed the update.</p>
+<p>Devi at A has an application-required claim failure after SAML acceptance and correct account matching. Compare the agreed department source, applicable claim configuration and actual output. Source data exists, but that does not prove release. Empty output, an incorrect source or name, or another configuration difference needs investigation rather than a guessed diagnosis.</p>
+<p>Noor's administrative denial is expected. Her successful projects path establishes a permitted outcome on A for that account, not readiness of B or correctness of Devi's claims.</p>
+<p>Correct the two established relationships separately, then verify fresh sign-ins on both nodes with the actual key, NameID, department, intended account, session and projects outcome. Preserve appropriate rejection behavior and reader-only restrictions. A signing rollback alone would not establish department release; it also requires an uncompromised permitted old key and supported sender/receiver recovery conditions. No repair is completed merely by this proposal.</p>
+</details>
+<h2 id="15-report-partial-repair-without-losing-the-next-failure">15. Report partial repair without losing the next failure</h2>
+<p>Treat this as an independent fictional Atlas test investigation. The approved contract requires the test audience and ACS, signed assertions from the approved issuer/key, Devi’s scoped employee identifier <code>E1042</code>, required department, and access to projects under her reader role. Her intended test account is enabled. Assignment and authentication policy are satisfied. These normalized records describe separate attempts, not successive processing of one response:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Attempt or record</th>
+<th>Supplied evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1: fresh sign-in</td>
+<td>No usable Atlas session. The response reaches the correct test ACS, but its audience names production. Atlas rejects it and creates no session.</td>
+</tr>
+<tr>
+<td>Approved change</td>
+<td>The audience output is corrected to the agreed test entity ID. A subsequent generated-output check shows that value; this check alone is not runtime acceptance.</td>
+</tr>
+<tr>
+<td>R2: page opens</td>
+<td>Another browser profile opens projects using an Atlas session established before the change. No new SAML exchange occurs.</td>
+</tr>
+<tr>
+<td>R3: fresh retest</td>
+<td>No usable Atlas session; new request and assertion IDs. Required SAML acceptance succeeds, including the corrected audience and approved signature. Actual NameID is <code>devi@northstar.example</code>; Atlas’s agreed lookup expects <code>E1042</code>, finds no matching account and creates no session.</td>
+</tr>
+<tr>
+<td>Remaining evidence</td>
+<td>Identity-output configuration has not been inspected. Its correction is proposed but not applied. No completed fresh test establishes required department, session creation or projects permission for Devi.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Trace R1–R3 and identify what each establishes. Does R2 prove the repair is complete? Choose the next investigation and verification, then write a short stakeholder update. Should the engineer report either “everything is fixed” or “the audience diagnosis was wrong”?</p>
+<details>
+<summary>Show explanation</summary>
+<p>R1 establishes an audience rejection. The generated-output check supports the changed value, while R3 establishes runtime progress through that earlier boundary for the fresh retest. R2 establishes only existing-session access: it did not exercise the corrected federation path.</p>
+<p>R3 then establishes an account-selection failure after SAML acceptance. The emitted email does not meet the agreed employee-identifier lookup. Compare the authoritative employee source, applicable application username/NameID mapping and actual output. Preserve the intended account relationship; do not create a duplicate account for the unexpected email. The packet does not identify why the output changed.</p>
+<p>After a confirmed correction, repeat a fresh sign-in with no usable Atlas session and verify actual NameID, intended unique account, required department, new session and projects access. Verify the agreed administrative denial separately. Those are proposed checks, not completed results.</p>
+<p>A useful update is: “The audience mismatch was corrected, and a fresh test now passes the required SAML acceptance checks. Atlas still cannot create a session for this attempt because the emitted email does not meet the agreed employee-identifier lookup. We propose investigating and correcting that output, then verifying the intended account, required claims, session and permissions. The mapping correction remains untested, and its underlying cause is unresolved. The page opened in another profile used an older session and does not establish fresh sign-in success.”</p>
+<p>Neither extreme report fits. Keep the confirmed earlier correction, the remaining failure and the untested proposal distinct. A later failure does not invalidate the evidence for the first one or justify promising that the next change will settle every remaining requirement.</p>
+</details>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/reports/reports_syslog.htm">Okta System Log</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/federated-claims-overview.htm">Okta custom claims</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/manage-signing-certificates.htm">Okta signing certificate management</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/about-app-sign-on-policies.htm">Okta app sign-in policies</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/security/idp-add-saml.htm">Okta external SAML IdP settings</a></li>
+<li><a href="https://developer.okta.com/docs/guides/single-logout/saml2/main/">Okta front-channel SAML SLO guide</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, message and artifact-resolution rules</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, browser SSO and artifact resolution</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies">MDN HTTP cookies</a></li>
+</ul>
+</article><nav class="page-navigation" aria-label="Lesson sequence"><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><small>← Previous lesson</small>Integration design and changes</a><a href="/SAML_Theory/reference/"><small>Keep nearby →</small>Reference library</a></nav></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#1-choose-the-observation-that-narrows-the-failure">1. Choose the observation that narrows the failure</a></li><li><a href="#2-can-these-records-be-treated-as-one-attempt">2. Can these records be treated as one attempt?</a></li><li><a href="#3-identify-the-path-and-the-missing-outcome">3. Identify the path and the missing outcome</a></li><li><a href="#4-diagnose-the-target-field-that-actually-differs">4. Diagnose the target field that actually differs</a></li><li><a href="#5-choose-a-correction-for-a-known-late-bearer-arrival">5. Choose a correction for a known late bearer arrival</a></li><li><a href="#6-distinguish-wrong-correlation-from-replay">6. Distinguish wrong correlation from replay</a></li><li><a href="#7-did-the-encryption-failure-identify-a-signing-certificate-problem">7. Did the encryption failure identify a signing-certificate problem?</a></li><li><a href="#8-what-does-a-recent-certificate-change-add-to-a-generic-error">8. What does a recent certificate change add to a generic error?</a></li><li><a href="#9-find-the-first-established-application-failure">9. Find the first established application failure</a></li><li><a href="#10-are-assignment-denial-and-an-extra-prompt-the-same-failure">10. Are assignment denial and an extra prompt the same failure?</a></li><li><a href="#11-which-observation-would-explain-a-loop">11. Which observation would explain a loop?</a></li><li><a href="#12-locate-the-broker-leg-before-changing-a-certificate">12. Locate the broker leg before changing a certificate</a></li><li><a href="#13-does-successful-access-after-logout-show-which-session-survived">13. Does successful access after logout show which session survived?</a></li><li><a href="#14-defend-a-conclusion-from-several-post-change-symptoms">14. Defend a conclusion from several post-change symptoms</a></li><li><a href="#15-report-partial-repair-without-losing-the-next-failure">15. Report partial repair without losing the next failure</a></li><li><a href="#sources">Sources</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

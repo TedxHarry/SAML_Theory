@@ -1,0 +1,253 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Practice Lesson 5 with independent scenarios and expandable explanations."><meta name="color-scheme" content="light"><title>Bindings and alternative paths: questions | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/questions/lesson-05/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/" aria-current="page"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><nav class="reading-modes" aria-label="Lesson material"><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/">Lesson 5</a><a href="/SAML_Theory/questions/lesson-05/" aria-current="page">Questions <span>(16)</span></a></nav><article class="prose"><h1 id="lesson-5-bindings-relaystate-and-alternative-paths">Lesson 5: Bindings, RelayState, and alternative paths</h1>
+<h2 id="1-does-an-okta-tile-identify-who-initiated-saml">1. Does an Okta tile identify who initiated SAML?</h2>
+<p>Devi clicks an Okta dashboard tile for Atlas. A capture of this fictional attempt shows the browser reaching an Atlas launch URL, Atlas creating AuthnRequest <code>_req_Q05_TILE</code>, the browser delivering it to Okta, and Okta returning a response that answers that request.</p>
+<p>A colleague labels the exchange unsolicited because Devi began on the Okta dashboard. Is that classification supported? What evidence identifies the initiation?</p>
+<details>
+<summary>Show explanation</summary>
+<p>This is an SP-initiated SAML exchange: Atlas created the authentication request, and the response answers it. The dashboard tile was the starting navigation control, but its destination led to Atlas initiating SAML.</p>
+<p>Unsolicited means the response does not answer a preceding SP AuthnRequest. It does not mean simply that a person clicked a particular product's tile or began on a provider's page.</p>
+<p>Identify the actual request and its relationship to the response before choosing the label. The browser's starting page, the message-delivery binding and the participant that creates the request answer different questions.</p>
+</details>
+<h2 id="2-decode-the-selected-binding-rather-than-every-message-alike">2. Decode the selected binding rather than every message alike</h2>
+<p>Atlas uses HTTP-Redirect with DEFLATE encoding for its outgoing AuthnRequest and ordinary HTTP-POST for the returning Response. A capture tool shows the original encoded query value and form-control value, with neither decoded yet.</p>
+<p>An engineer proposes applying Redirect's DEFLATE decompression to both values after removing their HTTP encoding and Base64 layers. Which message needs that step? Do Base64, DEFLATE or URL encoding make the information secret?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The selected Redirect encoding packages XML using DEFLATE, Base64 and URL encoding. Recover the request by reversing the applicable transformations. Ordinary POST carries Base64-encoded XML in its form control; Redirect's DEFLATE step is not part of that POST encoding. The browser's form encoding is a separate HTTP representation layer.</p>
+<p>None of these transformations provides confidentiality. Base64 represents bytes as text, compression reduces size and URL encoding represents data suitably for a URL. HTTPS protects the connection; SAML encryption protects selected message content under its own arrangement.</p>
+<p>An authorized capture can therefore expose personal or security-sensitive information even though its original representation looked unreadable. Establish what the tool has already decoded before decoding again, and use approved inspection and redaction procedures.</p>
+</details>
+<h2 id="3-is-a-large-relaystate-payload-automatically-acceptable">3. Is a large RelayState payload automatically acceptable?</h2>
+<p>An Atlas design uses RelayState to carry a 120-byte ASCII JSON value containing the original request ID, a return URL and navigation settings. Its selected SAML binding limits RelayState to 80 bytes. The returning assertion has a valid XML signature, but no supplied evidence establishes integrity protection or target validation for the separate RelayState value.</p>
+<p>The developer argues that Base64 encoding the JSON will solve the size problem and that the assertion signature protects everything. What needs correction in the design?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The original payload already exceeds the supplied limit. Base64 does not compress it and will not make that oversized value fit. A short opaque reference to appropriately protected local state is one possible supported design, but its associated record still needs integrity, association and lifetime controls.</p>
+<p>The assertion's XML signature does not automatically protect an external RelayState parameter. Atlas needs the relevant binding and application protections for the state it consumes. Merely returning the same value does not establish that the original value was safe or authorized.</p>
+<p>Keep the roles separate: InResponseTo identifies the request a response answers; RelayState can preserve agreed application context. A request ID inside JSON does not replace the applicable message-correlation checks, and a supplied URL still needs approved navigation handling.</p>
+</details>
+<h2 id="4-why-retain-the-original-redirect-representation">4. Why retain the original Redirect representation?</h2>
+<p>An SP sends a signed Redirect request with SAMLRequest, RelayState, SigAlg and Signature query parameters. A troubleshooting tool saves only the decoded XML. An engineer reformats that XML and constructs a new query string, expecting verification of the original Redirect signature to be equivalent.</p>
+<p>Why is the reconstruction insufficient evidence? Would verification of a later assertion signature establish the integrity of the original Redirect RelayState?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Redirect signature verification depends on the binding's prescribed representation of the encoded parameters, including RelayState when present and the algorithm parameter. Reformatted XML and a newly constructed query string do not establish which original encoded data was signed.</p>
+<p>Retain the relevant original binding data through approved tooling and inspect the corresponding verification result. A decoded XML view is useful for reading fields, but it can omit binding-level protection evidence.</p>
+<p>A later assertion signature protects its referenced XML content. It does not retrospectively verify the earlier Redirect parameters. Protection conclusions belong to the actual signed content and mechanism, rather than to every item that participated somewhere in the sign-in journey.</p>
+</details>
+<h2 id="5-reconstruct-a-deliberately-unsolicited-sign-in">5. Reconstruct a deliberately unsolicited sign-in</h2>
+<p>For this independent Atlas scenario, the configured Okta launch sends an unsolicited POST response. Atlas explicitly supports and permits that path. Devi has a usable Okta session satisfying the applicable requirements, an Atlas assignment, no Atlas session, and an enabled Atlas account with projects permission. Approved trust and the relevant response checks are in place. Atlas never created an AuthnRequest for this attempt.</p>
+<p>Describe the path through the browser to the permitted projects page. Where does Atlas establish its own session, and what request ID should it invent for InResponseTo?</p>
+<details>
+<summary>Show explanation</summary>
+<ol>
+<li>Devi's browser launches the configured Atlas integration at Okta using applicable Okta session context.</li>
+<li>Okta evaluates the assignment and requirements. Under the supplied successful conditions, it creates an unsolicited response and returns a form carrying it to the browser.</li>
+<li>The browser posts the form to the configured Atlas ACS, the application's SAML receiving endpoint.</li>
+<li>Atlas applies its supported unsolicited-response acceptance rules. It still checks required trust, protection, targets, timing, replay and other applicable requirements.</li>
+<li>Atlas matches the intended enabled account, allows entry and creates its own application session. It selects the approved projects target under its navigation rules.</li>
+<li>Atlas sets its application cookie and redirects the browser. The browser requests projects with the applicable Atlas session, and Atlas returns the resource after checking permission.</li>
+</ol>
+<p>Atlas should not invent a request ID. There was no initiating Atlas AuthnRequest to answer. The response and bearer confirmation data must not claim a request-correlation value for this unsolicited path. Absence of that relationship is why this path needs deliberate support rather than silent fallback from failed requested correlation.</p>
+</details>
+<h2 id="6-does-a-valid-signature-remove-unsolicited-login-risk">6. Does a valid signature remove unsolicited-login risk?</h2>
+<p>Atlas's approved design requires responses to match its pending authentication attempts. A different launch sends unsolicited responses, and Atlas rejects them because no requested relationship exists. A colleague proposes disabling correlation and accepting any otherwise valid signed response from the approved provider.</p>
+<p>What design change does that proposal introduce? Explain the login-CSRF concern without claiming that the provider's signature is invalid.</p>
+<details>
+<summary>Show explanation</summary>
+<p>The proposal changes Atlas from its requested-flow design to accepting an additional unsolicited path. It is not simply a repair to the original correlation check.</p>
+<p>A valid signature can establish the relevant verification result under an approved key. It cannot recreate an SP request and browser relationship that never existed. In login CSRF, an unwanted sign-in can place a browser into a session for an identity the browser's user did not intend to use. This is different from forging a signature.</p>
+<p>Determine whether the application deliberately supports this path and its appropriate controls. If the agreed design requires requested SSO, use a launch that starts that supported exchange. Do not erase the requirement merely because the alternate launch reaches the ACS. <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E90</a></p>
+</details>
+<h2 id="7-does-a-deep-link-confer-permission">7. Does a deep link confer permission?</h2>
+<p>Atlas has completed an explicitly supported unsolicited sign-in for Devi and created its own session. Its navigation policy uses an opaque state lookup for approved targets and a safe home page when supplied state is absent, unsupported or unapproved. Resource permissions are checked separately.</p>
+<p>Compare three independent returns:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Return</th>
+<th>Navigation and permission facts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>The state resolves to approved <code>/projects</code>; Devi has projects permission.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>The state resolves to approved <code>/admin</code>; Devi lacks administration permission.</td>
+</tr>
+<tr>
+<td>C</td>
+<td>The state supplies an unapproved external URL.</td>
+</tr>
+</tbody>
+</table></div>
+<p>What should happen under this policy? Could Okta's Default RelayState setting by itself establish permission or force Atlas to honor every URL?</p>
+<details>
+<summary>Show explanation</summary>
+<p>A can navigate to projects and return that permitted resource. B can select an approved navigation target, but Atlas must deny the administration resource because permission is absent. An approved target is not a permission grant.</p>
+<p>C should use the safe home page under the stated policy. This scenario supplies that fallback behavior; a different application's documented handling may differ.</p>
+<p>Default RelayState is an Okta setting for agreed navigation needs. Its presence does not define every receiver's interpretation or override Atlas's target validation and authorization. Establish the actual supported contract rather than assuming that a full URL is accepted everywhere. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference, Default RelayState</a></p>
+</details>
+<h2 id="8-follow-an-artifact-without-treating-it-as-an-assertion">8. Follow an artifact without treating it as an assertion</h2>
+<p>A generic Example SP and Example IdP support requested SSO with an artifact response. This is a protocol scenario, not a claim that Okta or Atlas supports this binding. Devi has no SP session. Both servers have approved trust, protected resolution connectivity, an enabled account and permission for projects.</p>
+<p>The SP sends an AuthnRequest through Redirect. After authentication, the IdP redirects the browser to an artifact-capable SP ACS with SAMLart and agreed state. The artifact is a reference to the response.</p>
+<p>Explain who retrieves the actual message and how the successful journey reaches projects. Does the browser retrieve the message through SOAP? Is a successfully resolved artifact a reusable sign-in bookmark?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The browser delivers the reference to the SP. The SP, rather than the browser, sends ArtifactResolve directly to the approved IdP resolution service through the protected SOAP exchange. The IdP authenticates and authorizes resolution and returns ArtifactResponse containing the authentication Response when resolution succeeds.</p>
+<p>The SP checks the resolution reply and recovered authentication result, including their respective correlation and acceptance requirements. It then matches the intended enabled account, allows entry, creates its session and returns a cookie and approved redirect. The browser requests projects using that application session, and the SP returns the permitted resource after checking permission.</p>
+<p>The artifact is not the assertion itself and is not a reusable bookmark. It is a sensitive reference with single-use semantics after successful resolution. Retrieving the message also does not establish that its assertion passes all the receiver's checks.</p>
+</details>
+<h2 id="9-which-request-does-artifactresponse-answer">9. Which request does ArtifactResponse answer?</h2>
+<p>In a fictional generic artifact-capable integration, the SP creates AuthnRequest <code>_req_Q05_AUTH</code>. The browser later delivers an artifact, and the SP creates ArtifactResolve <code>_resolve_Q05_FETCH</code>. The returned ArtifactResponse contains authentication Response <code>_resp_Q05_AUTH</code>.</p>
+<p>The developer proposes putting <code>_resolve_Q05_FETCH</code> in every InResponseTo field because it is the most recent request. Identify the two request relationships. Why should they remain separate?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The ArtifactResponse answers the ArtifactResolve operation, so its correlation refers to <code>_resolve_Q05_FETCH</code>. The contained authentication Response and applicable requested bearer confirmation refer to the original AuthnRequest, <code>_req_Q05_AUTH</code>.</p>
+<p>The retrieval operation and authentication exchange have different purposes. Resolving an artifact obtains a message; it does not replace the authentication request that the inner message answers. Copying the latest request ID everywhere would confuse those relationships.</p>
+<p>The SP needs the applicable checks at both layers. A correct retrieval-reply correlation does not excuse a wrong authentication correlation, and the inner response's own ID <code>_resp_Q05_AUTH</code> is another identifier again. These are symbolic transaction labels for reading, not actual signed messages.</p>
+</details>
+<h2 id="10-where-did-artifact-processing-stop">10. Where did artifact processing stop?</h2>
+<p>Two independent support packets concern a generic artifact-capable SP and IdP. Artifact support is explicitly established for those participants; no Okta capability is assumed.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Packet</th>
+<th>Supplied evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>The browser delivers the artifact to the correct SP ACS. The SP's server connection to the approved resolution service times out, and no protocol reply is received.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>The SP receives HTTP 200 from the resolution endpoint, but its parser reports no usable ArtifactResponse. No authentication result is recovered.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Do either packets establish a missing application account? What would the investigation need beyond another browser capture?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Both packets stop before a usable authentication result has been recovered. A supplies a server-connection timeout. B supplies successful HTTP delivery without a usable resolution-protocol reply. Neither establishes that the application reached account lookup.</p>
+<p>For A, inspect server-side connectivity, endpoint selection and the relevant service evidence. For B, inspect the actual protected reply and resolution-processing records to determine what was returned and why it was unusable. HTTP 200 alone does not establish SAML resolution success.</p>
+<p>The packets identify different observations at the resolution boundary without establishing their full causes. The browser's successful delivery of a reference cannot prove the server exchange succeeded. Restore and verify that boundary before claiming a downstream account or permission diagnosis.</p>
+</details>
+<h2 id="11-follow-okta-across-two-relationships">11. Follow Okta across two relationships</h2>
+<p>Devi begins at Atlas without a usable Atlas or Okta session. Atlas requests authentication from Okta using <code>_req_Q05_ATLAS</code>. An applicable Okta routing rule selects an approved external workforce IdP, so Okta creates upstream request <code>_req_Q05_OKTA</code>.</p>
+<p>For this successful fictional case, the external account is already linked to the intended enabled Okta user. The required policies, Atlas assignment, enabled Atlas account and projects permission are satisfied. The upstream subject is <code>external-devi-73</code>; the approved downstream mapping supplies <code>E1042</code> to Atlas. Both legs use browser-carried responses.</p>
+<p>Explain the two roles Okta plays and the complete journey to Atlas projects. Which request should each response answer? Does Atlas need to treat the external assertion as its own incoming Okta assertion?</p>
+<details>
+<summary>Show explanation</summary>
+<ol>
+<li>Atlas retains its pending request and browser context, then directs the browser to Okta with <code>_req_Q05_ATLAS</code>.</li>
+<li>Okta retains that downstream context and starts its separate upstream request <code>_req_Q05_OKTA</code>. The browser carries it to the external provider, toward which Okta acts as the SP.</li>
+<li>After authentication, the external provider returns its response through the browser to Okta's inbound ACS. That response answers <code>_req_Q05_OKTA</code> and targets the configured Okta inbound SP relationship.</li>
+<li>Okta validates the upstream result, resolves the approved linked Okta identity and satisfies the applicable requirements. Under this successful scenario it establishes its own session and creates a separate response for Atlas, acting as Atlas's IdP.</li>
+<li>The browser posts that downstream response to Atlas's ACS. It answers <code>_req_Q05_ATLAS</code>, identifies Atlas as its audience and supplies the agreed <code>E1042</code> identity.</li>
+<li>Atlas checks Okta's response, selects the enabled account, allows entry and creates its own session. Cookie issuance, approved navigation and the projects permission check complete the resource outcome.</li>
+</ol>
+<p>Okta does not merely forward the external assertion unchanged. The two relationships have separate issuers, targets, trust and identity mappings. Atlas's approved reliance is on Okta for the downstream statement; external-provider trust at Okta does not automatically become external-key trust at Atlas.</p>
+</details>
+<h2 id="12-diagnose-the-downstream-audience-without-changing-upstream-trust">12. Diagnose the downstream audience without changing upstream trust</h2>
+<p>In an independent external-IdP-to-Okta-to-Atlas attempt, Okta accepts the external response, resolves Devi's intended Okta user and issues a downstream response. The browser posts it to the expected Atlas ACS. Atlas reports successful signature verification under its approved Okta key but rejects the assertion audience, which names Okta's inbound SP instead of Atlas.</p>
+<p>An engineer proposes replacing the external IdP's signing certificate in Okta. Does that address the supplied failure? What should be compared and retested?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The supplied failure is on the Okta-to-Atlas relationship. Upstream acceptance is already established in this packet. Replacing the external provider's certificate would not correct the downstream audience value.</p>
+<p>Compare the Atlas app integration's audience setting, Atlas's approved SP entity ID and the actual downstream assertion. The upstream Okta SP identifier belongs to a different relationship and must not be substituted for Atlas's audience.</p>
+<p>Correct the confirmed mismatch through the supported process and retest the downstream message and complete Atlas result. Preserve the upstream relationship's own values. The packet identifies a configuration/output mismatch, but it does not establish who changed it or prove that every later application requirement will pass once it is corrected.</p>
+</details>
+<h2 id="13-at-which-account-boundary-would-jit-act">13. At which account boundary would JIT act?</h2>
+<p>Compare two independent inbound SAML cases involving an external IdP, Okta and Atlas:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Supplied state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Okta accepts the external assertion but cannot resolve an allowed Okta user. No permitted inbound JIT path is configured, so no downstream Atlas response is issued.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>A configured inbound JIT path creates the intended Okta user. Assignment and policy requirements are satisfied, Okta issues the response and Atlas accepts it, but Atlas has no matching account and no downstream JIT capability enabled.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Would enabling Atlas JIT repair A? Does successful inbound JIT establish that B has an Atlas account? What must be decided before enabling any account-linking or creation behavior?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Atlas account creation cannot repair A's unresolved Okta user boundary. B establishes creation of an Okta user under its inbound arrangement, not creation of an Atlas account. Atlas still needs its own supported account-readiness mechanism.</p>
+<p>Inbound JIT and downstream provisioning or JIT operate on different records. Identify which record is missing and which system owns the decision before proposing a change. Okta documents inbound matching, linking and JIT controls for the external-provider relationship. <a href="https://help.okta.com/oie/en-us/content/topics/security/idp-add-saml.htm">Okta external SAML IdP settings</a></p>
+<p>Linking or creating accounts is an explicit trust and lifecycle decision. Establish approved matching scope, who may be linked or created, source authority and applicable policy. A matching email-like string alone is not universal proof that two accounts belong to the same person. Permission to create an account also does not establish its later application permissions.</p>
+</details>
+<h2 id="14-does-routing-establish-authentication-or-authorization">14. Does routing establish authentication or authorization?</h2>
+<p>Northstar has several configured IdPs. For this fictional Okta Identity Engine attempt, the effective routing rule selects an approved provider using the requested application and available network context. No rule in this scenario uses email domain. A teammate claims that the provider selection must be wrong because the employee's email suffix suggests a different provider, then claims a successful route grants Atlas administration access.</p>
+<p>Which conclusions are unsupported? What evidence would explain the selection and the later access result?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The scenario explicitly supplies a rule that uses application and network context. An assumption that email domain always decides selection does not override that evidence. Okta routing rules can use several kinds of context; inspect the effective rule and the information available when it ran. <a href="https://help.okta.com/oie/en-us/content/topics/security/identity_provider_discovery.htm">Okta IdP routing rules</a></p>
+<p>Routing selects a provider. It does not establish successful authentication, satisfaction of every applicable policy, downstream account readiness or Atlas permission. Follow the selected provider's actual result and each subsequent boundary.</p>
+<p>For administration access, inspect Atlas's account and permission decisions. A correctly selected provider may be part of a successful sign-in while the application correctly denies a privileged action.</p>
+</details>
+<h2 id="15-does-a-second-browser-profile-prove-an-assertion-is-bad">15. Does a second browser profile prove an assertion is bad?</h2>
+<p>In browser profile A, Devi has usable external-provider and Okta sessions, and her Atlas sign-in proceeds without another visible challenge. In profile B, neither of those sessions is available. Profile B reaches the same approved provider through the configured route and is prompted to authenticate. No response rejection is supplied for either profile.</p>
+<p>An engineer treats the extra prompt as evidence of a bad assertion and proposes sharing one service's cookie with every participant. What does the supplied difference actually establish? What would you inspect if the prompt were followed by a failure?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The profiles have different available session state. The additional prompt is consistent with the supplied absence of usable authentication sessions in B. It does not establish a malformed or rejected assertion.</p>
+<p>Cookies are presented according to their scope, attributes and browser rules. The external provider, Okta and Atlas do not share one universal cookie that should be copied between them. Each has its own session responsibilities.</p>
+<p>If B later fails, reconstruct its actual redirects, submissions, available state and processing results. Browser restrictions, lost application context, unsatisfied authentication requirements and response rejection are different possibilities requiring evidence. Do not weaken browser protections or change trust based only on the presence of another prompt.</p>
+</details>
+<h2 id="16-describe-the-path-using-separate-dimensions">16. Describe the path using separate dimensions</h2>
+<p>Three independent fictional investigations establish these facts:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Atlas creates an AuthnRequest; Okta returns a correlated response through a browser POST.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Generic providers explicitly support a requested artifact-response flow; the browser carries SAMLart and the SP retrieves the response through SOAP. No Okta artifact support is claimed.</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Atlas requests Okta; Okta requests an external IdP; each relationship receives a separate correlated browser POST response.</td>
+</tr>
+</tbody>
+</table></div>
+<p>A tracker offers one mutually exclusive choice among “SP-initiated,” “POST,” “artifact” and “brokered.” Explain why that classification is incomplete and give a clearer description for each case. Do these observations alone prove resource access?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The choices mix initiation, delivery and participant topology. Those dimensions can coexist rather than compete for one label.</p>
+<p>A is an SP-initiated exchange with a POST response. B is a requested exchange with artifact response delivery and server-side SOAP resolution. C is a brokered journey with a requested exchange on each of its two relationships and POST responses on both legs.</p>
+<p>Add the actual request binding where the evidence establishes it; do not infer it merely from the response binding. A complete investigation then follows acceptance, identity mapping, account readiness, session creation and the requested resource result. The supplied movement and correlation facts help identify each path, but they do not establish every later decision or permitted access.</p>
+</details>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf">SAML Bindings, Redirect, POST, Artifact and SOAP</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, browser SSO and artifact resolution: §§4.1 and 5</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, artifact resolution: §3.5</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, RelayState and unsolicited-response exposure: E90</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/security/idp-inbound-saml-workflow.htm">Okta inbound SAML workflow</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/security/idp-add-saml.htm">Okta external SAML IdP settings, matching, linking and JIT</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/security/identity_provider_discovery.htm">Okta IdP routing rules</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies">MDN HTTP cookies, scope and browser context</a></li>
+</ul>
+</article><nav class="page-navigation" aria-label="Lesson sequence"><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><small>← Previous lesson</small>Responses and identity</a><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><small>Next lesson →</small>Trust and protection</a></nav></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#1-does-an-okta-tile-identify-who-initiated-saml">1. Does an Okta tile identify who initiated SAML?</a></li><li><a href="#2-decode-the-selected-binding-rather-than-every-message-alike">2. Decode the selected binding rather than every message alike</a></li><li><a href="#3-is-a-large-relaystate-payload-automatically-acceptable">3. Is a large RelayState payload automatically acceptable?</a></li><li><a href="#4-why-retain-the-original-redirect-representation">4. Why retain the original Redirect representation?</a></li><li><a href="#5-reconstruct-a-deliberately-unsolicited-sign-in">5. Reconstruct a deliberately unsolicited sign-in</a></li><li><a href="#6-does-a-valid-signature-remove-unsolicited-login-risk">6. Does a valid signature remove unsolicited-login risk?</a></li><li><a href="#7-does-a-deep-link-confer-permission">7. Does a deep link confer permission?</a></li><li><a href="#8-follow-an-artifact-without-treating-it-as-an-assertion">8. Follow an artifact without treating it as an assertion</a></li><li><a href="#9-which-request-does-artifactresponse-answer">9. Which request does ArtifactResponse answer?</a></li><li><a href="#10-where-did-artifact-processing-stop">10. Where did artifact processing stop?</a></li><li><a href="#11-follow-okta-across-two-relationships">11. Follow Okta across two relationships</a></li><li><a href="#12-diagnose-the-downstream-audience-without-changing-upstream-trust">12. Diagnose the downstream audience without changing upstream trust</a></li><li><a href="#13-at-which-account-boundary-would-jit-act">13. At which account boundary would JIT act?</a></li><li><a href="#14-does-routing-establish-authentication-or-authorization">14. Does routing establish authentication or authorization?</a></li><li><a href="#15-does-a-second-browser-profile-prove-an-assertion-is-bad">15. Does a second browser profile prove an assertion is bad?</a></li><li><a href="#16-describe-the-path-using-separate-dimensions">16. Describe the path using separate dimensions</a></li><li><a href="#sources">Sources</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

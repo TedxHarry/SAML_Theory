@@ -1,0 +1,341 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Find official documentation for the question at hand."><meta name="color-scheme" content="light"><title>Sources and further reading | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/reference/sources-and-further-reading/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/" aria-current="page">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><div class="eyebrow">Reference library</div><article class="prose"><h1 id="saml-with-okta-sources-and-further-reading">SAML with Okta: sources and further reading</h1>
+<p>Begin with the question you need to answer, then read the relevant section. You do not need to read every specification from beginning to end to investigate an integration. You do need to distinguish what SAML defines, what Okta supports, what the application requires and what the recorded attempt actually did.</p>
+<h2 id="choose-the-source-for-the-question">Choose the source for the question</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Source to use</th>
+<th>Limit of that source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What does this SAML field or processing rule mean?</td>
+<td>Relevant OASIS specification with applicable approved errata.</td>
+<td>A defined capability is not proof of product support.</td>
+</tr>
+<tr>
+<td>What does this Okta setting do?</td>
+<td>Official documentation for the applicable engine, integration and feature.</td>
+<td>A configured setting does not establish the receiver's result.</td>
+</tr>
+<tr>
+<td>What does the SP support or require?</td>
+<td>Application-vendor documentation, supported library guidance and the approved integration agreement.</td>
+<td>Another application's example does not establish this application's contract.</td>
+</tr>
+<tr>
+<td>How should this protection be implemented or reviewed?</td>
+<td>Applicable standards, maintained implementation documentation and current security guidance.</td>
+<td>An old sample is not a complete current algorithm or deployment policy.</td>
+</tr>
+<tr>
+<td>What happened in this attempt?</td>
+<td>Associated browser, provider and receiving/application records.</td>
+<td>Documentation describes behavior; it does not prove a particular runtime outcome.</td>
+</tr>
+</tbody>
+</table></div>
+<p>For the last question, use the <a href="/SAML_Theory/reference/troubleshooting-evidence/">troubleshooting evidence reference</a>. For an unfamiliar protocol feature, use the <a href="/SAML_Theory/reference/specialized-awareness/">specialized-awareness reference</a>. For recording an agreed design and its limits, use the <a href="/SAML_Theory/reference/integration-planning-changes-and-handover/">planning and handover reference</a>.</p>
+<h2 id="find-the-relevant-saml-document">Find the relevant SAML document</h2>
+<p>The four base specifications below are OASIS SAML 2.0 Standards. Read them with the applicable approved corrections in Errata 05, rather than treating an isolated paragraph or historical example as the complete rule.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Use it for</th>
+<th>Helpful starting sections</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core: Assertions and Protocols</a></td>
+<td>Message/statement meaning, identifiers, restrictions and protocols.</td>
+<td>§2.2 identifiers; §2.4 subjects; §2.5 conditions; §2.7 statements; §3.4 authentication requests; §3.7 logout.</td>
+</tr>
+<tr>
+<td><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf">SAML Bindings</a></td>
+<td>How messages or references travel.</td>
+<td>§3.4 Redirect; §3.5 POST; §3.6 Artifact; §3.2 SOAP when relevant.</td>
+</tr>
+<tr>
+<td><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles</a></td>
+<td>Rules combining SAML building blocks for a particular use case.</td>
+<td>§4.1 browser SSO, especially §4.1.4 processing; §4.4 logout; §5 artifact resolution when relevant.</td>
+</tr>
+<tr>
+<td><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf">SAML Metadata</a></td>
+<td>Participant roles, endpoints, keys and advertised requirements.</td>
+<td>§2.2.2 endpoints; §2.4.3 IdP role; §2.4.4 SP role.</td>
+</tr>
+<tr>
+<td><a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05</a></td>
+<td>Approved corrections to the original specifications.</td>
+<td>Locate the affected base document/section, then read the amended requirement.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Core defines the vocabulary; a profile constrains how it is used. For example, a field being optional in a generic XML schema does not settle whether browser SSO requires or prohibits it in a particular location. Likewise, a general binding's capabilities do not override the selected profile's permitted combinations.</p>
+<p>The <a href="https://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html">OASIS Technical Overview</a> provides explanatory architecture and example flows. The linked document identifies itself as Committee Draft 02. Use it for orientation, alongside the normative specifications and approved corrections; it is not a replacement for those rules.</p>
+<p>The <a href="https://docs.oasis-open.org/security/saml/Post2.0/sstc-metadata-iop.pdf">Metadata Interoperability Profile</a> is a separate OASIS Standard describing a metadata-based interoperability and trust model. It helps explain key acceptance in that named model. Confirm whether the receiver implements it before assuming its certificate-processing behavior applies.</p>
+<h3 id="errata-items-used-in-this-course">Errata items used in this course</h3>
+<p>Use these item numbers to locate the applicable amendments in <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.html">Errata 05</a>. The section numbers refer to the amended base specifications.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Subject</th>
+<th>Amended specification location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E14</td>
+<td>Identifier creation/association permission</td>
+<td>Core §3.4.1.1</td>
+</tr>
+<tr>
+<td>E76</td>
+<td>Shorter inherited metadata limits</td>
+<td>Metadata §§2.3.1, 2.3.2, 2.4.1 and 2.5</td>
+</tr>
+<tr>
+<td>E78</td>
+<td>Persistent identifiers cannot move to another principal</td>
+<td>Core §8.3.7</td>
+</tr>
+<tr>
+<td>E79</td>
+<td>Derived-session upper bound, with profile-specific processing</td>
+<td>Core §2.7.2</td>
+</tr>
+<tr>
+<td>E86</td>
+<td>Persistent identifier privacy without one mandated generation method</td>
+<td>Core §8.3.7</td>
+</tr>
+<tr>
+<td>E90</td>
+<td>RelayState handling and unsolicited-response CSRF</td>
+<td>Bindings §3.1.1; Profiles §§4.1.5–4.1.6</td>
+</tr>
+<tr>
+<td>E92</td>
+<td>Clock-difference tolerance</td>
+<td>Core §1.3.3 and related time processing</td>
+</tr>
+<tr>
+<td>E93</td>
+<td>Encryption integrity protection and permitted POST signature layers</td>
+<td>Core §6.2; Profiles §§4.1.3.5 and 4.1.4.3</td>
+</tr>
+<tr>
+<td>E94</td>
+<td>Cache refresh and metadata validity are separate</td>
+<td>Metadata §§4.3.1–4.3.2</td>
+</tr>
+</tbody>
+</table></div>
+<p>E79 concerns derived sessions; E94 concerns metadata cache refresh and validity. E76 addresses inherited metadata limits. Keep these separate when reading a sentence that compares assertion, session and metadata clocks.</p>
+<h3 id="read-a-rule-in-context">Read a rule in context</h3>
+<p>Identify the document, section, participant role, message, binding and profile. Then determine whether the text is a requirement, a recommendation, an optional capability or an example. Check applicable errata and cross-references. Words such as MUST or MAY acquire their scope from that context; copying the sentence without it can change the meaning.</p>
+<p>Historical specifications contain examples and algorithm references that are not current deployment recommendations. Use current approved security policy and supported implementation guidance when selecting actual protection.</p>
+<h2 id="find-the-relevant-okta-guidance">Find the relevant Okta guidance</h2>
+<p>Use Identity Engine material for the Northstar context. A page or UI label called <strong>Classic experience</strong> is not, by itself, proof that the org uses Classic Engine. Conversely, Classic Engine session or policy examples should not be assumed to describe Identity Engine behavior.</p>
+<h3 id="integration-identity-and-protection">Integration, identity and protection</h3>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Engineering question</th>
+<th>Official source</th>
+<th>What to look for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Is an existing integration suitable?</td>
+<td><a href="https://help.okta.com/oie/en-us/content/topics/apps/apps-add-applications.htm">Add existing app integrations</a></td>
+<td>Supported capabilities and the identified integration, rather than the app name alone.</td>
+</tr>
+<tr>
+<td>What does creating a custom integration or preview establish?</td>
+<td><a href="https://help.okta.com/oie/en-us/content/topics/apps/apps_app_integration_wizard_saml.htm">Create SAML app integrations</a></td>
+<td>Required partner information and generated assertion inspection.</td>
+</tr>
+<tr>
+<td>What do the SAML setting labels mean?</td>
+<td><a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">SAML field reference</a></td>
+<td>ACS/audience, identity output, distinct protection settings and request behavior.</td>
+</tr>
+<tr>
+<td>How are application attributes configured?</td>
+<td><a href="https://help.okta.com/oie/en-us/content/topics/apps/federated-claims-overview.htm">Custom claims</a></td>
+<td>Applicable current/legacy configuration, sources and actual output.</td>
+</tr>
+<tr>
+<td>How are provider signing certificates managed?</td>
+<td><a href="https://help.okta.com/oie/en-us/content/topics/apps/manage-signing-certificates.htm">Manage signing certificates</a></td>
+<td>Available material, activation and integration setup information.</td>
+</tr>
+<tr>
+<td>How is account lifecycle configured separately from sign-in?</td>
+<td><a href="https://help.okta.com/oie/en-us/content/topics/provisioning/lcm/lcm-deploy-cloud.htm">Provisioning workflow</a></td>
+<td>Supported lifecycle capabilities and assignment as distinct work.</td>
+</tr>
+<tr>
+<td>What changes when Okta receives upstream SAML?</td>
+<td><a href="https://help.okta.com/oie/en-us/content/topics/security/idp-add-saml.htm">Add a SAML Identity Provider</a></td>
+<td>Inbound issuer/trust, verification, matching and linking choices.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Pair these pages with the application's supported configuration guide and the actual integration's setup information. Atlas is fictional, so its example values do not substitute for a real vendor's contract. A signature setting or certificate file is not proof of successful runtime acceptance.</p>
+<p>For the connected explanations, see <a href="/SAML_Theory/reference/field-comparison-and-message-anatomy/">message anatomy</a>, <a href="/SAML_Theory/reference/binding-comparison/">bindings</a> and <a href="/SAML_Theory/reference/trust-and-protection/">trust/protection</a>.</p>
+<h3 id="policy-sessions-lifecycle-and-logout">Policy, sessions, lifecycle and logout</h3>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Engineering question</th>
+<th>Official source</th>
+<th>Scope to preserve</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What governs Okta session context?</td>
+<td><a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/about-okta-sign-on-policies.htm">Global session policies</a></td>
+<td>Provider session/authentication decisions.</td>
+</tr>
+<tr>
+<td>What authentication does an app require?</td>
+<td><a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/about-app-sign-on-policies.htm">App sign-in policies</a></td>
+<td>Applicable app authentication requirements, distinct from local app authorization.</td>
+</tr>
+<tr>
+<td>How are Okta sessions and cookie persistence governed?</td>
+<td><a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/add-okta-sign-on-policy-rule.htm">Identity Engine global session rules</a></td>
+<td>Session establishment, maximum/idle lifetimes and cookie persistence; separate from app-local sessions.</td>
+</tr>
+<tr>
+<td>What session assumptions differ by engine?</td>
+<td><a href="https://developer.okta.com/docs/guides/oie-upgrade-sessions-api/main/">Identity Engine session guidance</a></td>
+<td>Engine-specific context and cautions; this is an upgrade guide, not a reason to copy historical API recipes.</td>
+</tr>
+<tr>
+<td>What does basic SAML SLO support?</td>
+<td><a href="https://help.okta.com/oie/en-us/content/topics/apps/apps_single_logout.htm">Configure Single Logout</a></td>
+<td>App support, signed initiating requests and documented response delivery.</td>
+</tr>
+<tr>
+<td>How are other participants notified?</td>
+<td><a href="https://developer.okta.com/docs/guides/single-logout/saml2/main/">Front-channel SAML SLO guide</a></td>
+<td>Feature status, initiation/participation configuration, browser delivery and participant responsibility.</td>
+</tr>
+<tr>
+<td>What does deactivation affect?</td>
+<td><a href="https://help.okta.com/oie/en-us/content/topics/users-groups-profiles/usgp-deactivate-user-account.htm">Deactivate user accounts</a></td>
+<td>Background completion and applicable downstream deprovisioning.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Check current feature availability and the exact integration's support before transferring an example to another org. A separately documented mechanism, such as <a href="https://developer.okta.com/docs/guides/oin-universal-logout-overview/">Universal Logout</a>, needs its own supported relationship; using SAML does not automatically enable it.</p>
+<p>The <a href="/SAML_Theory/reference/sessions-reauthentication-and-logout/">session and logout reference</a> keeps provider state, application state, propagation and confirmed results separate.</p>
+<h3 id="investigation-evidence">Investigation evidence</h3>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Useful purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://help.okta.com/oie/en-us/content/topics/reports/reports_syslog.htm">System Log</a></td>
+<td>Org-side observations and event context.</td>
+</tr>
+<tr>
+<td><a href="https://help.okta.com/oie/en-us/content/topics/reports/syslog-filters.htm">System Log filters and search</a></td>
+<td>Narrowing the relevant activity without treating an unsuccessful search as proof of absence.</td>
+</tr>
+<tr>
+<td><a href="https://developer.okta.com/docs/reference/system-log-query/">System Log query guide</a></td>
+<td>Event/operation/session correlation and the limits of those identifiers.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Use the documented meaning of each event and field. Do not turn an illustrative normalized packet into an invented vendor event schema, or assume the log's operation identifier equals a SAML request ID. Receiver and application records remain necessary for their own decisions.</p>
+<h2 id="read-deeper-when-a-protection-question-requires-it">Read deeper when a protection question requires it</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Why to open it</th>
+<th>How to use it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://www.w3.org/TR/xmldsig-core1/">W3C XML Signature 1.1</a></td>
+<td>References, SignedInfo, digest and signature-value processing.</td>
+<td>Start with §§3.2 and 4.4; connect the mechanism to the applicable SAML rules and implementation.</td>
+</tr>
+<tr>
+<td><a href="https://www.w3.org/TR/xmlenc-core1/">W3C XML Encryption 1.1</a></td>
+<td>Encrypted data, protected key material and algorithm roles.</td>
+<td>Start with §2.2 for the structure; do not infer a universal SAML processing order from one example.</td>
+</tr>
+<tr>
+<td><a href="https://www.w3.org/TR/xmldsig-bestpractices/">W3C XML Signature Best Practices</a></td>
+<td>Trust, safe processing and verified-versus-consumed content.</td>
+<td>This is a Working Group Note providing guidance, not a replacement for normative SAML requirements.</td>
+</tr>
+<tr>
+<td><a href="https://cheatsheetseries.owasp.org/cheatsheets/SAML_Security_Cheat_Sheet.html">OWASP SAML Security Cheat Sheet</a></td>
+<td>Defensive review of implementation and configuration.</td>
+<td>Apply relevant controls to the selected supported design rather than treating the page as proof that they are already enforced.</td>
+</tr>
+<tr>
+<td><a href="https://pages.nist.gov/800-63-4/sp800-63c.html">NIST federation guidance</a></td>
+<td>Trust, federation assurance and session relationships.</td>
+<td>Read its applicability and requirements in context; it does not automatically impose one assurance/compliance framework on every Okta integration.</td>
+</tr>
+<tr>
+<td><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies">MDN HTTP cookies</a></td>
+<td>Browser storage, sending, removal and cookie attributes.</td>
+<td>Distinguish browser-held information from the application's session enforcement.</td>
+</tr>
+</tbody>
+</table></div>
+<p>These are targeted references for understanding and investigation. Cryptographic mechanisms still need maintained implementations and currently approved supported choices. Reading their internal structure is not an instruction to implement signature or encryption algorithms yourself.</p>
+<h2 id="resolve-an-apparent-disagreement-by-separating-its-scope">Resolve an apparent disagreement by separating its scope</h2>
+<p>Suppose Daniel reads that the amended browser SSO profile permits response or assertion signature protection for POST, while Atlas requires a signed assertion. Those statements answer different questions.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>What it answers in this case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Profiles §4.1.3.5 with Errata 05 E93</td>
+<td>What the amended profile permits/requires for that protection context.</td>
+</tr>
+<tr>
+<td>Atlas's approved receiving contract</td>
+<td>Which supported arrangement this particular application requires.</td>
+</tr>
+<tr>
+<td>Okta's field reference and effective configuration</td>
+<td>Which signed layers the provider is configured to produce.</td>
+</tr>
+<tr>
+<td>Actual receiver evidence</td>
+<td>Whether the required verification and remaining acceptance checks passed for the attempt.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The broader protocol permission does not waive Atlas's narrower supported contract. A selectable Okta setting does not prove Atlas accepted its output. Use the relevant <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">Profiles</a> and <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">E93 correction</a>, then establish application requirements and actual outcomes separately.</p>
+<p>For a new question, record the claim, authoritative source and section, applicable role/profile/binding, product/feature conditions, and the evidence still needed. If documentation and observed behavior remain inconsistent, preserve both observations and involve the responsible application, implementation or vendor owner. Do not silently weaken a requirement to make the disagreement disappear.</p>
+</article></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#choose-the-source-for-the-question">Choose the source for the question</a></li><li><a href="#find-the-relevant-saml-document">Find the relevant SAML document</a></li><li><a href="#find-the-relevant-okta-guidance">Find the relevant Okta guidance</a></li><li><a href="#read-deeper-when-a-protection-question-requires-it">Read deeper when a protection question requires it</a></li><li><a href="#resolve-an-apparent-disagreement-by-separating-its-scope">Resolve an apparent disagreement by separating its scope</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

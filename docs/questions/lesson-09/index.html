@@ -1,0 +1,277 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Practice Lesson 9 with independent scenarios and expandable explanations."><meta name="color-scheme" content="light"><title>Integration design and changes: questions | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/questions/lesson-09/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/" aria-current="page"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><nav class="reading-modes" aria-label="Lesson material"><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/">Lesson 9</a><a href="/SAML_Theory/questions/lesson-09/" aria-current="page">Questions <span>(15)</span></a></nav><article class="prose"><h1 id="lesson-9-secure-integration-design-and-change-planning">Lesson 9: Secure integration design and change planning</h1>
+<h2 id="1-review-the-proposal-before-treating-it-as-configuration">1. Review the proposal before treating it as configuration</h2>
+<p>Daniel is reviewing an Atlas test integration with Northstar's Okta Identity Engine org. The approved design uses SP-initiated Redirect/POST, a signed assertion and a scoped employee identifier. The fictional proposal contains these entries:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Approved requirement</th>
+<th>Proposed value or assumption</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SP entity ID</td>
+<td><code>https://atlas-test.northstar.example/saml</code></td>
+<td>Correct test value</td>
+</tr>
+<tr>
+<td>ACS</td>
+<td><code>https://atlas-test.northstar.example/saml/acs</code></td>
+<td><code>https://atlas.northstar.example/saml/acs</code>, the production address</td>
+</tr>
+<tr>
+<td>Account selection</td>
+<td>Employee identifier <code>E1042</code> in the approved issuer relationship</td>
+<td>Devi's email address</td>
+</tr>
+<tr>
+<td>Account readiness</td>
+<td>Enabled test account or an agreed supported creation mechanism</td>
+<td>Okta assignment proves readiness</td>
+</tr>
+<tr>
+<td>Logout</td>
+<td>Explicit targeted service/session outcomes</td>
+<td>“Every session ends when Okta logout succeeds”</td>
+</tr>
+</tbody>
+</table></div>
+<p>The <code>.example</code> addresses and records are fictional. Does the correct entity ID make the proposal ready? Identify the unresolved decisions without claiming any runtime outcome.</p>
+<details>
+<summary>Show explanation</summary>
+<p>The proposal is not ready on this packet. It copies the production receiving address, changes the agreed identity value, assumes downstream account readiness and leaves logout scope unsupported. A correct entity ID does not compensate for those independent gaps.</p>
+<p>Use the approved test ACS, preserve or explicitly review the intended scoped identifier relationship, obtain the downstream account evidence, and define the supported logout mechanisms and per-service expectations. Record who owns each decision and its authoritative source.</p>
+<p>These are review findings about proposed values. They establish neither that production accepted a test response nor that a corrected test will pass. Effective configuration, emitted messages and receiver outcomes still require evidence. Review by purpose and environment rather than by whether a string looks familiar.</p>
+</details>
+<h2 id="2-does-the-standards-feature-list-define-this-projects-scope">2. Does the standard's feature list define this project's scope?</h2>
+<p>Atlas test's approved requirement is a supported SP-initiated Redirect/POST sign-in. There is no requirement for unsolicited acceptance, artifact delivery or an external provider. A developer adds all three to the proposal because they appear in SAML documentation, without checking support in the selected Atlas edition or Okta integration.</p>
+<p>Should the review treat these additions as mandatory completeness work? What would justify including another path?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The standard defines capabilities beyond this project's selected path. Their existence does not make every capability necessary or supported in a particular product configuration.</p>
+<p>Retain the explicit agreed scope. Include another path when a concrete requirement, documented participant support, appropriate trust and account decisions, and corresponding acceptance tests justify it. For example, unsolicited acceptance needs its own deliberate controls rather than becoming a fallback for failed requested correlation.</p>
+<p>An OIN or custom integration must match the actual application deployment. Adding options without requirements can introduce unreviewed behavior and confuse what a successful test proves. A complete design explains the selected relationship and its limits; it does not need every mechanism in the standard.</p>
+</details>
+<h2 id="3-which-failed-assumption-does-each-control-address">3. Which failed assumption does each control address?</h2>
+<p>A fictional Atlas design review finds three separate assumptions:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Assumption</th>
+<th>Supplied concern</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>A signed, unexpired assertion can create another session each time it is submitted.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>A genuinely signed response for Atlas must complete any browser's current pending sign-in.</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Once any assertion verifies, account selection may read a NameID from another object in the document.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Identify the missing relationship or control for each. Would fixing any one make the other two safe automatically?</p>
+<details>
+<summary>Show explanation</summary>
+<p>A needs effective bearer-assertion replay prevention tied to the actual assertion and applicable lifetime, including relevant receiving nodes. Signature and time checks do not establish permitted reuse.</p>
+<p>B needs the requested exchange's usable provider/browser context and required correlation. Approved origin and audience do not establish that the result answers this particular browser attempt.</p>
+<p>C needs safe, unambiguous object selection connecting application use to the exact content whose required protection passed. Verification of one object cannot authenticate another object's identity.</p>
+<p>These controls address different assumptions. A replay check does not repair incorrect request association, and correct correlation does not repair unsafe consumed-content selection. Each also leaves other targeting, timing, authentication and application requirements to be satisfied.</p>
+</details>
+<h2 id="4-did-an-assignment-test-actually-exercise-assignment">4. Did an assignment test actually exercise assignment?</h2>
+<p>The test objective is: an unassigned user must not establish a new Atlas session through the Okta integration. The tester removes the user's Okta assignment but leaves a usable Atlas session in the browser. Atlas then returns projects without starting SAML. The report calls this a failure of the Okta assignment boundary.</p>
+<p>What did this test actually exercise? How should the starting conditions and expected evidence be improved?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The observed request exercised Atlas's existing local session and resource rules. It did not establish that the unassigned user completed a new Okta-to-Atlas exchange or created a new application session.</p>
+<p>To test the stated boundary, use an approved isolated test identity and browser state without a usable Atlas session. Establish the effective assignment condition, observe the actual new exchange or denial, and record whether this attempt created a downstream session.</p>
+<p>If the requirement also concerns immediate termination of old application sessions after assignment removal, define that as a separate lifecycle/session requirement with its own supported mechanism and test. Do not interpret one test as evidence for both boundaries when its starting state only exercised one.</p>
+</details>
+<h2 id="5-mark-results-by-evidence-rather-than-by-the-word-denied">5. Mark results by evidence rather than by the word “denied”</h2>
+<p>An approved isolated test plan produces these fictional records. Starting states and fixtures have been established as shown; no production manipulation is involved.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Expected result</th>
+<th>Actual evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Assigned user with the expected enabled account reaches projects through a new sign-in.</td>
+<td>Correct test delivery, SAML acceptance, intended account, new session and permitted projects confirmed.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Valid SAML lacking required department is rejected by Atlas's application data check.</td>
+<td>Atlas records SAML acceptance, required-department denial and no new session.</td>
+</tr>
+<tr>
+<td>C</td>
+<td>A fixture with an unacceptable audience is rejected at the target check.</td>
+<td>A generic browser error appears; no receiver processing result is available.</td>
+</tr>
+<tr>
+<td>D</td>
+<td>An enabled reader signs in but cannot perform the restricted administrative action.</td>
+<td>A new session works for projects; the administrative action unexpectedly succeeds.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Classify each as pass, fail or unresolved against its criterion. Why is one denial a pass while another apparent failure is unresolved?</p>
+<details>
+<summary>Show explanation</summary>
+<p>A passes its supplied criterion. B also passes: intended rejection at the specified application-data boundary is successful test behavior.</p>
+<p>C is unresolved. The generic error does not establish rejection for the intended audience reason. The attempt could have stopped earlier, so the required receiver result is still missing. D fails because the restricted action was allowed when the criterion required denial.</p>
+<p>A test result compares actual evidence with a specific expected outcome. “Something went wrong” is not automatically a successful rejection test, just as a denied operation is not automatically an integration defect. Preserve the boundary and evidence needed to defend each classification.</p>
+</details>
+<h2 id="6-improve-a-test-matrix-that-checks-only-the-happy-path">6. Improve a test matrix that checks only the happy path</h2>
+<p>Atlas test's intended contract requires an approved signed assertion for the correct audience and pending request, an exact employee-identifier match to one enabled account, required department data, and reader-only resource permissions. The proposed test plan checks only that Devi's browser returns to Atlas's home page.</p>
+<p>Suggest a small set of meaningful acceptance tests, with starting conditions and evidence. Controlled invalid-message cases are available only through the owners' approved isolated test facility. This is a planning exercise, not a request to generate or submit attack messages.</p>
+<details>
+<summary>Show explanation</summary>
+<p>Begin with a permitted baseline that has no existing app session, an assigned user, satisfied policy and the expected enabled test account. Require correct test delivery, SAML acceptance, actual scoped identity, required claims, session creation and permitted resource evidence.</p>
+<p>Add an agreed restricted-resource case for that reader account, expecting denial after a usable sign-in. Add separate supported fixtures for wrong target, wrong requested correlation and repeated assertion, each with the relevant receiver rejection and no successful new session. A missing-department case should establish SAML acceptance followed by the required application-data denial.</p>
+<p>Choose remaining cases from the actual release risks, such as unsatisfied authentication policy, clock boundaries or a planned key change. Keep each case's starting state and expected stopping boundary explicit. A home page alone cannot prove the identity, permission and rejection requirements in this contract.</p>
+</details>
+<h2 id="7-did-a-successful-sign-in-after-an-identifier-change-preserve-the-account">7. Did a successful sign-in after an identifier change preserve the account?</h2>
+<p>Atlas's approved design selects Devi's existing test account using scoped employee identifier <code>E1042</code>. A proposed mapping change emits email instead. During a supported isolated test, the application creates a second account through its configured JIT mechanism, and that account reaches a permitted page. The original account still holds Devi's expected project associations. No migration decision was approved.</p>
+<p>Can the new page access be recorded as successful preservation of the identity relationship? What needs to be decided and retested?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The new sign-in does not establish preservation of the intended account. The supplied evidence identifies a second account, while the requirement concerns Devi's existing relationship and project associations.</p>
+<p>Determine whether the intended design should preserve the employee identifier, migrate the link under a supported controlled process or block the changed identity pending correction. Involve the account and lifecycle owners rather than adopting an accidental duplicate as the new contract.</p>
+<p>Retest the emitted value, unique intended account selection, relevant data associations, permissions and lifecycle behavior. A reachable page is weaker evidence than correct account continuity. Also assess the created duplicate separately; reverting a mapping does not automatically remove it or reverse any actions it performed.</p>
+</details>
+<h2 id="8-does-releasing-every-group-solve-an-unclear-claim-contract">8. Does releasing every group solve an unclear claim contract?</h2>
+<p>Atlas requires <code>department</code> and one agreed reader group value. Daniel proposes sending every available Okta group and profile field because the application team has not yet confirmed exact attribute names, value multiplicity or role interpretation. A preview shows many values, so the proposal labels claims complete.</p>
+<p>What agreement is missing? Which evidence should establish a minimal, usable release without treating preview output as application acceptance?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Agree the technical names and name formats, authoritative sources, value types, multiplicity, required/missing behavior and application meaning. Group names do not carry universal roles, and extra output does not resolve an unclear contract.</p>
+<p>Configure the selected claim model and inspect the actual required values. Okta's current documentation distinguishes current and legacy claims configuration, so source expressions must match the applicable model. <a href="https://help.okta.com/oie/en-us/content/topics/apps/federated-claims-overview.htm">Okta custom claims</a></p>
+<p>Then verify that the identified live test delivered the expected statements and that Atlas consumed them for the correct account and permission outcome. A preview is useful generated-output evidence. It does not establish runtime acceptance, and releasing unnecessary data adds exposure without establishing correctness.</p>
+</details>
+<h2 id="9-do-different-product-ids-prove-different-attempts">9. Do different product IDs prove different attempts?</h2>
+<p>Daniel assembles a fictional test packet. Okta's normalized record contains diagnostic reference <code>okta-record-42</code>; the browser's outgoing SAML request ID is <code>_req_Q09_42</code>; Atlas has local processing reference <code>atlas-record-88</code>. These are synthetic labels, not vendor event schemas. The packet does not yet document how the records were associated.</p>
+<p>A reviewer rejects the packet because the identifiers differ. Another reviewer assumes they must belong together because they were collected on the same day. What would establish a defensible association? What does a failed System Log search prove by itself?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Product diagnostic IDs and SAML message IDs have different roles and need not be identical. But collecting records on one day does not prove their association either.</p>
+<p>Connect the exact test case, user, integration/environment, browser context, timestamps and time zones, available message correlation and supported diagnostic relationships. Document what connects each record and what remains uncertain. Preserve enough approved correlation when redacting evidence.</p>
+<p>For a missing System Log result, inspect the search scope, time range, target, filters and logging expectations before concluding an action never occurred. The log supplies Okta-side events, not Atlas's internal decision. A missing search result alone establishes neither the absence of an exchange nor successful downstream processing. <a href="https://help.okta.com/oie/en-us/content/topics/reports/reports_syslog.htm">Okta System Log</a></p>
+</details>
+<h2 id="10-why-stage-environment-mapping-and-signing-changes-separately">10. Why stage environment, mapping and signing changes separately?</h2>
+<p>A proposed Atlas test update changes its ACS, replaces employee-number output with email, adds department, changes authentication policy and activates signing key K2 in one operation. The only recorded pre-change result is that a different user once reached a page. No individual acceptance criteria or recovery checkpoints exist.</p>
+<p>What makes the plan difficult to diagnose and recover? Suggest a more explainable sequence without assuming every change is already justified.</p>
+<details>
+<summary>Show explanation</summary>
+<p>Several independent relationships would change at once without a reliable baseline or a defined result for each. A later failure could involve delivery, identity mapping, claims, policy or trust, while recovery would have to account for several altered states.</p>
+<p>First confirm which changes meet approved requirements. Establish a baseline and correct environment values and the agreed account/claim contract with appropriate tests. Treat the signing transition as a separately identifiable change with receiver prerequisites, activation behavior and recovery conditions. Isolate policy changes and their expected authentication outcomes as needed for the scope.</p>
+<p>Record effective state and evidence at useful checkpoints. Staging improves attribution and recovery; it does not justify a speculative mapping change or replace final integrated testing. The proposed email replacement still needs an approved identity decision before execution.</p>
+</details>
+<h2 id="11-does-one-successful-node-make-a-key-cutover-ready">11. Does one successful node make a key cutover ready?</h2>
+<p>Northstar plans to activate approved K2 for Atlas. The receiving deployment supports controlled overlap with uncompromised K1. A settings screenshot declares K2 imported, and node A's actual K2 verification test passes. Node B's runtime inventory still contains only K1. A dashboard shows that Devi succeeded through node A. K2 is not yet the sender's active key.</p>
+<p>Should the team proceed based on Devi's success? Which evidence and stopping criteria apply?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Node B is a known unmet prerequisite. The screenshot and A's successful test do not establish effective trust across every receiver that may handle K2 output.</p>
+<p>Confirm authoritative K2 information, supported adoption on each relevant instance, the sender's selected and observed key, intended verification results and the complete account/resource outcome. Okta generation or activation is separate from receiver adoption. <a href="https://help.okta.com/oie/en-us/content/topics/apps/manage-signing-certificates.htm">Okta signing certificate management</a></p>
+<p>Hold progression while a required receiver lacks K2. Define post-change stops as well, such as unexpected signing material, wrong-account selection or a rejection test creating a session. A healthy result on one path must not conceal a known failure on another required path.</p>
+</details>
+<h2 id="12-does-rollback-reverse-accounts-sessions-and-disclosures">12. Does rollback reverse accounts, sessions and disclosures?</h2>
+<p>During an approved isolated test of a mapping change, Atlas creates a duplicate account, establishes a session for it and releases more profile data than the agreed contract requires. Daniel restores the previous configuration values. No separate account, session or evidence-handling actions have been taken.</p>
+<p>Can the team report that every effect was reversed? What should a recovery assessment distinguish? How would a suspected compromised K1 affect a proposed signing rollback?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Restoring configuration can restore selected future behavior, but it does not establish deletion or reconciliation of the duplicate, invalidation of the created session or reversal of a disclosure. Assess those effects under the applicable owners and supported procedures.</p>
+<p>Record which state was restored, which artifacts and sessions remain, what exposure occurred and what follow-up is required. Verify the restored sender/receiver agreement rather than treating a configuration save as completed recovery.</p>
+<p>A signing rollback additionally requires a permitted, available sender key and matching receiver trust. If K1 may be compromised, restoring its authority is not an ordinary availability fix. Use the approved incident and containment decision instead of assuming the old state remains safe.</p>
+</details>
+<h2 id="13-is-an-unverified-alternate-administrator-account-enough-recovery-planning">13. Is an unverified alternate administrator account enough recovery planning?</h2>
+<p>A federation change may affect administrative access to an application. The plan lists an alternate administrator account, but no owner has verified its permitted use, availability, monitoring or ability to work independently of the federation path being changed. The proposed recovery step is simply “use the alternate account.”</p>
+<p>What is missing? Does recovery readiness require an undocumented bypass or disclosure of credentials in the integration handover?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The plan has named a possible route without establishing its readiness. Under the organization's procedures, confirm an authorized owner, the route's supported independence from the changed path, permitted use and monitoring, and evidence that it is available when needed.</p>
+<p>This does not require an undocumented policy bypass or putting credentials into a broadly shared handover. Reference the approved access and recovery process through its controlled location and responsible owner.</p>
+<p>The practical question is whether recovery can be carried out through a permitted supported mechanism if the federation path fails. A line in a spreadsheet is not that evidence. Resolve this prerequisite before claiming readiness for a change that could remove administrative access.</p>
+</details>
+<h2 id="14-can-a-green-test-justify-an-undocumented-exception">14. Can a green test justify an undocumented exception?</h2>
+<p>Atlas's approved design requires requested correlation and approved issuer-specific keys. A proposed integration workaround disables correlation and automatically accepts whichever certificate a response includes. A demonstration then reaches projects. The team has not approved a different security agreement or established compensating controls.</p>
+<p>Should the demonstration be treated as meeting the original requirements? What should the review record and investigate?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The demonstration changed the controls whose requirements were being assessed. It does not establish that the original requested-correlation and approved-trust design works.</p>
+<p>Record the specific unsupported requirement or implementation limitation, the changed behavior and its security effect. Seek documented support, a suitable implementation correction or an explicitly evaluated supported alternative through the responsible decision owner. Do not make the exception invisible by calling the permissive result a pass.</p>
+<p>A signature verified using a self-supplied key does not authorize that key, and reaching a resource does not establish the intended request relationship. A useful review connects the success claim to the actual controls and evidence that produced it.</p>
+</details>
+<h2 id="15-make-the-release-and-handover-decision">15. Make the release and handover decision</h2>
+<p>The Atlas test handover contains this fictional state:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Current evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Environment</td>
+<td>Approved test entity ID and ACS recorded; copied production address corrected in the proposal.</td>
+</tr>
+<tr>
+<td>Identity and claims</td>
+<td>Employee mapping and department contract documented; preview matches the proposed output.</td>
+</tr>
+<tr>
+<td>Runtime</td>
+<td>No browser-to-Atlas test has been completed.</td>
+</tr>
+<tr>
+<td>Trust change</td>
+<td>K2 generated; effective receiver adoption not confirmed.</td>
+</tr>
+<tr>
+<td>Rejection cases</td>
+<td>Planned but not run.</td>
+</tr>
+<tr>
+<td>Recovery</td>
+<td>Administrative recovery owner and readiness unresolved.</td>
+</tr>
+<tr>
+<td>Logout</td>
+<td>Requirement still says “all sessions”; targeted services and devices undefined.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The release criterion requires complete baseline access, selected rejection cases, receiving-key readiness, defined logout scope and approved recovery readiness. Is the packet ready for release? Write a short handover decision with the smallest useful next evidence for the unresolved areas.</p>
+<details>
+<summary>Show explanation</summary>
+<p>The supplied packet is not ready against its release criterion. It records useful design work, but preview output and proposed corrections do not establish runtime access, rejection behavior or key adoption.</p>
+<p>A useful decision is: “Hold release progression. Confirm effective test configuration and approved trust, then run the baseline to establish actual identity, claims, account, session and permitted-resource outcomes. Run the selected rejection cases with their receiver evidence. Confirm K2 readiness on relevant instances before any sender cutover, establish authorized recovery readiness, and define and test the intended per-service logout scope.”</p>
+<p>Assign owners and evidence references to these items and record pass, fail or unresolved results when available. The handover should preserve what was established without converting planned work into completed tests. Another engineer needs the current agreement, effective state, evidence, limits and next decisions, rather than a success label detached from those facts.</p>
+</details>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/apps_app_integration_wizard_saml.htm">Okta SAML integration and assertion preview</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/federated-claims-overview.htm">Okta custom claims</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/manage-signing-certificates.htm">Okta signing certificate management</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/reports/reports_syslog.htm">Okta System Log</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, request correlation and replay requirements</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, unsolicited-response and RelayState considerations: E90</a></li>
+<li><a href="https://www.w3.org/TR/xmldsig-bestpractices/">W3C XML Signature Best Practices</a></li>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/SAML_Security_Cheat_Sheet.html">OWASP SAML security guidance</a></li>
+</ul>
+</article><nav class="page-navigation" aria-label="Lesson sequence"><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><small>← Previous lesson</small>Sessions and logout</a><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><small>Next lesson →</small>Troubleshooting and casework</a></nav></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#1-review-the-proposal-before-treating-it-as-configuration">1. Review the proposal before treating it as configuration</a></li><li><a href="#2-does-the-standards-feature-list-define-this-projects-scope">2. Does the standard's feature list define this project's scope?</a></li><li><a href="#3-which-failed-assumption-does-each-control-address">3. Which failed assumption does each control address?</a></li><li><a href="#4-did-an-assignment-test-actually-exercise-assignment">4. Did an assignment test actually exercise assignment?</a></li><li><a href="#5-mark-results-by-evidence-rather-than-by-the-word-denied">5. Mark results by evidence rather than by the word “denied”</a></li><li><a href="#6-improve-a-test-matrix-that-checks-only-the-happy-path">6. Improve a test matrix that checks only the happy path</a></li><li><a href="#7-did-a-successful-sign-in-after-an-identifier-change-preserve-the-account">7. Did a successful sign-in after an identifier change preserve the account?</a></li><li><a href="#8-does-releasing-every-group-solve-an-unclear-claim-contract">8. Does releasing every group solve an unclear claim contract?</a></li><li><a href="#9-do-different-product-ids-prove-different-attempts">9. Do different product IDs prove different attempts?</a></li><li><a href="#10-why-stage-environment-mapping-and-signing-changes-separately">10. Why stage environment, mapping and signing changes separately?</a></li><li><a href="#11-does-one-successful-node-make-a-key-cutover-ready">11. Does one successful node make a key cutover ready?</a></li><li><a href="#12-does-rollback-reverse-accounts-sessions-and-disclosures">12. Does rollback reverse accounts, sessions and disclosures?</a></li><li><a href="#13-is-an-unverified-alternate-administrator-account-enough-recovery-planning">13. Is an unverified alternate administrator account enough recovery planning?</a></li><li><a href="#14-can-a-green-test-justify-an-undocumented-exception">14. Can a green test justify an undocumented exception?</a></li><li><a href="#15-make-the-release-and-handover-decision">15. Make the release and handover decision</a></li><li><a href="#sources">Sources</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

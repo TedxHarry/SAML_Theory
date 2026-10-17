@@ -1,0 +1,441 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Read the agreement, endpoints, entity IDs and trusted configuration."><meta name="color-scheme" content="light"><title>Planning and metadata | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/" aria-current="page"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><nav class="reading-modes" aria-label="Lesson material"><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/" aria-current="page">Lesson 2</a><a href="/SAML_Theory/questions/lesson-02/">Questions <span>(15)</span></a></nav><article class="prose"><h1 id="lesson-2-planning-an-okta-saml-integration-and-reading-metadata">Lesson 2: Planning an Okta SAML integration and reading metadata</h1>
+<p>Devi can sign in to Atlas through Okta. Daniel, the engineer responsible for federation at Northstar Research, now needs to document how that integration works and prepare a separate test environment. He has a practical question to answer before anyone copies settings: which information belongs to Atlas, which belongs to Okta, and what must each side agree to trust?</p>
+<p>A successful sign-in is useful evidence, but it does not explain the configuration that produced it. If Daniel cannot identify the source and purpose of each value, he may reproduce the wrong relationship in test, overlook an account-matching assumption, or leave a certificate change without an owner.</p>
+<p>The starting point is an integration agreement that can be explained. Metadata supplies part of that agreement in a structured form. The rest comes from the application’s requirements, Okta configuration, and the people responsible for operating both systems.</p>
+<h2 id="21-collect-the-requirements-before-changing-settings">2.1 Collect the requirements before changing settings</h2>
+<h3 id="begin-with-the-applications-expectations">Begin with the application’s expectations</h3>
+<p>Atlas owns the service Devi wants to use. Its application team must explain how Atlas receives SAML, which identity it expects, and how that identity becomes a local account. Daniel should not have to guess those answers from the names of Okta fields.</p>
+<p>For the existing Northstar example, Atlas’s entity ID is <code>https://atlas.northstar.example/saml</code>, and its SAML receiving endpoint is <code>https://atlas.northstar.example/saml/acs</code>. These values are fictional, but their different purposes are important: one identifies Atlas as a SAML participant; the other identifies a location that receives a message.</p>
+<p>Priya, Atlas’s application owner, also needs to specify the application’s account rules. Does Atlas expect an email address, an employee number, or another identifier? Must the account already exist? Which attributes does it require? If a department or group value is supplied, how does Atlas interpret it?</p>
+<p>Without these answers, Daniel could deliver a technically acceptable identity statement that Atlas cannot use. There is no universal field called “the username” that automatically means the same thing to both products.</p>
+<h3 id="turn-the-requirements-into-a-shared-information-sheet">Turn the requirements into a shared information sheet</h3>
+<p>An information sheet makes configuration review more useful than comparing screenshots. Each entry should identify a value, its purpose, where it came from, and who can confirm it.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Evidence or decision needed</th>
+<th>Responsibility in this example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Which application instance and environment?</td>
+<td>Atlas production or Atlas test, with separately identified configuration</td>
+<td>Daniel and Priya</td>
+</tr>
+<tr>
+<td>What identifies the SP?</td>
+<td>Application’s exact entity ID</td>
+<td>Atlas team</td>
+</tr>
+<tr>
+<td>Where should the SAML response arrive?</td>
+<td>Approved ACS URL and supported response binding</td>
+<td>Atlas team</td>
+</tr>
+<tr>
+<td>How can sign-in start?</td>
+<td>Supported application-initiated and unsolicited-response behavior</td>
+<td>Atlas team, checked against the chosen Okta integration</td>
+</tr>
+<tr>
+<td>Which issuer and keys will Atlas trust?</td>
+<td>Relevant Okta metadata/setup information and approved trust process</td>
+<td>Daniel supplies; Atlas team configures and confirms</td>
+</tr>
+<tr>
+<td>What identifies the person to Atlas?</td>
+<td>Expected identifier, NameID format, source value and matching rule</td>
+<td>Both teams</td>
+</tr>
+<tr>
+<td>What additional information is needed?</td>
+<td>Attribute names, value types and interpretation</td>
+<td>Atlas team specifies; Daniel maps supported sources</td>
+</tr>
+<tr>
+<td>How are accounts maintained?</td>
+<td>Creation, updates, disablement and any supported JIT behavior</td>
+<td>Application and lifecycle owners</td>
+</tr>
+<tr>
+<td>Who may attempt access?</td>
+<td>Okta user/group assignment and applicable authentication policy</td>
+<td>Okta administrators</td>
+</tr>
+<tr>
+<td>What establishes success?</td>
+<td>Accepted response, correct account, usable session and permitted resource</td>
+<td>Both teams</td>
+</tr>
+<tr>
+<td>Who owns later changes?</td>
+<td>Certificate, metadata, application, policy and support contacts</td>
+<td>Named owners, not an assumption</td>
+</tr>
+</tbody>
+</table></div>
+<p>Keep four kinds of evidence separate as you fill in the sheet. <strong>Declared</strong> means published in metadata or requirements. <strong>Configured</strong> means entered or selected in a system. <strong>Observed</strong> means seen in a particular message or event. <strong>Enforced</strong> means applied by the receiver, with a recorded outcome. If metadata declares one ACS and Okta is configured with another, the declaration alone cannot tell you where a response will go.</p>
+<p>Some entries are URLs or identifiers. Others are decisions. A metadata file can advertise an ACS, but it cannot settle whether Priya wants Atlas to create an account for an unfamiliar subject. A working app assignment cannot establish that a downstream provisioning operation completed.</p>
+<p>For Devi’s existing successful case, the supplied facts remain unchanged: she has an active Okta account, an Atlas assignment, suitable authentication policy, and an enabled Atlas account with projects access. The separate test environment needs its own evidence. Production success does not silently establish test readiness.</p>
+<h3 id="choose-the-right-integration-starting-point">Choose the right integration starting point</h3>
+<p>The <strong>Okta Integration Network</strong>, or <strong>OIN</strong>, provides prepared integrations that can be added and configured for an organization. A custom SAML integration provides another starting point when the appropriate integration is unavailable or the application requires a custom arrangement. Either path still requires agreement with the application’s documented requirements. <a href="https://help.okta.com/oie/en-us/content/topics/apps/apps-add-applications.htm">Okta: add existing app integrations</a>, <a href="https://help.okta.com/oie/en-us/content/topics/apps/apps_app_integration_wizard_saml.htm">create SAML app integrations</a></p>
+<p>An OIN entry is not proof that every edition or deployment of a product supports the behavior you want. Check the actual integration’s capabilities and setup instructions. Similarly, having access to a custom configuration field does not prove that the application will process the resulting message as intended.</p>
+<p>Daniel’s choice should answer, “Which supported integration matches this Atlas deployment?” The purpose is compatibility and clear ownership, not collecting the largest set of configurable options.</p>
+<p><strong>Figure L02-C1: Information supplied in each direction.</strong> These arrows represent configuration information, not browser traffic or a live SAML exchange. The application requirements configure Okta’s output; the approved Okta identity-provider information configures Atlas’s expectations.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L02-C1.svg" alt="L02-C1: Information supplied in each direction" width="276" height="660" loading="lazy"><figcaption><span>L02-C1</span><a href="/SAML_Theory/assets/diagrams/L02-C1.svg" data-diagram="L02-C1: Information supplied in each direction">Open full diagram</a></figcaption></figure><p>The upper-level relationship is two-sided. Daniel configures Okta with what Atlas needs, then the Atlas team configures its side with the appropriate Okta information. Giving an application its own ACS URL as the IdP sign-in URL would mix these responsibilities: a destination for the returning response cannot also be assumed to be the provider endpoint that receives the outgoing authentication request.</p>
+<h2 id="22-read-the-saml-building-blocks-without-memorizing-a-specification">2.2 Read the SAML building blocks without memorizing a specification</h2>
+<h3 id="different-documents-answer-different-questions">Different documents answer different questions</h3>
+<p>During a project, “the SAML XML” can refer to several different things. Ask which document you are looking at before interpreting its contents.</p>
+<p>A <strong>metadata document</strong> describes a participant and its services. An <strong>AuthnRequest</strong> asks for an authentication exchange. A <strong>Response</strong> reports a protocol result and can carry assertions. An <strong>assertion</strong> contains statements about a subject, together with information governing their use. Metadata is not evidence that Devi authenticated during a particular attempt.</p>
+<p>For the browser journey, start with two questions: what message is being exchanged, and how does it travel? The <strong>protocol</strong> defines the interaction and its messages, including the authentication request and response. A <strong>binding</strong> defines their carriage, such as an HTTP redirect or POST. The same message name does not imply the same delivery method.</p>
+<p>Two other terms describe the rules around those pieces. A <strong>profile</strong> combines and constrains them for a use case, such as browser SSO. A <strong>schema</strong> describes allowed XML structure and data types. When reviewing an integration, translate these terms into questions:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Relevant term</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What is Atlas asking Okta to do?</td>
+<td>Protocol</td>
+</tr>
+<tr>
+<td>How does the browser carry each message?</td>
+<td>Binding</td>
+</tr>
+<tr>
+<td>Which rules apply to this browser SSO arrangement?</td>
+<td>Profile</td>
+</tr>
+<tr>
+<td>Is the XML shaped correctly?</td>
+<td>Schema</td>
+</tr>
+</tbody>
+</table></div>
+<p>These are different layers of the agreement, not alternative names for one file. <a href="https://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html">OASIS Technical Overview, §4.3</a></p>
+<p>The engineering consequence is practical. Two systems may both understand SAML messages but still disagree about the supported delivery arrangement or the rules of the selected profile. “Both support SAML” is a starting point for checking compatibility.</p>
+<h3 id="an-xml-element-contains-information-an-attribute-describes-it">An XML element contains information; an attribute describes it</h3>
+<p>The following is a small XML fragment from fictional Atlas metadata. It contains one service declaration, not a complete metadata document.</p>
+<pre><code class="language-xml">&lt;md:AssertionConsumerService
+    xmlns:md=&quot;urn:oasis:names:tc:SAML:2.0:metadata&quot;
+    Binding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&quot;
+    Location=&quot;https://atlas.northstar.example/saml/acs&quot;
+    index=&quot;0&quot;
+    isDefault=&quot;true&quot; /&gt;
+</code></pre>
+<p><code>AssertionConsumerService</code> is the <strong>element</strong> name. <code>Binding</code>, <code>Location</code>, <code>index</code>, and <code>isDefault</code> are <strong>XML attributes</strong> on that element. An XML attribute is a property written in the opening tag; it is not automatically a SAML attribute about a user. A department value carried in an assertion belongs to a different concept despite the shared word <em>attribute</em>.</p>
+<p>The <code>/&gt;</code> ends an element with no child content. An element with children instead uses an opening tag and a matching closing tag. Nesting tells you which structure owns a value.</p>
+<p>The prefix <code>md</code> is associated with the metadata <strong>namespace</strong> by <code>xmlns:md</code>. A namespace distinguishes XML vocabularies. The prefix is a local label for that namespace: another document could use a different prefix for the same namespace. Matching the visible letters <code>md</code> is therefore not a substitute for interpreting the namespace and element together. <a href="https://www.w3.org/TR/xmlschema-0/">W3C XML Schema Primer, §§2.1 and 3.1</a></p>
+<p>For a first reading, identify the element, then its location and delivery method. In this fragment, read “an ACS at the Atlas <code>/saml/acs</code> address that receives HTTP-POST.” You can then inspect the index and default flag. There is no need to memorize every long URI before understanding what the declaration says.</p>
+<p>This distinction helps when reading mixed documents. A metadata element and an assertion element can have different namespaces even if they appear in related examples. Their prefixes help you read; the namespace supplies the vocabulary identity.</p>
+<h3 id="read-the-structure-from-outside-inward">Read the structure from outside inward</h3>
+<p>The next compact document describes the fictional Atlas SP. Its values and signing expectations are example choices, not Okta defaults. It advertises one ACS and requests signed assertions. It includes no real key material or metadata signature.</p>
+<pre><code class="language-xml">&lt;md:EntityDescriptor
+    xmlns:md=&quot;urn:oasis:names:tc:SAML:2.0:metadata&quot;
+    entityID=&quot;https://atlas.northstar.example/saml&quot;
+    cacheDuration=&quot;PT24H&quot;&gt;
+  &lt;md:SPSSODescriptor
+      protocolSupportEnumeration=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;
+      AuthnRequestsSigned=&quot;false&quot;
+      WantAssertionsSigned=&quot;true&quot;&gt;
+    &lt;md:NameIDFormat&gt;urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified&lt;/md:NameIDFormat&gt;
+    &lt;md:AssertionConsumerService
+        Binding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&quot;
+        Location=&quot;https://atlas.northstar.example/saml/acs&quot;
+        index=&quot;0&quot;
+        isDefault=&quot;true&quot; /&gt;
+  &lt;/md:SPSSODescriptor&gt;
+&lt;/md:EntityDescriptor&gt;
+</code></pre>
+<p>Start with <code>EntityDescriptor</code>: it identifies the SAML entity whose information is being described. Inside it, <code>SPSSODescriptor</code> describes the SP’s SSO role. The child declarations describe that role’s capabilities and expectations. An IdP role uses <code>IDPSSODescriptor</code>; a collection of entity descriptions can be grouped inside <code>EntitiesDescriptor</code>. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf">SAML Metadata, §§2.3–2.4</a></p>
+<p>The role matters. Finding a key or URL somewhere in a large metadata document does not establish that it belongs to the entity and role you intended to configure. A document can describe more than one participant or capability.</p>
+<p><strong>Figure L02-M1: Containment in the Atlas metadata.</strong> The arrows mean “contains,” not “sends.” The entity ID belongs to the entity description; the ACS URL belongs to an endpoint declaration inside its SP role.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L02-M1.svg" alt="L02-M1: Containment in the Atlas metadata" width="589" height="440" loading="lazy"><figcaption><span>L02-M1</span><a href="/SAML_Theory/assets/diagrams/L02-M1.svg" data-diagram="L02-M1: Containment in the Atlas metadata">Open full diagram</a></figcaption></figure><p>Read the tree in the same order as the XML. The entity is Atlas. Its role is SP. The ACS is a service belonging to that role. This prevents a common shortcut: collecting familiar-looking URLs before asking what they identify.</p>
+<p>The <code>SAML:1.1</code> text within the unspecified NameID format URI does not make this a SAML 1.1 metadata document. A standardized identifier can retain an older version label while being used within SAML 2.0. The selected protocol and the meaning of the particular identifier must be interpreted separately. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §8.3.1</a></p>
+<p>A schema can help check structure and data types. It does not prove that a URL reaches the intended application, that a publisher is authorized, or that the advertised behavior is implemented. Extensions also exist: an unfamiliar element may belong to a documented extension rather than being a typo. Determine its namespace and applicable rules instead of either trusting or rejecting it solely because it is unfamiliar.</p>
+<h2 id="23-read-the-values-that-must-agree">2.3 Read the values that must agree</h2>
+<h3 id="a-name-is-different-from-a-delivery-address">A name is different from a delivery address</h3>
+<p>Atlas’s entity ID and ACS both resemble web addresses. That appearance does not give them the same job.</p>
+<p><code>https://atlas.northstar.example/saml</code> names Atlas as a SAML entity. <code>https://atlas.northstar.example/saml/acs</code> is the address selected to receive the response in this example. They may share a hostname, but copying one into the other’s configuration field changes the agreement.</p>
+<p>A <strong>URI</strong>, or Uniform Resource Identifier, can identify something without being a page the browser can open. A URL is a location-oriented form of identifier. For SAML configuration, use the documented value as intended; do not “repair” an entity ID because opening it does not display a page.</p>
+<p>In particular, avoid silently adding a trailing slash, changing case in a path, or replacing an identifier’s scheme. Treat entity IDs as exact agreed values under the applicable comparison rules, rather than as invitations to apply a browser’s URL-cleanup behavior. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §1.3.2</a></p>
+<p>The <strong>Issuer</strong> in a message identifies the entity making that message or assertion. In the main outbound case, Atlas expects the appropriate Okta issuer. That is different from Atlas’s own SP entity ID, which the assertion’s audience must target under the selected configuration. The sender’s identity and the intended recipient are separate facts.</p>
+<h3 id="translate-oktas-field-labels-into-protocol-meaning">Translate Okta’s field labels into protocol meaning</h3>
+<p>The following table connects the existing Atlas values to Okta’s terminology. Obtain real Okta issuer, endpoint and certificate values from the specific integration’s approved setup information or metadata; they are not constructed by copying Atlas’s domain.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Configuration item</th>
+<th>What it means in this outbound integration</th>
+<th>Atlas example or source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Okta <strong>Single sign-on URL</strong></td>
+<td>Default SP ACS used for the response</td>
+<td><code>https://atlas.northstar.example/saml/acs</code></td>
+</tr>
+<tr>
+<td>Okta <strong>Audience URI (SP Entity ID)</strong></td>
+<td>Intended assertion audience</td>
+<td><code>https://atlas.northstar.example/saml</code></td>
+</tr>
+<tr>
+<td>Okta <strong>Recipient URL</strong> and <strong>Destination URL</strong></td>
+<td>Related receiving-location values, where separately configured</td>
+<td>Agreed with Atlas; not assumed interchangeable in every deployment</td>
+</tr>
+<tr>
+<td><strong>IdP SSO URL</strong> supplied to Atlas</td>
+<td>Provider endpoint to receive the authentication request</td>
+<td>Relevant Okta integration metadata/setup information</td>
+</tr>
+<tr>
+<td><strong>IdP issuer</strong> supplied to Atlas</td>
+<td>Provider identity Atlas expects</td>
+<td>Relevant Okta integration metadata/setup information</td>
+</tr>
+<tr>
+<td><strong>Default RelayState</strong></td>
+<td>Navigation-related state used by the integration where applicable</td>
+<td>Application requirements; not an entity ID or signature key</td>
+</tr>
+</tbody>
+</table></div>
+<p>The most misleading label is <strong>Single sign-on URL</strong>: on the Okta SAML app form it describes the application-side destination. It is not the Okta IdP SSO URL that Atlas uses to start authentication. Okta’s field reference documents this ACS mapping and the audience setting. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference: General settings</a></p>
+<p>For the simple Atlas arrangement, the receiving location values can agree. That does not erase their different protocol purposes. If a partner requires separate values, establish why and verify the relevant configuration. Changing every location to the same string because it “usually works” hides the distinction an engineer needs to diagnose a rejection.</p>
+<h3 id="the-binding-belongs-with-the-endpoint">The binding belongs with the endpoint</h3>
+<p>An endpoint declaration pairs a location with a supported binding. In the Atlas XML, the ACS location is associated with HTTP-POST. A receiver expecting a SAML response in a form submission is not automatically offering a general-purpose endpoint for every other SAML transport.</p>
+<p>The corresponding provider service is named <code>SingleSignOnService</code>; locate the matching binding and location within the expected IdP role in the approved Okta metadata. Other metadata service names include <code>SingleLogoutService</code> for logout and <code>ArtifactResolutionService</code> for artifact resolution. They describe different jobs; their presence does not establish that Northstar has configured all those features in Okta and Atlas.</p>
+<p>An integration with multiple ACS endpoints may use indexes and default-selection information. The <code>index=&quot;0&quot;</code> in Atlas’s example identifies this ACS entry; <code>isDefault=&quot;true&quot;</code> marks it as the declared default. An index is not a port number, an array position to guess, or a user priority. Selection also depends on the request, binding/profile rules and receiving configuration. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf">SAML Metadata, endpoint types and SP role</a></p>
+<p>Do not assume that loading SP metadata into a product automatically enables every advertised endpoint. Some setup paths use manual values. Okta’s SAML settings include additional requestable ACS choices and signed-request behavior; the selected configuration matters. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference: Other Requestable SSO URLs and Signed Requests</a></p>
+<h3 id="keep-environments-distinguishable">Keep environments distinguishable</h3>
+<p>Daniel cannot conclude that test is a copy of production with a different display name. The integration inventory must identify which values each environment actually uses.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Existing Atlas production example</th>
+<th>Separate Atlas test example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SP entity ID</td>
+<td><code>https://atlas.northstar.example/saml</code></td>
+<td><code>https://atlas-test.northstar.example/saml</code></td>
+</tr>
+<tr>
+<td>ACS</td>
+<td><code>https://atlas.northstar.example/saml/acs</code></td>
+<td><code>https://atlas-test.northstar.example/saml/acs</code></td>
+</tr>
+<tr>
+<td>Okta configuration</td>
+<td>Approved production app integration</td>
+<td>Explicitly identified test app integration</td>
+</tr>
+<tr>
+<td>Expected Okta issuer and key</td>
+<td>Verified against that integration’s approved information</td>
+<td>Established for the test relationship; not assumed equal or different</td>
+</tr>
+<tr>
+<td>Accounts and access</td>
+<td>Devi’s known production account and permission</td>
+<td>Test identity/account/assignment/policy chosen for the test</td>
+</tr>
+</tbody>
+</table></div>
+<p>These separate SP identifiers are Northstar’s example design. The broader requirement is to document the application’s actual environment boundaries and avoid accidentally sending identity information to the wrong instance. Do not assume an Okta issuer or key changes merely because an integration’s label changes, or remains the same merely because both integrations are in one org.</p>
+<h3 id="check-the-destination-before-moving-on">Check the destination before moving on</h3>
+<p>Daniel is preparing the test integration. The approved application requirements identify the test SP as <code>https://atlas-test.northstar.example/saml</code> and its ACS as <code>https://atlas-test.northstar.example/saml/acs</code>. He finds these entries in the proposed Okta configuration:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Okta field</th>
+<th>Proposed value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single sign-on URL</td>
+<td><code>https://atlas.northstar.example/saml/acs</code></td>
+</tr>
+<tr>
+<td>Audience URI (SP Entity ID)</td>
+<td><code>https://atlas-test.northstar.example/saml</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Which entry needs attention, and what could go wrong if Daniel leaves it as shown? Try answering before reading the explanation.</p>
+<p>The Single sign-on URL points to the production ACS. The audience identifies the intended test SP correctly, but that does not redirect the response to test. Daniel should correct the receiving address against the approved test requirements before an attempt. This review identifies a configuration mismatch; it does not establish that production would accept the response or that the corrected test integration will pass every check.</p>
+<h2 id="24-read-the-keys-and-declared-expectations">2.4 Read the keys and declared expectations</h2>
+<h3 id="a-public-certificate-supplies-verification-material-not-permission-to-trust">A public certificate supplies verification material, not permission to trust</h3>
+<p>A <strong>key pair</strong> has a private key, kept under its owner’s control, and a corresponding public key that can be shared. For signing, the owner creates a signature with the private key; the receiver uses the public key to verify it. For encryption to a recipient, public-key encryption helps protect content for that recipient, which needs the corresponding private key to decrypt it. Signing does not hide the content. Encryption alone does not establish who supplied it.</p>
+<p>A public <strong>certificate</strong> contains a public key and associated information. In SAML setup, exchanging a certificate is a common way to supply that public key. Metadata can describe its intended use through <code>KeyDescriptor</code>. Read the direction before choosing a certificate:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Purpose in this example</th>
+<th>Public information supplied to the other side</th>
+<th>Private key stays with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Okta signs an assertion for Atlas</td>
+<td>Okta signing certificate supplied to Atlas for verification</td>
+<td>Okta</td>
+</tr>
+<tr>
+<td>Okta encrypts an assertion for Atlas</td>
+<td>Atlas encryption certificate supplied to Okta for encryption</td>
+<td>Atlas</td>
+</tr>
+</tbody>
+</table></div>
+<p>The table describes two different operations. It does not assume assertion encryption is enabled or that the same key pair serves both purposes.</p>
+<p>The following is an abbreviated IdP-role fragment. It shows placement only. The certificate text is a placeholder, not Base64 certificate data; the fragment is not a complete or usable metadata document. It contains no real Okta issuer, endpoint or key.</p>
+<pre><code class="language-xml">&lt;md:IDPSSODescriptor
+    xmlns:md=&quot;urn:oasis:names:tc:SAML:2.0:metadata&quot;
+    xmlns:ds=&quot;http://www.w3.org/2000/09/xmldsig#&quot;
+    protocolSupportEnumeration=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;&gt;
+  &lt;md:KeyDescriptor use=&quot;signing&quot;&gt;
+    &lt;ds:KeyInfo&gt;
+      &lt;ds:X509Data&gt;
+        &lt;ds:X509Certificate&gt;ILLUSTRATIVE_CERTIFICATE_DATA&lt;/ds:X509Certificate&gt;
+      &lt;/ds:X509Data&gt;
+    &lt;/ds:KeyInfo&gt;
+  &lt;/md:KeyDescriptor&gt;
+&lt;/md:IDPSSODescriptor&gt;
+</code></pre>
+<p>In this fragment, the key belongs to the IdP role and is declared for signing. Atlas can use the approved public key to verify signed content from Okta. It cannot use that public key to create an Okta signature. Nor would supplying Okta’s signing certificate to Okta tell it how to encrypt for Atlas.</p>
+<p>The public certificate is shareable configuration material. A private key is not something to paste into the partner’s metadata form. A certificate attached to an unexpected message also does not become approved simply because software can read it.</p>
+<p>Trust comes from how the metadata or key was obtained, authenticated and authorized for this relationship. Establish the expected source and issuer before adopting changed keys. An approved metadata trust model may rely on directly configured keys rather than treating certificate contents as a Web PKI chain; do not infer certificate acceptance rules from the certificate’s appearance. <a href="https://docs.oasis-open.org/security/saml/Post2.0/sstc-metadata-iop.pdf">SAML Metadata Interoperability Profile, §§2.3–2.6</a></p>
+<p>Okta exposes signing certificates for an app integration. The partner configuration must agree with the intended active signing key; obtaining a new certificate is not proof that Atlas has adopted it. <a href="https://help.okta.com/oie/en-us/content/topics/apps/manage-signing-certificates.htm">Okta: manage signing certificates</a></p>
+<h3 id="signing-declarations-describe-different-responsibilities">Signing declarations describe different responsibilities</h3>
+<p>The Atlas example advertises <code>AuthnRequestsSigned=&quot;false&quot;</code> and <code>WantAssertionsSigned=&quot;true&quot;</code>. The first concerns the SP’s authentication requests; the second concerns the assertions it expects to receive. They do not contradict each other. Request protection and returned assertion protection are distinct choices under the applicable requirements.</p>
+<p>You may also encounter <code>WantAuthnRequestsSigned</code> on an IdP role. Read the role and full attribute name before translating it into a configuration decision. A metadata declaration does not show whether a particular request was signed or whether a particular receiver enforced its configured policy. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf">SAML Metadata, IdP and SP SSO role definitions</a></p>
+<p>Okta separately exposes response-signing, assertion-signing and assertion-encryption choices. Agree on the protection Atlas actually requires and inspect the resulting message. “Signed” is incomplete unless you know which content is signed and what the receiver checks. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference: Advanced settings</a></p>
+<h3 id="an-identifier-format-does-not-choose-the-account-value">An identifier format does not choose the account value</h3>
+<p>Atlas’s metadata advertises the unspecified NameID format. That declaration does not say that the value must be an email address, an employee number or the application’s internal ID. A format declaration and a selected value answer different questions.</p>
+<p>In Okta, review the configured Name ID format and application username along with the application’s expectations. For this example, Priya requires a stable employee identifier. Daniel’s proposed output is <code>E1042</code>, and Atlas’s agreed matching rule resolves that value to Devi’s existing account <code>atlas-4821</code>. These are declared example decisions, not universal behavior of the unspecified format.</p>
+<p><strong>Figure L02-M2: From source data to the application account.</strong> The arrows show a configured data relationship. They are not network requests. An attribute existing in an Okta profile does not by itself establish that it was included in the assertion or consumed correctly.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L02-M2.svg" alt="L02-M2: From source data to the application account" width="276" height="625" loading="lazy"><figcaption><span>L02-M2</span><a href="/SAML_Theory/assets/diagrams/L02-M2.svg" data-diagram="L02-M2: From source data to the application account">Open full diagram</a></figcaption></figure><p>The first connection needs a source and mapping. The second needs an accepted identity and an agreed interpretation. The third needs an appropriate application record. If any connection differs from the documented design, a familiar-looking identifier can still select no account, or the wrong account.</p>
+<p>Okta’s Profile Editor supports mappings between Okta and application profiles. Direction matters: “App to Okta User” and “Okta User to App” are different data flows. Do not assume that editing a profile mapping automatically proves a particular SAML field was emitted. Review the field’s configured source and its actual output. <a href="https://help.okta.com/oie/en-us/content/topics/users-groups-profiles/usgp-map-attributes.htm">Okta: map profile attributes</a></p>
+<h3 id="requested-attributes-and-released-attributes-are-different-evidence">Requested attributes and released attributes are different evidence</h3>
+<p>An SP metadata document may include <code>AttributeConsumingService</code> information, an index, a service name, and <code>RequestedAttribute</code> entries. These advertise the requested information for a service. They are not the user attributes of a particular authentication attempt.</p>
+<p>For example, Atlas might request a <code>department</code> attribute. Its actual requirement must still be agreed: spelling, name format, value type, whether multiple values are possible, and what happens if the value is missing. A declaration that marks an attribute required does not prove that Okta released it or Atlas enforced it.</p>
+<p>In the response, an attribute statement is evidence of what was supplied. In Okta, custom claims supply user information to integrations, and SAML custom claims are attribute statements. Current documentation distinguishes newer claims management from legacy configuration. Use the applicable configuration model rather than assuming an expression copied from another org or interface has the same syntax or source. <a href="https://help.okta.com/oie/en-us/content/topics/apps/federated-claims-overview.htm">Okta: configure custom claims</a></p>
+<p>Group statements also need an agreed interpretation. Sending a group name does not itself assign a universal application role. Atlas must define what that value means for its own permissions. Release only the information the application needs; copying every available profile attribute creates exposure without establishing correctness.</p>
+<h2 id="25-make-metadata-usable-and-keep-it-current">2.5 Make metadata usable and keep it current</h2>
+<h3 id="a-source-is-not-trusted-merely-because-it-returns-xml">A source is not trusted merely because it returns XML</h3>
+<p>Daniel receives a file labeled “Okta metadata.” Before Atlas relies on it, he needs to know which integration it describes, who supplied it, and how that source was authenticated. A valid XML structure establishes none of those facts on its own.</p>
+<p>Metadata may be transferred as a file, retrieved from a documented location, or managed through a supported publication/refresh arrangement. Downloading from an authenticated expected source and verifying signed metadata under an approved trust anchor are ways a deployment can establish confidence. The exact method must match the chosen trust model. <a href="https://docs.oasis-open.org/security/saml/Post2.0/sstc-metadata-iop.pdf">SAML Metadata Interoperability Profile, §2.3</a></p>
+<p>A <strong>trust anchor</strong> is previously approved information used to establish trust, rather than something accepted solely because it arrived in the document under examination. If signed metadata includes a certificate, that inclusion alone does not explain why the metadata signer is authorized.</p>
+<p>Keep the two signature questions distinct. A metadata signature protects relevant configuration information. A message or assertion signature protects the relevant runtime content. Verifying one does not establish the other; nor must the same key serve both roles. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf">SAML Metadata, signing and processing metadata</a></p>
+<h3 id="freshness-and-refresh-are-operational-decisions">Freshness and refresh are operational decisions</h3>
+<p>Metadata can carry <code>validUntil</code> and <code>cacheDuration</code>, but they answer different questions. <code>validUntil</code> sets an expiry time after which the affected metadata is invalid. <code>cacheDuration</code> sets how long a consumer should cache it before attempting refresh. Atlas’s compact document uses <code>cacheDuration=&quot;PT24H&quot;</code>, a duration of 24 hours. This is a refresh-related value, not a 24-hour assertion or Atlas session. Reaching that cache duration does not, by itself, make metadata invalid. Expiry under <code>validUntil</code> does. <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E94</a></p>
+<p>The metadata specification requires a root <code>EntityDescriptor</code> or <code>EntitiesDescriptor</code> to carry at least one of these attributes. Each attribute is individually optional in the XML schema, which cannot by itself establish that this root-level rule has been met. Applicable profiles can add requirements. Respect inherited limits and the deployment’s refresh and failure policy. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf">SAML Metadata, §§2.3.1–2.3.2</a>, <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E76</a></p>
+<p>Publication and consumption are separate operations. If Daniel publishes updated information, Atlas may still use a manually imported copy. If Atlas supports refresh, its schedule, source authentication, error handling and adoption of changes must be understood. A metadata URL does not prove that the receiver polls it.</p>
+<p>An update plan should explain what happens when retrieval fails or the available information expires. Continuing to use old data indefinitely is not a harmless substitute for a defined policy. Equally, discarding working configuration because an unverified replacement arrived is not a sound trust decision.</p>
+<p><strong>Figure L02-D1: Reviewing a proposed metadata update.</strong> This is an example change-review flow, not a required SAML processing order. The arrows represent decisions about configuration. “Proceed” still means carrying out the receiver’s supported update process and testing the result.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L02-D1.svg" alt="L02-D1: Reviewing a proposed metadata update" width="619" height="1341" loading="lazy"><figcaption><span>L02-D1</span><a href="/SAML_Theory/assets/diagrams/L02-D1.svg" data-diagram="L02-D1: Reviewing a proposed metadata update">Open full diagram</a></figcaption></figure><p>The first decision concerns the source. The second concerns the relationship and whether the information is usable under the applicable validity rules. The third concerns the effect of the change. A document that passes one question does not answer the others.</p>
+<p>This is especially important for keys. If Okta uses a new signing key while Atlas still trusts only the previous one, authentication can succeed at Okta while the application rejects the returned information. Conversely, adding an unapproved key because it appeared in a message changes who Atlas is prepared to trust. The remedy depends on which side changed and which configuration is authoritative.</p>
+<h3 id="diagnose-a-mismatch-from-the-values-actually-supplied">Diagnose a mismatch from the values actually supplied</h3>
+<p>Consider an independent fictional Atlas test attempt involving Devi. Her test account is assigned in Okta, the applicable policy allows sign-in, and the downstream test account is enabled. The test SP expects these values:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Atlas test expectation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SP entity ID / intended audience</td>
+<td><code>https://atlas-test.northstar.example/saml</code></td>
+</tr>
+<tr>
+<td>ACS</td>
+<td><code>https://atlas-test.northstar.example/saml/acs</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The evidence packet contains three observations:</p>
+<ol>
+<li>The browser delivered the response to the expected test ACS.</li>
+<li>The application’s diagnostic record reports that verification under its configured trusted key succeeded.</li>
+<li>The application reports an audience mismatch. The assertion audience shown in the captured excerpt is <code>https://atlas-test.northstar.example/saml/acs</code>.</li>
+</ol>
+<p>Daniel also finds that Okta’s <strong>Audience URI (SP Entity ID)</strong> field contains the test ACS URL. What does that establish?</p>
+<p>The supplied evidence identifies a specific configuration mismatch: the emitted audience is the receiving address, while the test SP expects its entity ID. Successful delivery answers where the response arrived. The reported signature result answers a different question about verification. Neither makes the wrong audience acceptable.</p>
+<p>Changing the ACS merely to make its string match the audience would confuse the two roles further. The justified proposal is to correct the audience configuration against the approved test SP requirements, then repeat the test and inspect both the resulting message and the application outcome.</p>
+<p>That proposal is not a claim that access has already succeeded. The next attempt must establish that the audience now matches, the other applicable checks succeed, the expected account is selected, and the requested resource is allowed. There may be additional failures after the known mismatch is removed.</p>
+<h3 id="leave-an-agreement-that-another-engineer-can-maintain">Leave an agreement that another engineer can maintain</h3>
+<p>Daniel’s useful deliverable is more than “metadata uploaded.” It is a record of the specific Atlas/Okta relationship: authoritative identifiers and endpoints, approved issuer/key information, binding/protection requirements, identity and attribute mappings, environment boundaries, account assumptions, refresh behavior, ownership and tested outcomes.</p>
+<p>Before accepting that record, ask whether another engineer could explain which system owns a value, why it is present, and what evidence shows it is being used. If the answer depends on guessing from a field label, the agreement is incomplete.</p>
+<p>The practical distinction to retain is <strong>declared, configured, observed, enforced</strong>. Metadata declares information. Administrators configure systems to use selected information. A captured message shows what was observed in an attempt. Receiver evidence shows which decisions were enforced and with what result. These layers should agree, but their agreement must be established rather than assumed.</p>
+<h3 id="terms-to-keep-straight">Terms to keep straight</h3>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Useful meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Entity ID / endpoint</td>
+<td>Participant identifier / service location</td>
+</tr>
+<tr>
+<td>Metadata / authentication response</td>
+<td>Participant configuration information / result of a particular protocol exchange</td>
+</tr>
+<tr>
+<td>XML attribute / SAML user attribute</td>
+<td>Property in an XML tag / information about the subject</td>
+</tr>
+<tr>
+<td>Namespace / prefix</td>
+<td>XML vocabulary identity / local label for that vocabulary</td>
+</tr>
+<tr>
+<td>Binding / profile</td>
+<td>Message carriage rules / rules combining SAML pieces for a use case</td>
+</tr>
+<tr>
+<td>Key declaration / trusted key</td>
+<td>Published verification or encryption information / key approved for the relevant relationship</td>
+</tr>
+<tr>
+<td>Requested attribute / released attribute</td>
+<td>Information advertised as needed / information actually supplied</td>
+</tr>
+<tr>
+<td>Metadata validity / session lifetime</td>
+<td>Usability of configuration information / duration of signed-in application state</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf">OASIS SAML Metadata</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">OASIS SAML Core</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">OASIS SAML Errata 05: nested metadata limits and caching versus validity, E76 and E94</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html">OASIS Technical Overview</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/Post2.0/sstc-metadata-iop.pdf">SAML Metadata Interoperability Profile</a></li>
+<li><a href="https://www.w3.org/TR/xmlschema-0/">W3C XML Schema Primer</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/manage-signing-certificates.htm">Okta signing certificate management</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/federated-claims-overview.htm">Okta custom claims</a></li>
+</ul>
+</article><nav class="page-navigation" aria-label="Lesson sequence"><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><small>← Previous lesson</small>Why SAML exists</a><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><small>Next lesson →</small>SP-initiated sign-in</a></nav></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#21-collect-the-requirements-before-changing-settings">2.1 Collect the requirements before changing settings</a></li><li><a href="#22-read-the-saml-building-blocks-without-memorizing-a-specification">2.2 Read the SAML building blocks without memorizing a specification</a></li><li><a href="#23-read-the-values-that-must-agree">2.3 Read the values that must agree</a></li><li><a href="#24-read-the-keys-and-declared-expectations">2.4 Read the keys and declared expectations</a></li><li><a href="#25-make-metadata-usable-and-keep-it-current">2.5 Make metadata usable and keep it current</a></li><li><a href="#references">References</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

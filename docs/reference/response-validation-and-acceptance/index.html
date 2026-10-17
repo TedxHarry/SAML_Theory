@@ -1,0 +1,236 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Trust, targets, time, correlation and application entry."><meta name="color-scheme" content="light"><title>Response acceptance | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/reference/response-validation-and-acceptance/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/" aria-current="page">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><div class="eyebrow">Reference library</div><article class="prose"><h1 id="saml-with-okta-response-validation-and-acceptance">SAML with Okta: response validation and acceptance</h1>
+<p>Okta can authenticate Devi successfully while Atlas rejects the information returned to it. Atlas can also accept that information but deny entry to a disabled application account. Even after Atlas creates a session, it can deny a particular resource. Each result belongs to a different decision.</p>
+<p>For the fictional Northstar Research integration, Atlas expects a requested browser SSO response from its approved Okta provider, delivered by POST to <code>https://atlas.northstar.example/saml/acs</code>. Its entity ID is <code>https://atlas.northstar.example/saml</code>. Atlas requires a signed assertion and uses the accepted employee identifier <code>E1042</code> to match account <code>atlas-4821</code>. The <code>.example</code> addresses and records are fictional.</p>
+<h2 id="locate-the-acceptance-boundary">Locate the acceptance boundary</h2>
+<p><strong>Figure RF-V1: From arrival to resource access.</strong> Arrows show logical dependencies, not network messages or a universal parser/cryptographic execution order. The scenario starts without a usable Atlas session. Rejection does not create a new one; the resource-denied branch occurs after session creation.</p>
+<!-- mermaid:id=RF-V1 -->
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/RF-V1.svg" alt="RF-V1: From arrival to resource access" width="750" height="1746" loading="lazy"><figcaption><span>RF-V1</span><a href="/SAML_Theory/assets/diagrams/RF-V1.svg" data-diagram="RF-V1: From arrival to resource access">Open full diagram</a></figcaption></figure><p>Start at arrival. Atlas must safely obtain the expected message, establish that its SAML information is acceptable, then apply its account and entry requirements. A failure before session creation stops this sign-in. A failure at resource permission has a different outcome: the Atlas session exists, but the requested action is denied.</p>
+<p>The full browser journey remains visible in <a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/#75-complete-the-application-decisions-and-identify-the-stopping-boundary">Lesson 7's complete exchange</a>. RF-V1 expands the receiver's decisions rather than introducing another message path.</p>
+<h2 id="review-input-trust-and-use-requirements">Review input, trust and use requirements</h2>
+<p>The groups below belong together. A passing row does not establish that the remaining rows passed, and table order does not replace the receiving implementation's supported secure processing.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Group</th>
+<th>What Atlas needs to establish</th>
+<th>Insufficient observation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Input and structure</td>
+<td>Expected binding, safely decoded input and supported message shape.</td>
+<td>An HTTP request reached the ACS.</td>
+</tr>
+<tr>
+<td>Reported protocol result</td>
+<td>Appropriate handling of the response Status.</td>
+<td>A Success status is present.</td>
+</tr>
+<tr>
+<td>Issuer and trust</td>
+<td>Approved provider/key relationship for this integration.</td>
+<td>The issuer text or a supplied certificate looks familiar.</td>
+</tr>
+<tr>
+<td>Required protection</td>
+<td>Intended signed layer, permitted algorithms and complete verification.</td>
+<td>An XML Signature element exists.</td>
+</tr>
+<tr>
+<td>Object selection</td>
+<td>The identity and restrictions used belong to the actual verified object.</td>
+<td>A signature somewhere in the document passed.</td>
+</tr>
+<tr>
+<td>Target and presentation</td>
+<td>Applicable destination, audience and bearer-recipient requirements.</td>
+<td>The browser reached the expected host.</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>Applicable Conditions and confirmation limits, with approved tolerance.</td>
+<td>One timestamp has not expired.</td>
+</tr>
+<tr>
+<td>Attempt association</td>
+<td>Applicable response/confirmation correlation and usable browser/provider context.</td>
+<td>RelayState matches.</td>
+</tr>
+<tr>
+<td>Replay</td>
+<td>The bearer assertion cannot be accepted again contrary to the profile.</td>
+<td>Its signature and time window still pass.</td>
+</tr>
+<tr>
+<td>Authentication evidence</td>
+<td>Reported authentication satisfies the applicable requirement.</td>
+<td>The response was issued recently.</td>
+</tr>
+<tr>
+<td>Application entry</td>
+<td>Usable claims, intended unique account match and permitted account state.</td>
+<td>Okta assigned the app to Devi.</td>
+</tr>
+<tr>
+<td>Resource access</td>
+<td>The resulting account is permitted to perform the requested action.</td>
+<td>Atlas created a session.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="process-input-safely">Process input safely</h3>
+<p>Untrusted XML must not trigger arbitrary external entity resolution, file access, remote schema retrieval or unbounded processing. Where schema validation is performed, schemas come from controlled configuration. Schema validity establishes allowed structure and data types, not an approved sender or acceptable assertion. <a href="https://cheatsheetseries.owasp.org/cheatsheets/SAML_Security_Cheat_Sheet.html">OWASP SAML security guidance</a></p>
+<p>An unsupported or ambiguous message does not become usable because an implementation can find a NameID inside it. An identifier alone is not the required authentication information for browser sign-in. A non-success Status needs appropriate failure handling, not a search for a convenient identity.</p>
+<h3 id="establish-the-protected-content-actually-used">Establish the protected content actually used</h3>
+<p>Atlas needs approved trust, complete required verification and secure content selection together. Verifying assertion A while reading the account identifier from B leaves the consumed identity unprotected by that result. <a href="https://www.w3.org/TR/xmldsig-bestpractices/">W3C XML Signature Best Practices, §3.1.5</a></p>
+<p>Browser SSO processing verifies signatures present on the response and assertions. Another passing signature does not excuse an invalid additional signature. The amended profile's signing rules and Atlas's particular assertion-signing requirement both matter. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, §4.1.4.3</a>, <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E93</a></p>
+<p>For encrypted content, required outer protection and recovery of an inner signature introduce construction-dependent dependencies. Decryption alone does not establish origin. The <a href="/SAML_Theory/reference/trust-and-protection/">trust and protection reference</a> explains key ownership, layers and the verified-versus-consumed relationship.</p>
+<h2 id="distinguish-the-target-and-time-checks">Distinguish the target and time checks</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Value in the established response</th>
+<th>Role</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Response Destination</td>
+<td>Intended receiving location for the reply.</td>
+<td>Atlas ACS: <code>https://atlas.northstar.example/saml/acs</code></td>
+</tr>
+<tr>
+<td>Bearer Recipient</td>
+<td>Permitted location for that presentation.</td>
+<td>The same ACS in this arrangement.</td>
+</tr>
+<tr>
+<td>Audience</td>
+<td>Intended relying party.</td>
+<td>Atlas entity ID: <code>https://atlas.northstar.example/saml</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>These values can look alike without being interchangeable. Apply approved values and the relevant comparison rules. Do not rewrite an entity ID into an ACS URL or normalize an unfamiliar value merely to make a comparison pass. The <a href="/SAML_Theory/reference/field-comparison-and-message-anatomy/#targeting-correlation-and-navigation">field comparison</a> locates each field.</p>
+<p>An assertion's Conditions and the selected confirmation impose separate limits. Multiple AudienceRestriction elements combine as restrictions: a matching audience in one does not override another restriction that excludes Atlas. Unrecognized conditions cannot simply be ignored to obtain acceptance. Supported subject-confirmation alternatives are evaluated as complete alternatives, rather than combining the recipient from one with the deadline from another. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §§2.4.1 and 2.5.1</a></p>
+<h3 id="read-the-established-time-example-precisely">Read the established time example precisely</h3>
+<p>The following times are all UTC on 16 October 2026. Conditions permits use from 14:59:50 until before 15:05:00. The bearer deadline is before 15:02:00. These comparisons use zero clock tolerance and address only these illustrated limits.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Arrival</th>
+<th>Conditions interval</th>
+<th>Bearer deadline</th>
+<th>Time-group conclusion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>14:59:49</td>
+<td>Not yet open.</td>
+<td>Not reached.</td>
+<td>Too early for Conditions.</td>
+</tr>
+<tr>
+<td>15:00:21</td>
+<td>Open.</td>
+<td>Not reached.</td>
+<td>These limits pass; other requirements remain.</td>
+</tr>
+<tr>
+<td>15:02:00</td>
+<td>Open.</td>
+<td>Reached exactly.</td>
+<td>Presentation is too late.</td>
+</tr>
+<tr>
+<td>15:03:00</td>
+<td>Open.</td>
+<td>Passed.</td>
+<td>Conditions alone cannot authorize presentation.</td>
+</tr>
+<tr>
+<td>15:05:00</td>
+<td>End reached.</td>
+<td>Passed.</td>
+<td>Both end limits exclude this arrival.</td>
+</tr>
+</tbody>
+</table></div>
+<p>NotBefore is inclusive; NotOnOrAfter is exclusive. The selected browser bearer confirmation does not carry a NotBefore. Its deadline does not define Atlas's continuing session lifetime. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §§2.4.1.2 and 2.5.1.2</a>, <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, §4.1.4.2</a></p>
+<p>Approved clock tolerance accounts for clock differences; it is not an automatic extension to every session. A late arrival can reflect real delivery delay even when clocks agree. Use clock and arrival evidence before diagnosing skew or changing tolerance. <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E92</a></p>
+<h2 id="associate-the-requested-reply-and-prevent-replay">Associate the requested reply and prevent replay</h2>
+<p><strong>Figure RF-V2: Expand the requested-attempt requirements.</strong> This focuses on one part of RF-V1's SAML group. It assumes supported processing of the intended protected content. Its passing branch does not create a session or establish all other SAML requirements.</p>
+<!-- mermaid:id=RF-V2 -->
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/RF-V2.svg" alt="RF-V2: Expand the requested-attempt requirements" width="690" height="1666" loading="lazy"><figcaption><span>RF-V2</span><a href="/SAML_Theory/assets/diagrams/RF-V2.svg" data-diagram="RF-V2: Expand the requested-attempt requirements">Open full diagram</a></figcaption></figure><p>For the established exchange, required response and bearer-confirmation InResponseTo values identify <code>_req_D03_01</code>. Atlas must also have usable context for that provider and browser attempt. An arbitrary old matching ID does not recreate completed or expired context. RelayState <code>rs_D03_01</code> helps resolve agreed context; it cannot repair a wrong request relationship.</p>
+<p>An explicitly supported unsolicited path has different correlation expectations because no SP AuthnRequest initiated it. It is a separate configured path, not a fallback for an unmatched requested response. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, §§4.1.4.3 and 4.1.5</a>, <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E90</a></p>
+<p>If Atlas accepts an assertion at 15:00:21 and the same assertion arrives again at 15:00:25, both arrivals precede the example deadline. That does not authorize repeated acceptance. POST browser SSO requires bearer replay protection across the applicable validity period. A receiving deployment with several nodes must preserve that protection across those nodes, including concurrent submissions. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, §4.1.4.5</a></p>
+<p>Replay recording, request completion and successful sign-in processing need consistent coordination under the supported implementation. A retry may require a new sign-in attempt. Do not disable replay protection to make a repeated form submission succeed.</p>
+<p>Recent IssueInstant means recent issuance; AuthnInstant reports authentication time. ForceAuthn is a requested behavior, and a context-class URI is not a portable MFA-factor count. Compare the actual returned evidence with the requirement. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §§2.7.2 and 3.4.1</a></p>
+<h2 id="identify-who-owns-the-receiving-decision">Identify who owns the receiving decision</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Relationship</th>
+<th>Receiver</th>
+<th>Configuration and outcome to investigate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Okta sends SAML to Atlas.</td>
+<td>Atlas, as SP.</td>
+<td>Outbound Okta app output together with Atlas's effective trust and acceptance result.</td>
+</tr>
+<tr>
+<td>An external IdP sends SAML to Okta.</td>
+<td>Okta, as SP on that leg.</td>
+<td>Inbound IdP configuration and Okta's receiving/account-handling result.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Okta's outbound Response and Assertion Signature settings select generated protection; they do not prove Atlas's verifier accepted an attempt. The inbound external-IdP configuration has separate issuer, certificate and response-signature verification settings. Keep the relationship and direction explicit before changing settings. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference</a>, <a href="https://help.okta.com/oie/en-us/content/topics/security/idp-add-saml.htm">Okta external SAML IdP settings</a></p>
+<p>After SAML acceptance, Atlas still needs the intended scoped identity, usable required claims, an appropriate unique account match and permitted entry. Configured downstream JIT is an application capability; Okta assignment alone does not establish that an Atlas account exists or is enabled. Resource permissions remain Atlas's decisions.</p>
+<h2 id="state-the-result-without-overstating-it">State the result without overstating it</h2>
+<p>Each report below is an independent fictional attempt starting without a usable Atlas session. A supplied failure establishes that boundary; it does not prove unreported checks passed.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Recorded evidence</th>
+<th>Accurate result</th>
+<th>Next useful evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Okta reports success; no Atlas receiving result is available.</td>
+<td>Application acceptance is unresolved.</td>
+<td>Associated browser delivery and Atlas processing record.</td>
+</tr>
+<tr>
+<td>Approved signature passes; Atlas rejects a test-environment audience.</td>
+<td>Protection passed, but a relying-party target check failed.</td>
+<td>Actual audience and production integration expectation.</td>
+</tr>
+<tr>
+<td>SAML accepted; intended Atlas account is disabled; no session created.</td>
+<td>Application entry failed after SAML acceptance.</td>
+<td>Intended lifecycle state and entry-policy decision.</td>
+</tr>
+<tr>
+<td>SAML accepted; enabled account enters; session created; administrative resource denied.</td>
+<td>Sign-in succeeded; that resource permission failed.</td>
+<td>Intended roles and resource rule.</td>
+</tr>
+<tr>
+<td>A configuration correction is proposed but has not been tested.</td>
+<td>A possible repair is identified; recovery is unverified.</td>
+<td>A fresh attempt and the intended account, session and resource outcomes.</td>
+</tr>
+</tbody>
+</table></div>
+<p>For example: &quot;Atlas accepted the SAML information for Devi's intended account, then denied entry because that account was disabled. No new Atlas session was created.&quot; This identifies the known outcome without blaming a certificate or granting access as a routine repair.</p>
+<p>The <a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/">troubleshooting lesson</a> develops evidence association and diagnosis. Preserve enough authorized diagnostic detail to identify the failed boundary without distributing raw assertions, cookies or sensitive account data unnecessarily.</p>
+</article></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#locate-the-acceptance-boundary">Locate the acceptance boundary</a></li><li><a href="#review-input-trust-and-use-requirements">Review input, trust and use requirements</a></li><li><a href="#distinguish-the-target-and-time-checks">Distinguish the target and time checks</a></li><li><a href="#associate-the-requested-reply-and-prevent-replay">Associate the requested reply and prevent replay</a></li><li><a href="#identify-who-owns-the-receiving-decision">Identify who owns the receiving decision</a></li><li><a href="#state-the-result-without-overstating-it">State the result without overstating it</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

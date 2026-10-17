@@ -1,0 +1,221 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Signing, encryption, key ownership and lifecycle."><meta name="color-scheme" content="light"><title>Trust and protection | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/reference/trust-and-protection/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/" aria-current="page">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><div class="eyebrow">Reference library</div><article class="prose"><h1 id="saml-with-okta-trust-and-protection">SAML with Okta: trust and protection</h1>
+<p>When Atlas receives identity information for Devi, it needs more than readable XML. It needs an approved provider relationship, the required protection over the content it will use, and acceptable SAML and application results. A certificate appearing in the message does not establish all of these.</p>
+<p>The examples use the fictional Northstar Research integration: Okta is the IdP and Atlas is the SP. Atlas requires a signed assertion. Key labels K1 and K2 are discussion labels, not values to paste into configuration.</p>
+<h2 id="match-the-mechanism-to-the-question">Match the mechanism to the question</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Mechanism</th>
+<th>Question it helps answer</th>
+<th>Limit to keep in mind</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Digital signature</td>
+<td>Does the protected content verify under this signing key?</td>
+<td>The key must also be approved for the expected issuer and relationship. A signature does not hide the content.</td>
+</tr>
+<tr>
+<td>Encryption</td>
+<td>Can the intended recipient recover the protected content?</td>
+<td>Successful decryption alone does not identify the sender.</td>
+</tr>
+<tr>
+<td>HTTPS/TLS</td>
+<td>Is this connection protected under its negotiated security and peer-authentication rules?</td>
+<td>Browser-mediated delivery involves separate connections. TLS does not replace required SAML message protection.</td>
+</tr>
+<tr>
+<td>Base64 encoding</td>
+<td>How are these bytes represented as text?</td>
+<td>Encoding does not establish secrecy or origin.</td>
+</tr>
+<tr>
+<td>Digest or hash</td>
+<td>Does the processed input produce this digest?</td>
+<td>A digest alone does not establish who supplied it.</td>
+</tr>
+</tbody>
+</table></div>
+<p>For the complete browser-mediated message path, see the <a href="/SAML_Theory/reference/binding-comparison/#follow-the-complete-atlas-exchange">binding comparison</a>. Signing protects selected message content as it passes through the browser; encrypted assertions can additionally conceal their protected contents. These protections still leave session cookies and other connection traffic needing appropriate transport security. <a href="https://cheatsheetseries.owasp.org/cheatsheets/SAML_Security_Cheat_Sheet.html">OWASP SAML security guidance</a></p>
+<h2 id="identify-the-key-owner-before-choosing-a-certificate">Identify the key owner before choosing a certificate</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Private capability stays with</th>
+<th>Public information the other participant needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Okta signs an assertion or response for Atlas.</td>
+<td>Okta, as signer.</td>
+<td>Atlas needs approved Okta signature-verification information.</td>
+</tr>
+<tr>
+<td>Atlas signs a request to Okta, where configured.</td>
+<td>Atlas, as signer.</td>
+<td>Okta needs approved Atlas signature-verification information.</td>
+</tr>
+<tr>
+<td>Okta encrypts an assertion for Atlas.</td>
+<td>Atlas retains the private decryption capability.</td>
+<td>Okta needs Atlas's approved public encryption information.</td>
+</tr>
+</tbody>
+</table></div>
+<p>A public certificate can carry a public key. It does not give its holder the corresponding private signing or decryption capability. Partners exchange approved public information; private keys are not partner setup values.</p>
+<h3 id="establish-trust-independently-of-the-received-claim">Establish trust independently of the received claim</h3>
+<p><strong>Figure RF-T1: Atlas's trust boundary.</strong> Boxes group control and ownership. Solid arrows show cryptographic input or use; the dotted arrow shows approved configuration. These are not browser message deliveries. The candidate certificate cannot authorize itself.</p>
+<!-- mermaid:id=RF-T1 -->
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/RF-T1.svg" alt="RF-T1: Atlas's trust boundary" width="1238" height="492" loading="lazy"><figcaption><span>RF-T1</span><a href="/SAML_Theory/assets/diagrams/RF-T1.svg" data-diagram="RF-T1: Atlas's trust boundary">Open full diagram</a></figcaption></figure><p>Okta controls the private signing key. Atlas controls the expected issuer and permitted verification keys for its integration. Atlas can use received key information as a candidate, but the approval relationship must come from authenticated metadata or another controlled trust arrangement.</p>
+<p><code>KeyInfo</code> inside a signature supplies key-related information; its presence does not establish that the identified key is authorized for Northstar's Okta integration. Likewise, a matching issuer string is a claim until the required trust and message checks connect it to acceptable protected content. <a href="https://www.w3.org/TR/xmldsig-core1/">W3C XML Signature, §§3.2 and 4.5</a></p>
+<p>A certificate fingerprint compares certificate bytes under the agreed fingerprint algorithm. A fingerprint copied from the same unverified message is not independent approval. A replacement certificate may contain the same public key, so a changed certificate and a changed key are separate facts to establish.</p>
+<h3 id="check-which-certificate-rules-the-receiver-actually-applies">Check which certificate rules the receiver actually applies</h3>
+<p>Federation trust can differ from browser website validation. The SAML Metadata Interoperability Profile defines trust based on accepted metadata and represented keys, rather than independently treating certificate fields as a Web PKI policy. Under that named model, a self-signed certificate is not inherently a failure. A public-CA certificate does not automatically authorize its key for a particular issuer either.</p>
+<p>Establish Atlas's documented trust model, including certificate-date, chain and revocation handling. Do not assume every SP implements the named profile or automatically rejects a federation key when a certificate expires. <a href="https://docs.oasis-open.org/security/saml/Post2.0/sstc-metadata-iop.pdf">SAML Metadata Interoperability Profile, §§2.3–2.6</a></p>
+<h2 id="locate-the-protected-layer">Locate the protected layer</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Protection arrangement</th>
+<th>Content to examine</th>
+<th>Conclusion to avoid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Signed assertion</td>
+<td>The intended Assertion selected by the reference and transforms.</td>
+<td>That its signature also covers outer Response fields or RelayState.</td>
+</tr>
+<tr>
+<td>Signed response</td>
+<td>The Response content selected by its reference and transforms.</td>
+<td>That any nearby or separately selected XML object was therefore verified.</td>
+</tr>
+<tr>
+<td>Encrypted assertion</td>
+<td>EncryptedAssertion and the recovered assertion under the supported construction.</td>
+<td>That successful decryption establishes an approved signer.</td>
+</tr>
+<tr>
+<td>Signed response containing an encrypted, signed assertion</td>
+<td>Outer protected response and recovered inner protected assertion.</td>
+<td>That one generic verify/decrypt order is safe for every construction.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Figure RF-T2: Expand from signed content to encrypted layers.</strong> Solid arrows mean containment. The dotted recovery arrow means decryption exposes an inner object for further processing. The encrypted branch is an illustrative supported construction, not an Okta default. Both branches retain Atlas's signed-assertion requirement.</p>
+<!-- mermaid:id=RF-T2 -->
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/RF-T2.svg" alt="RF-T2: Expand from signed content to encrypted layers" width="1226" height="649" loading="lazy"><figcaption><span>RF-T2</span><a href="/SAML_Theory/assets/diagrams/RF-T2.svg" data-diagram="RF-T2: Expand from signed content to encrypted layers">Open full diagram</a></figcaption></figure><p>In the plaintext branch, Assertion <code>_assert_D03_01</code> contains the signature and readable identity information. Its enclosing Response is a different object. In the encrypted branch, an outer response signature and encrypted assertion add layers; the inner assertion signature becomes available after recovery. Signed content can remain readable, while encrypted content still needs its required origin and integrity checks.</p>
+<p>The amended browser SSO rules allow the response or enclosed assertions to supply the required POST signature protection. Atlas's narrower requirement still applies: a supported response-signing option does not waive its assertion-signing contract. Encryption processing depends on the actual construction. E93 addresses surrounding integrity protection for CBC encryption; do not generalize a diagram into an &quot;always decrypt first&quot; rule. <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E93</a></p>
+<p>In a public-key XML Encryption arrangement, a content key encrypts the assertion and a key-transport mechanism protects that key for Atlas. Content encryption and key transport are separate algorithm roles. Possessing Atlas's public encryption information does not make a sender Okta. <a href="https://www.w3.org/TR/xmlenc-core1/">W3C XML Encryption, §2.2</a></p>
+<h2 id="connect-the-verified-content-to-the-identity-used">Connect the verified content to the identity used</h2>
+<p>Signature processing involves reference validation over the selected, transformed content and signature-value validation over canonicalized SignedInfo. Both are needed. Canonicalization provides a defined representation; it does not make arbitrary XML edits harmless. The signature algorithm, digest algorithm and certificate's own signature algorithm have different roles. <a href="https://www.w3.org/TR/xmldsig-core1/">W3C XML Signature, §§3.2–4.4</a></p>
+<p>Suppose Atlas verifies assertion A but obtains the NameID used for account lookup from assertion B. The successful verification does not protect that chosen identity. This verified-versus-consumed mismatch is central to XML signature wrapping problems. Safe processing needs constrained content selection, unambiguous references and use of the actual verified object. A generic search for the first NameID cannot establish those properties. <a href="https://www.w3.org/TR/xmldsig-bestpractices/">W3C XML Signature Best Practices, §3.1.5</a></p>
+<p>For an Atlas attempt, connect these facts in the evidence:</p>
+<ol>
+<li>The expected provider and approved key apply to this integration.</li>
+<li>The required signed layer and intended object are selected unambiguously.</li>
+<li>Permitted algorithms and complete signature checks pass.</li>
+<li>Atlas uses that verified object's identity and restrictions.</li>
+<li>Applicable target, time, request association, replay, account and access requirements also pass.</li>
+</ol>
+<p>This is a set of linked requirements, not a universal parser or cryptographic execution order. <a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/#63-connect-the-signature-to-the-exact-content-used">Lesson 6</a> explains the internal relationships; <a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/">Lesson 7</a> connects protection to acceptance.</p>
+<h2 id="read-oktas-protection-settings-in-the-correct-direction">Read Okta's protection settings in the correct direction</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Outbound app-integration setting or information</th>
+<th>Meaning for the relationship</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Response and Assertion Signature</td>
+<td>Separate choices of signed layer.</td>
+</tr>
+<tr>
+<td>Signature Algorithm and Digest Algorithm</td>
+<td>Separate roles in message-signature processing.</td>
+</tr>
+<tr>
+<td>Assertion Encryption</td>
+<td>Whether the assertion output is encrypted.</td>
+</tr>
+<tr>
+<td>Encryption Algorithm and Key Transport Algorithm</td>
+<td>Content protection and content-key protection respectively.</td>
+</tr>
+<tr>
+<td>Encryption Certificate</td>
+<td>Atlas's public recipient information used by Okta.</td>
+</tr>
+<tr>
+<td>Signature Certificate</td>
+<td>Application public information used by Okta to validate application-supplied sign-in and SLO requests.</td>
+</tr>
+<tr>
+<td>Okta SAML signing certificate supplied to Atlas</td>
+<td>Provider verification information Atlas needs for Okta-signed content.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The <strong>Signature Certificate</strong> upload and the <strong>Okta signing certificate</strong> supplied to the SP have different directions. Naming the operation and key owner first prevents a misleading &quot;replace the certificate&quot; request. Effective support and required combinations must agree with the application. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference</a></p>
+<p>Use currently approved algorithms supported by both participants. Do not copy obsolete algorithms from historical SAML examples or weaken required verification to make a test pass. <a href="https://cheatsheetseries.owasp.org/cheatsheets/SAML_Security_Cheat_Sheet.html">OWASP SAML security guidance</a></p>
+<h2 id="separate-generation-activation-and-receiver-adoption">Separate generation, activation and receiver adoption</h2>
+<p>Generating a new certificate makes material available. Activating selects sender use. Receiver adoption updates what Atlas accepts. None of these proves the other two happened. Okta documents available certificates, activation and app setup information; it recommends keeping the app-only certificate active. <a href="https://help.okta.com/oie/en-us/content/topics/apps/manage-signing-certificates.htm">Okta signing certificate management</a></p>
+<p><strong>Figure RF-T3: Coordinated signing-key transition.</strong> This is Lesson 6's fictional 20 October 2026 schedule, in UTC. Atlas supports controlled multi-key trust, and K1 remains uncompromised and permitted during overlap. Bars show signing and trust states, not assertion or session lifetimes.</p>
+<!-- mermaid:id=RF-T3 -->
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/RF-T3.svg" alt="RF-T3: Coordinated signing-key transition" width="1264" height="244" loading="lazy"><figcaption><span>RF-T3</span><a href="/SAML_Theory/assets/diagrams/RF-T3.svg" data-diagram="RF-T3: Coordinated signing-key transition">Open full diagram</a></figcaption></figure><p>At 09:30, Atlas adopts K2 while Okta still uses K1. At 10:00, Okta switches to K2. At 11:00, Atlas removes K1 after the agreed checks. The chart ends at noon for display; K2 does not expire at that point. The overlap is an example supported plan, not a standard waiting period or Okta guarantee.</p>
+<p>Before cutover, Daniel needs the approved new public information, supported receiver update behavior, actual readiness across the receiving instances and an agreed recovery decision. A metadata URL does not prove automatic refresh. An import into one node does not prove fleet adoption. Before retiring K1, verify observed K2 use and acceptance, in-flight message handling and applicable cache/rollback needs.</p>
+<p>If Atlas accepts only one key, this overlap plan does not apply. Use its supported coordinated replacement arrangement. If K1 may be compromised, keeping or restoring it preserves unwanted signing authority. Incident response also needs to assess sessions already created; removing a verification key does not automatically erase them.</p>
+<p>Certificate validity dates, approved key usage, metadata validity/refresh, assertion expiry and application-session lifetime are separate controls. Define which deadlines each implementation enforces instead of treating &quot;expired&quot; as a complete diagnosis.</p>
+<h2 id="diagnose-the-failed-boundary">Diagnose the failed boundary</h2>
+<p>These are independent fictional reports. The supplied facts support a limited conclusion.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Report</th>
+<th>Supported conclusion</th>
+<th>What remains to establish</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A certificate is embedded in the response; no approved trust record is identified.</td>
+<td>A candidate key was supplied.</td>
+<td>Its authorization for the expected provider and integration.</td>
+</tr>
+<tr>
+<td>Atlas decrypts an assertion, but required signature verification fails.</td>
+<td>Recovery succeeded; required origin/integrity protection did not pass.</td>
+<td>Specific key, reference, algorithm or content failure.</td>
+</tr>
+<tr>
+<td>A signature over A passes, but Atlas selects identity from B.</td>
+<td>The verification does not protect the identity consumed.</td>
+<td>Correct secure object selection and all later acceptance results.</td>
+</tr>
+<tr>
+<td>Okta signs with approved K2; Atlas runtime trusts only K1 and reports no matching verification key.</td>
+<td>Sender use and receiver trust disagree.</td>
+<td>Successful verification and later decisions after an authorized correction.</td>
+</tr>
+<tr>
+<td>Atlas node A accepts K2; node B still trusts only K1.</td>
+<td>One successful node does not establish rollout completion.</td>
+<td>Effective trust and outcomes on every relevant receiver.</td>
+</tr>
+<tr>
+<td>Atlas verifies the required signature, then rejects the audience.</td>
+<td>Protection passed, but the assertion is unsuitable for that audience check.</td>
+<td>Correct intended relying party and environment configuration.</td>
+</tr>
+</tbody>
+</table></div>
+<p>A generic &quot;signature invalid&quot; message supplies less evidence than a specific key-selection or reference failure. Record the observed processing result before proposing a certificate, algorithm or endpoint change. The <a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/">troubleshooting lesson</a> develops that evidence-based approach.</p>
+</article></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#match-the-mechanism-to-the-question">Match the mechanism to the question</a></li><li><a href="#identify-the-key-owner-before-choosing-a-certificate">Identify the key owner before choosing a certificate</a></li><li><a href="#locate-the-protected-layer">Locate the protected layer</a></li><li><a href="#connect-the-verified-content-to-the-identity-used">Connect the verified content to the identity used</a></li><li><a href="#read-oktas-protection-settings-in-the-correct-direction">Read Okta's protection settings in the correct direction</a></li><li><a href="#separate-generation-activation-and-receiver-adoption">Separate generation, activation and receiver adoption</a></li><li><a href="#diagnose-the-failed-boundary">Diagnose the failed boundary</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

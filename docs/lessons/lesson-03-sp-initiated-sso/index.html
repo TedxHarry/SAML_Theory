@@ -1,0 +1,326 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Follow requests, responses and the context that connects them."><meta name="color-scheme" content="light"><title>SP-initiated sign-in | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/" aria-current="page"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><nav class="reading-modes" aria-label="Lesson material"><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/" aria-current="page">Lesson 3</a><a href="/SAML_Theory/questions/lesson-03/">Questions <span>(16)</span></a></nav><article class="prose"><h1 id="lesson-3-follow-an-sp-initiated-sign-in-through-okta">Lesson 3: Follow an SP-initiated sign-in through Okta</h1>
+<p>Devi opens the projects page in Atlas. She starts with the application because that is where the work is. Atlas finds no usable signed-in session for her browser and needs authentication information from Okta before it can continue.</p>
+<p>The resulting journey is called <strong>SP-initiated SSO</strong>. Atlas, the service provider, creates the authentication request. The browser carries it to Okta, the identity provider, and carries the resulting response back. The useful engineering question is how Atlas recognizes that the returning information belongs to the attempt it started.</p>
+<p>The example below follows one successful transaction. Devi has an active Okta account, an Atlas assignment and an enabled Atlas account. The relevant Okta policies allow the attempt, Atlas trusts the appropriate Okta issuer and signing information, and its account rules permit Devi to view projects. Neither Okta nor Atlas initially has a usable session for this browser. These facts define this case; they do not establish the result of any other attempt.</p>
+<h2 id="31-the-initial-request-and-the-state-atlas-remembers">3.1 The initial request and the state Atlas remembers</h2>
+<h3 id="start-with-the-page-request">Start with the page request</h3>
+<p>The browser requests <code>https://atlas.northstar.example/projects</code>. This is an ordinary request for an application resource. It is not yet a SAML request.</p>
+<p>Atlas examines the request for a usable application session. In this case it finds none. That means Atlas needs a sign-in exchange before it can serve this protected resource. It does not mean Devi has no account, no browser cookies, or no session anywhere else.</p>
+<p>Atlas selects the configured Okta identity provider. Selection is straightforward in this example because Atlas uses one provider for this user population. An application serving several organizations might need a discovery or organization-selection step. The application should select an approved configuration, not accept an arbitrary authentication destination supplied by the browser.</p>
+<p>Atlas then creates an <strong>AuthnRequest</strong>, the SAML authentication request message. This message asks Okta to handle authentication under the applicable requirements. Creating it is not evidence that Devi has authenticated.</p>
+<h3 id="give-the-attempt-an-identity">Give the attempt an identity</h3>
+<p>For this transaction, Atlas chooses the request ID <code>_req_D03_01</code>. The request also has an issue time. These help distinguish this attempt from other activity, including another tab, another user, or a retry.</p>
+<p>The following values are fictional transaction data. All times are UTC, indicated by the <code>Z</code> suffix. The five-minute pending-request window is an Atlas policy chosen for the example, not a universal SAML timeout.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Value for this attempt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Request ID</td>
+<td><code>_req_D03_01</code></td>
+</tr>
+<tr>
+<td>Request issue time</td>
+<td><code>2026-10-16T15:00:00Z</code></td>
+</tr>
+<tr>
+<td>SP entity ID</td>
+<td><code>https://atlas.northstar.example/saml</code></td>
+</tr>
+<tr>
+<td>Approved response endpoint</td>
+<td><code>https://atlas.northstar.example/saml/acs</code></td>
+</tr>
+<tr>
+<td>Intended resource</td>
+<td><code>/projects</code></td>
+</tr>
+<tr>
+<td>Optional RelayState value used here</td>
+<td><code>rs_D03_01</code></td>
+</tr>
+<tr>
+<td>Local pending-request expiry</td>
+<td><code>2026-10-16T15:05:00Z</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>An <strong>ID</strong> labels a particular message. Atlas's <strong>entity ID</strong> labels the participant. Devi's <strong>NameID</strong> will identify the subject in the returned identity information. These three identifiers do not have interchangeable roles.</p>
+<h3 id="remember-enough-to-evaluate-the-return">Remember enough to evaluate the return</h3>
+<p>Atlas needs context for the attempt it started. In this example, its implementation retains the pending request ID, expected provider, intended response endpoint, required authentication behavior, approved return target and expiry. It associates that context with the initiating browser through its own protected pre-authentication mechanism.</p>
+<p>That pre-authentication context is not already a signed-in Atlas session. It supports an unfinished exchange. Once authentication and the application's checks succeed, Atlas can establish the authenticated application session.</p>
+<p>The implementation can choose how to represent and protect its state. Server-side storage is used in this example; other designs may use protected state mechanisms. The engineering requirement is to understand what evidence ties the response to the relevant attempt, not to assume every product stores the same object in memory. The browser SSO profile permits the SP to associate the exchange with its original resource request. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, §4.1.3.1</a></p>
+<p><strong>Figure L03-M1: One attempt, several related values.</strong> These arrows show the relationship between Atlas's retained context and the values used during the exchange. They are not network messages. RelayState is a lookup value in this example, not a replacement for checking request correlation.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L03-M1.svg" alt="L03-M1: One attempt, several related values" width="1289" height="234" loading="lazy"><figcaption><span>L03-M1</span><a href="/SAML_Theory/assets/diagrams/L03-M1.svg" data-diagram="L03-M1: One attempt, several related values">Open full diagram</a></figcaption></figure><p>Read the response connection in the reverse direction from creation. Atlas does not create a new trusted attempt merely because a returning message includes a familiar-looking ID. It compares the received information with valid pending context and applies the other relevant checks.</p>
+<h2 id="32-follow-the-complete-redirect-and-post-exchange">3.2 Follow the complete Redirect and POST exchange</h2>
+<h3 id="know-which-delivery-mechanism-belongs-to-which-message">Know which delivery mechanism belongs to which message</h3>
+<p>Atlas sends the request using the HTTP-Redirect binding. The browser receives a redirect to the approved Okta SSO endpoint, with the packaged request carried in a <code>SAMLRequest</code> query parameter. The endpoint value comes from the relevant Okta integration information; it is not derived from Atlas's ACS.</p>
+<p>Okta returns the response using HTTP-POST in this example. The browser receives a page containing a form, then submits the response in a <code>SAMLResponse</code> form field to Atlas's ACS. The request binding and response binding are different choices. Using Redirect for the request does not mean the response also returns by Redirect.</p>
+<p>The Redirect packaging includes binding-defined compression and encoding; POST uses Base64-encoded XML in the form field. Those packaging steps are not encryption. A trace viewer may decode them so that the underlying message becomes readable. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf">SAML Bindings, §§3.4 and 3.5</a></p>
+<h3 id="keep-the-actors-and-local-decisions-visible">Keep the actors and local decisions visible</h3>
+<p>The next figure follows the transaction <code>_req_D03_01</code>. Its stage numbers retain the overall journey: initial request, SP preparation, delivery to Okta, Okta processing, response delivery, SP processing and resource access. Lettered substeps expose the work inside a stage.</p>
+<p><strong>Figure L03-S1: Complete SP-initiated SSO with retained request context.</strong> Cross-participant arrows show browser delivery. Self-arrows show local work. Step 4b groups authentication, policy and session-related browser interactions, rather than depicting a particular authentication screen sequence. The successful result assumes the applicable trust and validation checks pass.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L03-S1.svg" alt="L03-S1: Complete SP-initiated SSO with retained request context" width="1173" height="1115" loading="lazy"><figcaption><span>L03-S1</span><a href="/SAML_Theory/assets/diagrams/L03-S1.svg" data-diagram="L03-S1: Complete SP-initiated SSO with retained request context">Open full diagram</a></figcaption></figure><p>At step 1, Atlas receives the resource request. Steps 2a and 2b create the authentication request and retain its context. At step 2c, the browser receives the redirect; at step 3, it delivers the request to Okta. Atlas has initiated the exchange even though the browser performs the delivery.</p>
+<p>At step 4a, Okta evaluates the request in the context of the relevant app integration. Requested values are not automatically approved values. The request's claimed issuer, response endpoint and any required request protection need to fit the configured relationship.</p>
+<p>At step 4b, the successful case proceeds through the relevant assignment and authentication requirements. Devi is assigned to Atlas, her account is usable, and policy permits access after the required authentication. Because she has no suitable Okta session at the start, Okta performs the necessary interactions and establishes its own session during this grouped stage.</p>
+<p>Okta's session supports subsequent requests to Okta. It is not the Atlas session, and its cookie is not the identity payload posted to Atlas. The exact browser interactions involved depend on the authentication method and applicable Identity Engine policies. <a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/about-policies.htm">Okta policies and rules</a>, <a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/add-okta-sign-on-policy-rule.htm">Okta Identity Engine global session rules and cookies</a></p>
+<p>At step 5, Okta prepares the successful response form. For the fictional transaction, the response ID is <code>_resp_D03_01</code>, its issue time is <code>2026-10-16T15:00:20Z</code>, and its <code>InResponseTo</code> identifies <code>_req_D03_01</code>. The assertion has its own ID, <code>_assert_D03_01</code>. The response and assertion are not renamed copies of the request.</p>
+<p>The browser submits the form at step 6. Atlas receives information to evaluate, not an instruction it must obey. At step 7a, it applies the relevant trust, message and correlation checks. A matching request ID is one part of that evaluation. It does not establish the issuer's trustworthiness, valid timing, intended audience or correct consumed content by itself.</p>
+<p>At step 7b, the accepted identity maps to Devi's enabled Atlas account. At step 7c, Atlas establishes its application session and completes its pending-request processing under its rules. Reusing a completed request must not be treated as a fresh successful attempt merely because its ID is recognizable.</p>
+<p>Step 8a returns the application cookie and an approved navigation destination. At step 8b, the browser requests projects using the Atlas session. Steps 8c-i and 8c-ii establish the final resource outcome. The evidence for success includes the permitted page, not only a successful Okta-side authentication.</p>
+<h3 id="distinguish-response-correlation-from-assertion-correlation">Distinguish response correlation from assertion correlation</h3>
+<p><code>InResponseTo</code> means “this replies to the request with this ID.” It can occur at two different levels of the returned XML. The response is the outer envelope; the assertion is inside it. Within the assertion, subject-confirmation data supplies conditions for presenting that assertion. In the browser SSO <strong>bearer</strong> method, possession and presentation of the assertion are used without a separate proof that the presenter holds a subject-specific private key; recipient, time and request-correlation checks are therefore important.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Location, read from outside inward</th>
+<th>Value in this requested exchange</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Response</code> → <code>InResponseTo</code> attribute</td>
+<td><code>_req_D03_01</code></td>
+</tr>
+<tr>
+<td><code>Response</code> → <code>Assertion</code> → <code>Subject</code> → <code>SubjectConfirmation</code> → <code>SubjectConfirmationData</code> → <code>InResponseTo</code> attribute</td>
+<td><code>_req_D03_01</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Each row ends at an XML attribute on the named element. Neither value identifies the response or assertion itself: those have their own IDs, <code>_resp_D03_01</code> and <code>_assert_D03_01</code>. Both correlation values point back to Atlas’s initiating request.</p>
+<p>The locations have different processing contexts, and the applicable browser SSO rules govern their presence and checking. For this requested exchange, inspecting only the convenient outer occurrence is insufficient: Atlas must also apply the assertion’s bearer-confirmation requirements. A matching value in one location cannot excuse a mismatch in the other. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, §4.1.4.2</a></p>
+<p>If Atlas cannot find usable pending context, it has not established that this returned information completes the attempt it expected. Whether a product also supports a separately configured unsolicited-response path is a different question. Falling back silently from failed requested correlation to unrestricted acceptance would erase a meaningful distinction.</p>
+<h2 id="33-read-the-request-fields-that-support-those-decisions">3.3 Read the request fields that support those decisions</h2>
+<h3 id="examine-the-request-before-interpreting-its-outcome">Examine the request before interpreting its outcome</h3>
+<p>The following XML shows selected fields of <code>_req_D03_01</code>. Its issue time, SP identifier and ACS match the transaction above. The actual Okta <code>Destination</code> value and request-protection material are not printed here. In a real message, those details must satisfy the selected binding, profile and integration configuration. This excerpt is not a deployable request or proof that request verification succeeded.</p>
+<pre><code class="language-xml">&lt;samlp:AuthnRequest
+    xmlns:samlp=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;
+    xmlns:saml=&quot;urn:oasis:names:tc:SAML:2.0:assertion&quot;
+    ID=&quot;_req_D03_01&quot;
+    Version=&quot;2.0&quot;
+    IssueInstant=&quot;2026-10-16T15:00:00Z&quot;
+    AssertionConsumerServiceURL=&quot;https://atlas.northstar.example/saml/acs&quot;
+    ProtocolBinding=&quot;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&quot;
+    ForceAuthn=&quot;false&quot;
+    IsPassive=&quot;false&quot;&gt;
+  &lt;saml:Issuer&gt;https://atlas.northstar.example/saml&lt;/saml:Issuer&gt;
+  &lt;samlp:NameIDPolicy
+      Format=&quot;urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified&quot;
+      AllowCreate=&quot;true&quot; /&gt;
+&lt;/samlp:AuthnRequest&gt;
+</code></pre>
+<p>The root element names the message type. <code>ID</code> identifies this request, and <code>IssueInstant</code> records when it was issued. <code>Issuer</code> identifies Atlas as the requester. It does not identify Devi, and it does not name the Okta issuer expected on the returning assertion.</p>
+<p><code>Version</code> declares the SAML protocol version. It is separate from the version-like text inside an identifier such as the unspecified NameID format URI. <code>Destination</code>, when present and required in context, identifies the intended request-receiving endpoint. It is not the ACS at which Atlas wants the response.</p>
+<p><strong>Figure L03-M2: Group the request by purpose.</strong> The arrows mean containment of related information, not processing order. The diagram separates message identity, return delivery and requested authentication behavior.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L03-M2.svg" alt="L03-M2: Group the request by purpose" width="1206" height="243" loading="lazy"><figcaption><span>L03-M2</span><a href="/SAML_Theory/assets/diagrams/L03-M2.svg" data-diagram="L03-M2: Group the request by purpose">Open full diagram</a></figcaption></figure><p>The last two groups are especially useful during troubleshooting. A response may reach the wrong application instance because return delivery was misconfigured, or an authentication attempt may fail because its requirements cannot be satisfied. Those are different problems even though both started with the same message type.</p>
+<h3 id="acs-selection-is-a-request-within-a-trust-relationship">ACS selection is a request within a trust relationship</h3>
+<p>The request above names its response endpoint using <code>AssertionConsumerServiceURL</code>. A requester can instead identify a configured ACS by <code>AssertionConsumerServiceIndex</code> where the applicable arrangement supports it. The IdP needs an approved way to interpret that selection for the requester.</p>
+<p>These are alternative selection mechanisms. The ACS index is mutually exclusive with the ACS URL and <code>ProtocolBinding</code> attributes. A schema that accepts several individually defined attributes does not mean the protocol permits every combination. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §3.4.1</a></p>
+<p>An index is meaningful only through the corresponding configuration. <code>0</code> is not a universal name for an application's login endpoint. If two integrations map the same number to different locations, copying an index between them does not copy the relationship.</p>
+<p>Okta's <strong>Other Requestable SSO URLs</strong> and <strong>Signed Requests</strong> settings affect the supported selection arrangement. The documented signed-request configuration can use ACS information from the signed request instead of the static requestable URLs. Apply the specific configuration rules; do not assume any URL supplied by a browser-carried request is accepted. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference: Signed Requests and Other Requestable SSO URLs</a></p>
+<p><code>ProtocolBinding</code> in the displayed request asks for the response through HTTP-POST. It does not describe how this request itself arrived at Okta. In the selected journey, Redirect delivers the request and POST delivers the response.</p>
+<p><code>AttributeConsumingServiceIndex</code>, if used, selects information about requested attributes for a service. It does not select the ACS and does not identify a user. An application asking for particular attributes still needs evidence of what was actually released and how the receiving application interpreted it. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, §4.1.4.2</a></p>
+<h3 id="request-signing-is-separate-from-response-signing">Request signing is separate from response signing</h3>
+<p>An authentication request and its resulting assertion are different content created by different participants. Protecting one does not automatically protect the other. A declaration that the SP wants signed assertions does not tell you whether it signs its requests.</p>
+<p>With the Redirect binding, request-signature information can be carried in binding-defined query parameters rather than appearing as an XML signature inside the decoded request. Inspecting only the decoded XML can therefore omit relevant request-protection evidence. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf">SAML Bindings, §3.4.4</a></p>
+<p>Okta's relevant request-verification settings and the application must agree. A valid signature establishes a result under the verification key and covered data; acceptance also depends on the key's approved association and the applicable policy. Conversely, turning off a request-verification requirement solely to make an error disappear changes the agreement rather than explaining the original failure.</p>
+<h2 id="34-ask-for-identity-and-authentication-behavior">3.4 Ask for identity and authentication behavior</h2>
+<h3 id="nameidpolicy-concerns-the-identifier-returned-for-the-subject">NameIDPolicy concerns the identifier returned for the subject</h3>
+<p><code>NameIDPolicy</code> expresses requirements concerning the name identifier used in returned assertions. Its <code>Format</code> concerns the identifier format. <code>SPNameQualifier</code>, where applicable, supplies the SP-related naming scope. These are not fields that choose the user's application permissions.</p>
+<p>The request excerpt asks for the unspecified format. In Northstar's configured Atlas example, the emitted identifier is the employee value <code>E1042</code>, which Atlas maps to <code>atlas-4821</code>. That output comes from the agreed configuration, not from an intrinsic rule that unspecified means employee number.</p>
+<p><code>AllowCreate</code> is easy to misread. It concerns permission for the IdP to create or associate identifier-related information for the relying party while fulfilling the request. It is not an instruction for Atlas to create an application account. The SAML errata clarify its meaning and its deployment-dependent behavior. <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E14</a></p>
+<p>In particular, <code>AllowCreate=&quot;true&quot;</code> in the excerpt does not enable Atlas JIT provisioning, assign Devi to the app in Okta, or create a new Okta user. Those capabilities have their own configuration and context. The value does not demonstrate that any creation actually occurred.</p>
+<p>An IdP may be unable to satisfy a requested identifier policy. Diagnosis then needs the requested format and scope, the actual integration settings and the returned result. Replacing a format at random can turn a visible error into a less visible account-matching problem.</p>
+<h3 id="requestedauthncontext-expresses-requirements-not-proof">RequestedAuthnContext expresses requirements, not proof</h3>
+<p>An SP can include <code>RequestedAuthnContext</code> to state requirements for the authentication context it wants reported. The following is a standalone fragment illustrating syntax, not an additional condition silently added to <code>_req_D03_01</code>.</p>
+<pre><code class="language-xml">&lt;samlp:RequestedAuthnContext
+    xmlns:samlp=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;
+    xmlns:saml=&quot;urn:oasis:names:tc:SAML:2.0:assertion&quot;
+    Comparison=&quot;exact&quot;&gt;
+  &lt;saml:AuthnContextClassRef&gt;urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport&lt;/saml:AuthnContextClassRef&gt;
+&lt;/samlp:RequestedAuthnContext&gt;
+</code></pre>
+<p>Read the fragment as a specific requirement: “Return a context matching this requested class.” Its <code>Comparison=&quot;exact&quot;</code> does not mean “choose anything you consider stronger instead.” <code>exact</code> is also the default when <code>Comparison</code> is omitted. The other comparison values change the selection rule:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Comparison</th>
+<th>Meaning under the protocol’s comparison rules</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>exact</code></td>
+<td>Match at least one requested context exactly.</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td>Meet or exceed the strength of at least one requested context.</td>
+</tr>
+<tr>
+<td><code>better</code></td>
+<td>Exceed the strength of every requested context.</td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td>Choose the strongest available context that does not exceed at least one requested context.</td>
+</tr>
+</tbody>
+</table></div>
+<p>For comparisons involving strength, the responder’s assessment matters. These names do not define a universal numerical ranking of authentication methods or a portable “MFA level” scale. In a project, establish the SP’s actual requirement and the provider’s supported behavior before changing this setting. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §3.3.2.2.1</a></p>
+<p>The class URI in the fragment identifies an authentication-context class. Its name alone does not establish that a specific Okta sign-in used multiple factors. Likewise, requesting a context does not prove that the provider supplied it. Inspect the returned authentication information and the relevant policy/event evidence to support the particular conclusion.</p>
+<p>Okta exposes an <strong>Authentication context class</strong> setting in SAML configuration. Its relationship with an incoming request and the requirements of a particular SP must be understood for that integration. Do not assume the setting, a successful prompt and the SP's freshness requirements are all the same decision. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference: Authentication context class</a></p>
+<h3 id="forceauthn-asks-for-fresh-authentication">ForceAuthn asks for fresh authentication</h3>
+<p>At the protocol level, <code>ForceAuthn=&quot;true&quot;</code> asks the IdP to authenticate the presenter rather than rely on its previous authentication context. That is a freshness request. It does not universally mean “ask for a password,” “use MFA,” or “delete every existing session.” A different supported authentication method may establish the required result.</p>
+<p>For Okta, the <strong>Honor Force Authentication</strong> setting matters. The field reference describes whether Okta honors the incoming flag or ignores it under that configuration. Therefore, a captured request containing <code>ForceAuthn=&quot;true&quot;</code> is not by itself evidence that Okta performed the intended fresh authentication. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference: Honor Force Authentication</a></p>
+<p>Suppose a requirements document says sensitive Atlas actions need recent authentication. Daniel finds a ForceAuthn flag in a request. He still needs to check the applicable Okta behavior, the authentication evidence and what Atlas actually requires before saying the design meets that requirement.</p>
+<p>An AuthnRequest only exists when the SP starts an exchange. If Atlas continues using an existing local session without initiating SAML, changing a future request flag does not retroactively reauthenticate that current application activity.</p>
+<h3 id="ispassive-limits-visible-interaction">IsPassive limits visible interaction</h3>
+<p><code>IsPassive=&quot;true&quot;</code> asks for an outcome without visibly taking control of the user's interface for authentication interactions. It is useful for checking whether an appropriate authentication state can be used without interrupting the user. It is not permission to skip authentication or weaken policy.</p>
+<p>An existing session can make passive completion possible, but only if the applicable requirements can be satisfied without prohibited interaction. If an additional visible challenge is necessary, a passive request cannot be considered successful merely because showing that challenge would have worked.</p>
+<p><strong>Figure L03-D1: Passive processing under a stated requirement.</strong> This decision view illustrates the SAML meaning of the request constraint. It is not an exhaustive Okta processing pipeline and does not prescribe a product-specific error screen or status sequence.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L03-D1.svg" alt="L03-D1: Passive processing under a stated requirement" width="586" height="619" loading="lazy"><figcaption><span>L03-D1</span><a href="/SAML_Theory/assets/diagrams/L03-D1.svg" data-diagram="L03-D1: Passive processing under a stated requirement">Open full diagram</a></figcaption></figure><p>The yes branch does not mean automatic acceptance. It means this particular constraint can be satisfied. The no branch does not establish a bad password or disabled account; it establishes that the constrained attempt cannot succeed through the interaction it would need.</p>
+<p>ForceAuthn and IsPassive answer different questions: freshness and interaction. Both default to false when absent. A false ForceAuthn does not forbid fresh authentication if policy requires it, and a false IsPassive does not require a visible prompt when none is needed. Setting both true does not make their constraints disappear. Fresh authentication would still need to satisfy the passive constraint; the combination is not a universal way to force an MFA prompt silently. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §3.4.1</a></p>
+<p>For an Okta investigation, examine the actual request, route, applicable Identity Engine policy and observed result. External-provider routing can add another authentication boundary. Do not infer the exact passive outcome for every Okta arrangement from the flag alone.</p>
+<h2 id="35-change-the-starting-conditions-and-investigate-the-result">3.5 Change the starting conditions and investigate the result</h2>
+<h3 id="existing-sessions-change-the-work-required">Existing sessions change the work required</h3>
+<p>The successful journey began without an Atlas or Okta session. Other starting states are independent cases, not hidden changes to that completed transaction.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Starting state</th>
+<th>Likely path under the stated conditions</th>
+<th>Evidence still needed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No Atlas session, no suitable Okta session</td>
+<td>Atlas requests authentication; Okta needs to establish the required result</td>
+<td>Request, applicable requirements, returned information and application outcome</td>
+</tr>
+<tr>
+<td>No Atlas session, usable Okta session satisfying app requirements</td>
+<td>A new SAML exchange may complete without another visible authentication challenge</td>
+<td>A response still needs to be generated, delivered and accepted by Atlas</td>
+</tr>
+<tr>
+<td>No Atlas session, existing Okta session insufficient for the app</td>
+<td>Okta may require additional authentication or the attempt may not satisfy its constraints</td>
+<td>Policy, requested behavior and actual authentication/response result</td>
+</tr>
+<tr>
+<td>Usable Atlas session and sufficient application policy</td>
+<td>Atlas may serve the resource without another SAML exchange</td>
+<td>Application session and resource authorization evidence</td>
+</tr>
+</tbody>
+</table></div>
+<p>The word <em>existing</em> is not enough. A session might be expired, unsuitable for the requested app, or insufficient for an authentication requirement. In Identity Engine, global session and app sign-in policies have different roles; a global session does not promise that every app can be entered without further requirements. <a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/about-policies.htm">Okta policies and rules</a></p>
+<p><strong>Figure L03-S2: A separate attempt using an existing Atlas session.</strong> The browser and Atlas complete the permitted resource request without contacting Okta. This is a complete application request, not a new SAML exchange.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L03-S2.svg" alt="L03-S2: A separate attempt using an existing Atlas session" width="849" height="333" loading="lazy"><figcaption><span>L03-S2</span><a href="/SAML_Theory/assets/diagrams/L03-S2.svg" data-diagram="L03-S2: A separate attempt using an existing Atlas session">Open full diagram</a></figcaption></figure><p>Step 2 is doing the decisive work in this case. The absence of a new SAML request is consistent with the stated usable application session. It does not establish that Okta is bypassed incorrectly, or that the application has no authentication policy.</p>
+<h3 id="relaystate-is-not-the-request-id">RelayState is not the request ID</h3>
+<p>For <code>_req_D03_01</code>, Atlas used <code>rs_D03_01</code> as RelayState. In the selected Redirect/POST exchange, this separate binding-level value accompanies the outgoing request and is returned with the response. It is outside the request's XML message fields.</p>
+<p>Atlas's implementation uses it as a protected lookup for local navigation and attempt context. Another integration may use it differently under its agreement. Its presence does not define a universal storage format, and the string is not automatically the AuthnRequest ID.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Value or state</th>
+<th>Its role in this case</th>
+<th>What its presence alone does not prove</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>_req_D03_01</code></td>
+<td>Identifies the authentication request</td>
+<td>That the response is trustworthy or accepted</td>
+</tr>
+<tr>
+<td>Atlas pending context</td>
+<td>Records expected provider, browser association, requirements, expiry and target</td>
+<td>That the browser returned a response satisfying those expectations</td>
+</tr>
+<tr>
+<td><code>rs_D03_01</code></td>
+<td>Binding-level value used for an application lookup</td>
+<td>Correct <code>InResponseTo</code>, safe navigation or completed authentication</td>
+</tr>
+<tr>
+<td><code>/projects</code></td>
+<td>Approved target after sign-in</td>
+<td>That the account is allowed to view it</td>
+</tr>
+</tbody>
+</table></div>
+<p>An assertion's XML signature does not automatically protect an external form parameter. RelayState handling therefore needs the relevant binding protection and the application's own integrity and navigation controls. The selected binding also constrains its size and return behavior; it is not a general place to attach an unlimited unprotected application record. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf">SAML Bindings, §§3.4.3 and 3.5.3</a></p>
+<p>If RelayState supplies or selects a return target, Atlas should enforce its approved navigation rules. Authentication success is not permission to redirect the browser to any address the requester supplies.</p>
+<h3 id="a-matching-relaystate-cannot-repair-a-mismatched-response">A matching RelayState cannot repair a mismatched response</h3>
+<p>Consider a separate fictional attempt. Atlas creates request <code>_req_D03_02</code> and retains that ID as pending for Devi's browser. The expected provider and endpoint are configured correctly. The browser returns a form carrying the expected RelayState value for this attempt, but the supplied response evidence shows <code>InResponseTo=&quot;_req_D03_99&quot;</code>.</p>
+<p>Atlas's diagnostic record reports that the signature check under its configured trusted key passed, but the response does not match the retained pending request. No evidence establishes <code>_req_D03_99</code> as the valid request for this browser context.</p>
+<p>The returned RelayState does not make the different correlation ID acceptable. Nor does the reported signature result establish that the content answers <code>_req_D03_02</code>. The evidence identifies a correlation failure at the receiving boundary. It does not yet explain its cause.</p>
+<p>Multiple tabs, a delayed response, incorrect state association, a retry implementation or unwanted response injection are competing possibilities to investigate. The packet does not establish which occurred. The useful next observations are the original outgoing request, the relevant response and browser association, timestamps, and Atlas's state transitions for the attempt.</p>
+<p>Changing a signing certificate would not address the supplied mismatch. Turning off correlation might remove the visible error while abandoning the question Atlas needed to answer. A justified correction must explain why the wrong response was associated with the attempt, then verify both the intended success path and rejection of a mismatched one.</p>
+<h3 id="follow-the-actual-attempt-not-a-preferred-explanation">Follow the actual attempt, not a preferred explanation</h3>
+<p>A request can contain scoping, proxy-related controls or extensions beyond the common fields examined here. Recognize that they can affect a particular integration and consult the applicable profile and implementation documentation when they appear. Their existence does not make them necessary for every Atlas sign-in.</p>
+<p>For the main transaction, a precise account is now possible: Atlas created <code>_req_D03_01</code> for a browser without an application session, retained the expected context, and sent the request to Okta through Redirect. Okta completed the permitted authentication processing and returned a response through the browser. Atlas correlated and accepted the information, selected Devi's account, established its own session and allowed projects access.</p>
+<p>For an unfamiliar attempt, ask the same connected questions. What did the SP request? What did it retain? What authentication and policy decisions actually occurred? What returned, which attempt did it answer, and what did the application establish after acceptance?</p>
+<h3 id="terms-to-keep-straight">Terms to keep straight</h3>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning in this exchange</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SP-initiated</td>
+<td>Atlas creates the authentication request</td>
+</tr>
+<tr>
+<td>Request ID / entity ID</td>
+<td>Particular message identifier / participant identifier</td>
+</tr>
+<tr>
+<td>Destination / ACS</td>
+<td>Where the request is addressed / where the response is received</td>
+</tr>
+<tr>
+<td>ProtocolBinding</td>
+<td>Requested response delivery binding, not the request's delivery mechanism</td>
+</tr>
+<tr>
+<td>NameIDPolicy</td>
+<td>Requested identifier-related requirements, not downstream account provisioning</td>
+</tr>
+<tr>
+<td>RequestedAuthnContext / reported context</td>
+<td>Authentication requirement / information returned about authentication</td>
+</tr>
+<tr>
+<td>ForceAuthn / IsPassive</td>
+<td>Freshness request / constraint on visible interaction</td>
+</tr>
+<tr>
+<td>InResponseTo / RelayState</td>
+<td>Message correlation information / separate binding-level state with agreed application use</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core: AuthnRequest, §3.4.1; requested authentication context, §3.3.2.2.1</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles: Web Browser SSO, §§4.1.3 and 4.1.4</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf">SAML Bindings: Redirect and POST, §§3.4 and 3.5</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05: identifier creation and association, E14</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/about-policies.htm">Okta Identity Engine policies</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/identity-engine/policies/add-okta-sign-on-policy-rule.htm">Okta Identity Engine global session rules and cookies</a></li>
+</ul>
+</article><nav class="page-navigation" aria-label="Lesson sequence"><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><small>← Previous lesson</small>Planning and metadata</a><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><small>Next lesson →</small>Responses and identity</a></nav></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#31-the-initial-request-and-the-state-atlas-remembers">3.1 The initial request and the state Atlas remembers</a></li><li><a href="#32-follow-the-complete-redirect-and-post-exchange">3.2 Follow the complete Redirect and POST exchange</a></li><li><a href="#33-read-the-request-fields-that-support-those-decisions">3.3 Read the request fields that support those decisions</a></li><li><a href="#34-ask-for-identity-and-authentication-behavior">3.4 Ask for identity and authentication behavior</a></li><li><a href="#35-change-the-starting-conditions-and-investigate-the-result">3.5 Change the starting conditions and investigate the result</a></li><li><a href="#references">References</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

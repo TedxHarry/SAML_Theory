@@ -1,0 +1,122 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Recognize less common features and know when to investigate."><meta name="color-scheme" content="light"><title>Specialized capabilities | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/reference/specialized-awareness/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/" aria-current="page">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><div class="eyebrow">Reference library</div><article class="prose"><h1 id="saml-with-okta-specialized-capabilities-and-recognition-cues">SAML with Okta: specialized capabilities and recognition cues</h1>
+<p>A partner document may mention SAML features that do not appear in an ordinary Atlas sign-in. Start with the exact requirement: what needs to happen, which participants support it, and what evidence would establish the result? An unfamiliar term is a reason to investigate that relationship, rather than immediately redesign the working integration.</p>
+<p>For Okta, establish the engine, integration, direction of federation and documented feature support. A capability defined by SAML is not automatically available in an Okta app integration. The <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference</a> describes specific controls; its presence alone does not establish support for the alternatives below.</p>
+<h2 id="find-the-unfamiliar-feature">Find the unfamiliar feature</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Recognition cue</th>
+<th>Look here</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>holder-of-key</code>, subject key information</td>
+<td><a href="#holder-of-key-confirmation">Holder-of-key confirmation</a></td>
+</tr>
+<tr>
+<td>ECP, PAOS, <code>application/vnd.paos+xml</code></td>
+<td><a href="#enhanced-client-or-proxy">Enhanced client or proxy</a></td>
+</tr>
+<tr>
+<td><code>AuthnQuery</code>, <code>AttributeQuery</code>, <code>AuthzDecisionQuery</code></td>
+<td><a href="#queries-and-assertion-requests">Queries and assertion requests</a></td>
+</tr>
+<tr>
+<td><code>AssertionIDRequest</code>, URI binding</td>
+<td><a href="#retrieving-an-identified-assertion">Retrieving an identified assertion</a></td>
+</tr>
+<tr>
+<td><code>ManageNameIDRequest</code>, <code>NameIDMappingRequest</code></td>
+<td><a href="#name-identifier-protocols">Name identifier protocols</a></td>
+</tr>
+<tr>
+<td>HTTP-POST-SimpleSign, form <code>Signature</code> and <code>SigAlg</code></td>
+<td><a href="#post-simplesign">POST-SimpleSign</a></td>
+</tr>
+<tr>
+<td><code>EntitiesDescriptor</code>, federation operator, metadata aggregate</td>
+<td><a href="#federation-metadata-and-operators">Federation metadata and operators</a></td>
+</tr>
+<tr>
+<td>Conformance claim, operational mode, feature matrix</td>
+<td><a href="#formal-conformance">Formal conformance</a></td>
+</tr>
+<tr>
+<td><code>OneTimeUse</code>, <code>ProxyRestriction</code>, an unfamiliar format URI</td>
+<td><a href="#additional-conditions-and-formats">Additional conditions and formats</a></td>
+</tr>
+<tr>
+<td>SAML 1.0 or 1.1 in a vendor requirement</td>
+<td><a href="#earlier-saml-versions">Earlier SAML versions</a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="holder-of-key-confirmation">Holder-of-key confirmation</h2>
+<p>Holder-of-key associates subject confirmation with a specified key. Recognize <code>urn:oasis:names:tc:SAML:2.0:cm:holder-of-key</code> and key information in SubjectConfirmationData. The applicable profile determines how the presenter demonstrates the required key relationship. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, §3.1</a></p>
+<p>Keep the subject-confirmation key separate from the issuer's signing key and the SP's decryption key. Seeing a signed assertion does not establish holder-of-key confirmation. The <a href="/SAML_Theory/reference/trust-and-protection/#locate-the-protected-layer">trust reference</a> helps separate these questions.</p>
+<p>Investigate this when a partner explicitly requires key-based subject confirmation. Ask which profile and client mechanism implement it, how the receiver verifies the demonstration, and whether both products support that exact arrangement. Merely changing the confirmation-method URI in an otherwise bearer example would not establish it.</p>
+<h2 id="enhanced-client-or-proxy">Enhanced client or proxy</h2>
+<p>The Enhanced Client or Proxy profile, ECP, involves a capable client or proxy in authentication. PAOS is the reverse-SOAP binding used in this profile. Recognition cues include SOAP envelopes, the PAOS HTTP header and <code>application/vnd.paos+xml</code>. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, §4.2</a>, <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf">SAML Bindings, §3.3</a></p>
+<p>This matters when an application's documentation explicitly describes an ECP-capable client. Identify that client and its authentication capabilities before proposing a solution. A command-line HTTP client following redirects is not, by itself, evidence of ECP support. Likewise, the word “proxy” in a network diagram does not establish that the proxy implements this SAML profile.</p>
+<h2 id="queries-and-assertion-requests">Queries and assertion requests</h2>
+<p>These message names identify different requests to a SAML authority:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Message</th>
+<th>Purpose</th>
+<th>Useful distinction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AuthnQuery</code></td>
+<td>Ask for authentication statements about a subject.</td>
+<td>Different from an AuthnRequest asking for an authentication response.</td>
+</tr>
+<tr>
+<td><code>AttributeQuery</code></td>
+<td>Ask for subject attributes.</td>
+<td>Different from SCIM account provisioning.</td>
+</tr>
+<tr>
+<td><code>AuthzDecisionQuery</code></td>
+<td>Ask for an authorization decision about a resource/action.</td>
+<td>Different from Atlas's ordinary local permission check.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The definitions are in <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §§3.3.2.2–3.3.2.4</a>. The <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">query/request profile, Profiles §6</a>, describes their profiled use.</p>
+<p>Investigate a query when an architecture identifies a separate authority and query service. Establish who may request which information and for what purpose. For example, a missing department claim in Atlas's existing sign-in does not establish a need for AttributeQuery. First compare the agreed claim contract and actual emitted output.</p>
+<h2 id="retrieving-an-identified-assertion">Retrieving an identified assertion</h2>
+<p><code>AssertionIDRequest</code> asks for an assertion by its identifier. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §3.3.1</a></p>
+<p>The SAML URI binding retrieves an assertion through a URI; it is not a general transport for arbitrary SAML requests and responses. Its identifier ends in <code>bindings:URI</code>. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf">SAML Bindings, §3.7</a></p>
+<p>Investigate these when a partner explicitly describes assertion retrieval. Establish the retrieval service, authorization, trust and acceptance requirements. Do not equate an assertion ID, a URI reference and a SAML artifact merely because all can refer to something. The <a href="/SAML_Theory/reference/binding-comparison/#understand-what-artifact-adds">Artifact explanation</a> describes that separate arrangement.</p>
+<h2 id="name-identifier-protocols">Name identifier protocols</h2>
+<p><code>ManageNameIDRequest</code> concerns changing or terminating a federation identifier relationship. <code>NameIDMappingRequest</code> seeks another identifier for the same principal in a particular format or federation namespace. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §§3.6 and 3.8, with applicable errata</a></p>
+<p>These protocols differ from Atlas matching accepted <code>E1042</code> to its existing account. They also differ from configuring the application username or NameID output in Okta. Everyday <a href="/SAML_Theory/reference/field-comparison-and-message-anatomy/#identifier-formats-and-attribute-values">identifier-to-account mapping</a> does not imply either protocol is being used.</p>
+<p>Investigate them when a partner explicitly requires protocol-managed federation identifiers. Establish ownership of identifier changes and account continuity. A requirement to rename a local account should first be examined against the application's supported lifecycle and linking behavior.</p>
+<h2 id="post-simplesign">POST-SimpleSign</h2>
+<p>POST-SimpleSign defines a separate POST binding whose message-signing mechanism treats the message as an octet string rather than using XML Signature for that message protection. Recognition cues include its binding identifier and <code>Signature</code>/<code>SigAlg</code> form controls. The linked specification identifies itself as <strong>Committee Draft 03</strong>. <a href="https://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-binding-simplesign-cd-03.html">OASIS POST-SimpleSign, introduction and signature construction</a></p>
+<p>Investigate this only when the partner's actual binding requirement names it. POST delivery alone does not identify SimpleSign, and a form field called Signature needs interpretation under the selected mechanism. Do not change ordinary POST XML-signature verification to this mechanism as a speculative fix. Compare the exact supported binding with the <a href="/SAML_Theory/reference/binding-comparison/">binding reference</a>.</p>
+<h2 id="federation-metadata-and-operators">Federation metadata and operators</h2>
+<p>An <code>EntitiesDescriptor</code> can group multiple entities, including nested groups. A federation operator may distribute a metadata aggregate describing many participating organizations. The container and its entity records are configuration information, not a user's authentication response. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf">SAML Metadata, §§2.3.1–2.3.2</a></p>
+<p>For an operational example, <a href="https://technical.edugain.org/metadata">eduGAIN’s metadata guidance</a> describes an aggregate intended for participating federations, rather than direct consumption by individual IdPs or SPs. Distribution arrangements need to be understood in their own context.</p>
+<p>This may be central to a project involving a federation operator or many institutional partners. Determine the authoritative distribution source, trust model, participating entities, refresh/expiry handling and local acceptance policy. Receiving an aggregate does not automatically mean every listed entity is authorized for every local purpose.</p>
+<p>Keep operator trust, individual issuer trust and effective receiver configuration explicit. A signed aggregate requires an approved basis for trusting its signer. Metadata refresh does not automatically revoke every application session established earlier. The <a href="/SAML_Theory/reference/integration-planning-changes-and-handover/">planning reference</a> helps record these dependencies and owners.</p>
+<h2 id="formal-conformance">Formal conformance</h2>
+<p>SAML conformance distinguishes operational modes and combinations of profiles, messages and bindings. A broad “SAML 2.0 compliant” statement needs that scope before it can answer an integration question. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-conformance-2.0-os.pdf">SAML Conformance Requirements, §§3.1–3.2</a></p>
+<p>Use this when evaluating a product claim or comparing requirements with supported behavior. Ask for the precise supported role and exchange, required options and relevant implementation evidence. Neither a vendor label nor a schema-valid example establishes that Atlas's complete contract works. Conversely, a successful Atlas sign-in does not establish support for every SAML protocol.</p>
+<h2 id="additional-conditions-and-formats">Additional conditions and formats</h2>
+<p><code>OneTimeUse</code> constrains assertion reuse; <code>ProxyRestriction</code> constrains downstream assertion issuance. The latter does not mean an HTTP reverse-proxy setting. An unfamiliar NameID format or attribute profile also needs its defined semantics. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §§2.5.1.5–2.5.1.6 and §8.3</a></p>
+<p>Investigate these when they appear in an actual supported contract or message. Record the exact location and identifier, then check the receiving implementation's handling. An unfamiliar condition is not something to delete or ignore to make validation succeed. Absence of OneTimeUse also does not authorize replay of browser bearer assertions; use the <a href="/SAML_Theory/reference/response-validation-and-acceptance/#associate-the-requested-reply-and-prevent-replay">response-acceptance requirements</a>.</p>
+<p>Recognition examples include <code>X509SubjectName</code> and <code>WindowsDomainQualifiedName</code> in NameID format identifiers. For an unusual format, obtain representative approved values and verify the intended matching rule. Changing a format label alone cannot establish that the emitted value has the required meaning.</p>
+<h2 id="earlier-saml-versions">Earlier SAML versions</h2>
+<p>SAML 1.0 and 1.1 belong to earlier protocol versions. Version-specific documents, message structures and profiles need to be read in their own context. The <a href="https://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html">OASIS Technical Overview</a>, an explanatory Committee Draft, provides architectural and historical context alongside the normative specifications.</p>
+<p>This matters when maintaining an older integration or planning a supported migration. Obtain the actual version and vendor migration guidance. Do not assume that renaming an XML element or replacing a namespace converts an integration to SAML 2.0.</p>
+<p>A NameID format URI containing <code>1.1</code> is not enough to classify a message as SAML 1.1. Read the <a href="/SAML_Theory/reference/field-comparison-and-message-anatomy/#identifier-formats-and-attribute-values">format explanation</a> and the message's actual version and namespaces together.</p>
+<h2 id="turn-recognition-into-a-useful-investigation">Turn recognition into a useful investigation</h2>
+<p>Suppose an Atlas partner document says it requires ECP, while the available integration evidence describes a browser Redirect/POST exchange. Record the requirement and the mismatch. Ask the partner to identify the supported client, profile and endpoints; obtain corresponding Okta support information for the intended relationship. Until that is established, a working ordinary browser sign-in does not settle the ECP requirement.</p>
+<p>The same approach applies to any unfamiliar feature: identify its purpose, locate the authoritative definition, establish actual product support, and agree on the evidence needed for the intended result. The <a href="/SAML_Theory/reference/sources-and-further-reading/">sources guide</a> helps separate protocol rules, product documentation and runtime evidence.</p>
+</article></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#find-the-unfamiliar-feature">Find the unfamiliar feature</a></li><li><a href="#holder-of-key-confirmation">Holder-of-key confirmation</a></li><li><a href="#enhanced-client-or-proxy">Enhanced client or proxy</a></li><li><a href="#queries-and-assertion-requests">Queries and assertion requests</a></li><li><a href="#retrieving-an-identified-assertion">Retrieving an identified assertion</a></li><li><a href="#name-identifier-protocols">Name identifier protocols</a></li><li><a href="#post-simplesign">POST-SimpleSign</a></li><li><a href="#federation-metadata-and-operators">Federation metadata and operators</a></li><li><a href="#formal-conformance">Formal conformance</a></li><li><a href="#additional-conditions-and-formats">Additional conditions and formats</a></li><li><a href="#earlier-saml-versions">Earlier SAML versions</a></li><li><a href="#turn-recognition-into-a-useful-investigation">Turn recognition into a useful investigation</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

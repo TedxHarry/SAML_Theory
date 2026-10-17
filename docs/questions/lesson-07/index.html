@@ -1,0 +1,208 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Practice Lesson 7 with independent scenarios and expandable explanations."><meta name="color-scheme" content="light"><title>Response acceptance: questions | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/questions/lesson-07/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/" aria-current="page"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><nav class="reading-modes" aria-label="Lesson material"><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/">Lesson 7</a><a href="/SAML_Theory/questions/lesson-07/" aria-current="page">Questions <span>(15)</span></a></nav><article class="prose"><h1 id="lesson-7-response-acceptance-and-application-access">Lesson 7: Response acceptance and application access</h1>
+<h2 id="1-does-schema-valid-xml-make-unsafe-parsing-acceptable">1. Does schema-valid XML make unsafe parsing acceptable?</h2>
+<p>Atlas receives SAML through a browser POST. A proposed implementation accepts schema locations from the incoming document, permits external entity processing and performs unrestricted resource retrieval while parsing. It later validates the resulting XML structure and checks a signature.</p>
+<p>A developer argues that those later checks make the initial parser settings harmless. What has the developer missed? Where should schemas used for validation come from?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Unsafe work can happen while the receiver processes the input, before a later signature or structure result is available. Those later checks do not undo file access, remote retrieval or excessive resource consumption triggered during parsing.</p>
+<p>Atlas needs safe input handling, appropriate limits and a maintained SAML implementation. Where schema validation is used, the schemas should come from trusted local configuration rather than a location selected by untrusted message content. Structural checks and cryptographic reliance must work together.</p>
+<p>Schema validity establishes allowed XML structure and data types. It does not establish an approved issuer, valid use restrictions or permitted application access. Conversely, a signature result does not justify unsafe parsing. <a href="https://cheatsheetseries.owasp.org/cheatsheets/SAML_Security_Cheat_Sheet.html">OWASP SAML security guidance, XML and signature validation</a></p>
+</details>
+<h2 id="2-can-an-invalid-additional-signature-be-ignored">2. Can an invalid additional signature be ignored?</h2>
+<p>Atlas's supported browser SSO arrangement requires a signed assertion and verification of signatures present on the response and assertions. In a fictional attempt, required checks on the intended assertion signature succeed. The enclosing Response also contains a signature, and Atlas reports that its verification fails. No Atlas session has been created.</p>
+<p>An engineer calls the outer signature optional decoration and proposes accepting the response because the assertion signature passed. Does that follow from the supplied processing rules?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The supplied arrangement requires verification of signatures that are present. Passing the assertion signature does not permit ignoring the failed response signature under those rules.</p>
+<p>Investigate the actual failing protection layer, including its reference, verification material, algorithms and result. The packet establishes a failed additional signature; it does not establish whether the cause is changed content, an incorrect key or another processing problem.</p>
+<p>Do not confuse a configuration that does not require a particular signature to be present with permission to ignore that signature when it is present and fails. Profile requirements, applicable errata and the receiver's supported policy govern the complete arrangement. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, §4.1.4.3</a></p>
+</details>
+<h2 id="3-which-receiver-owns-this-failure">3. Which receiver owns this failure?</h2>
+<p>In an external-IdP-to-Okta-to-Atlas journey, Okta receives the upstream response but rejects it because its configured inbound signature-verification requirement is not met. No downstream response to Atlas is issued. The relevant Okta user already exists; account resolution has not been reached.</p>
+<p>A colleague proposes changing assertion signing on the outbound Atlas app integration. Which relationship needs investigation, and would Atlas's account or signing settings repair the supplied failure?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The failed relationship is external IdP to Okta. Okta is the receiving SP on that leg. Inspect its inbound provider configuration, the approved external issuer and keys, the selected signature-verification requirement and the actual upstream message.</p>
+<p>The Atlas app integration controls a separate downstream relationship in which Okta supplies information to Atlas. Its outbound signing choices do not repair the already-failed inbound requirement. Atlas account changes would also address a boundary this attempt has not reached.</p>
+<p>Okta documents inbound response-signature verification separately from outbound application signing. Any correction should meet the intended inbound agreement, then be retested before assessing the downstream result. <a href="https://help.okta.com/oie/en-us/content/topics/security/idp-add-saml.htm">Okta external SAML IdP settings</a></p>
+</details>
+<h2 id="4-does-one-matching-audience-anywhere-suffice">4. Does one matching audience anywhere suffice?</h2>
+<p>Atlas's agreed SP entity ID is <code>https://atlas.northstar.example/saml</code>. This standalone fictional Conditions fragment appears inside the assertion selected for evaluation. Other checks are outside this question. The <code>.example</code> addresses are fictional participant identifiers.</p>
+<pre><code class="language-xml">&lt;saml:Conditions xmlns:saml=&quot;urn:oasis:names:tc:SAML:2.0:assertion&quot;&gt;
+  &lt;saml:AudienceRestriction&gt;
+    &lt;saml:Audience&gt;https://atlas.northstar.example/saml&lt;/saml:Audience&gt;
+    &lt;saml:Audience&gt;https://ledger.northstar.example/saml&lt;/saml:Audience&gt;
+  &lt;/saml:AudienceRestriction&gt;
+  &lt;saml:AudienceRestriction&gt;
+    &lt;saml:Audience&gt;https://partner.northstar.example/saml&lt;/saml:Audience&gt;
+  &lt;/saml:AudienceRestriction&gt;
+&lt;/saml:Conditions&gt;
+</code></pre>
+<p>A developer flattens all Audience values into one list and finds Atlas. Does Atlas satisfy the supplied audience restrictions? What distinction did flattening lose?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Atlas satisfies the first restriction, which permits Atlas or Ledger. It does not satisfy the second, which names only the partner entity. The restrictions together therefore do not permit Atlas.</p>
+<p>Within one AudienceRestriction, the listed audiences are alternatives. Separate AudienceRestriction conditions must each be satisfied. Flattening them into one list changes that relationship and discards a restriction. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §2.5.1.4</a></p>
+<p>The appropriate response is to reject reliance on this assertion for Atlas under these restrictions and investigate the intended audience configuration. Correct delivery or signature verification cannot make the failed audience group pass. A schema check on this fragment would establish structure, rather than permission for Atlas to use it.</p>
+</details>
+<h2 id="5-can-confirmation-fields-be-borrowed-from-different-alternatives">5. Can confirmation fields be borrowed from different alternatives?</h2>
+<p>Atlas supports evaluating complete bearer-confirmation alternatives under its selected arrangement. It receives an otherwise appropriately protected assertion at 15:01 UTC on 16 October 2026, with zero clock tolerance. Its ACS is <code>https://atlas.northstar.example/saml/acs</code>. Exactly two supported alternatives are supplied:</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Alternative</th>
+<th>Recipient</th>
+<th>NotOnOrAfter</th>
+<th>Other required confirmation facts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Atlas ACS</td>
+<td>15:00 UTC</td>
+<td>Satisfied</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Ledger ACS, a different endpoint</td>
+<td>15:05 UTC</td>
+<td>Satisfied</td>
+</tr>
+</tbody>
+</table></div>
+<p>Neither alternative passes as a whole. Can Atlas combine A's Recipient with B's deadline to produce a successful confirmation?</p>
+<details>
+<summary>Show explanation</summary>
+<p>No. A has the right recipient but is too late. B is timely but has the wrong recipient. The receiver cannot invent a third confirmation by mixing their values.</p>
+<p>Each supported alternative must be evaluated as a complete alternative under the applicable rules. If one complete supported alternative met all its requirements, that would be a different case. Here, none does.</p>
+<p>The supplied protection result does not remove the presentation restrictions. Reject this use and inspect why the provider produced these alternatives for the intended integration. The packet establishes the failed confirmation relationship, not the configuration history that caused it.</p>
+</details>
+<h2 id="6-should-a-proxy-facing-receiver-trust-any-incoming-host-value">6. Should a proxy-facing receiver trust any incoming host value?</h2>
+<p>Atlas is behind a reverse proxy. Its approved external ACS is <code>https://atlas.northstar.example/saml/acs</code>; the internal service address is different. The supported deployment documentation defines how the proxy and application establish that external receiving location.</p>
+<p>To remove Destination mismatches, a developer proposes treating any incoming Host or forwarded-host value as the authoritative ACS and matching the response against that. No restrictions establish which proxy-supplied values are trusted.</p>
+<p>What should be aligned instead? Does a mismatch justify inventing Atlas's SAML identity from arbitrary request input?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Align the documented external endpoint, supported proxy trust settings, application receiving configuration and provider output. The receiver needs an approved basis for the expected location.</p>
+<p>Arbitrary incoming host information cannot safely become that authority. Otherwise, untrusted input could influence the very expectation used to evaluate the response. The internal service address and external ACS can differ without making either an invitation to guess.</p>
+<p>Investigate the effective external-address handling and the actual Destination and Recipient under the integration's comparison rules. A mismatch is evidence to explain, not permission to weaken the expected-target decision. The scenario does not establish which specific proxy setting is wrong.</p>
+</details>
+<h2 id="7-did-clock-skew-cause-a-late-presentation">7. Did clock skew cause a late presentation?</h2>
+<p>Atlas receives an assertion at 15:03 UTC. Conditions ends at 15:05, while the selected bearer deadline is 15:02. Its current policy applies zero tolerance for this fictional test. Atlas reports rejection at the bearer-time check. No independent clock-synchronization or browser-delivery timing evidence has been collected.</p>
+<p>An engineer proposes increasing tolerance and reports that clock skew caused the failure. What is established, what remains unknown, and what would distinguish clock error from genuine delay?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Under the supplied receiver clock and policy, presentation is too late for the bearer confirmation even though Conditions has not ended. That identifies the failed time boundary.</p>
+<p>The packet does not establish why the arrival appears late. Obtain clock evidence for the relevant systems and a reliable timeline of issuance, browser activity and receiving events. A clock difference and a delayed submission require different explanations and corrections.</p>
+<p>Changing tolerance changes what the receiver will permit. It is not proof of a clock problem or a routine way to make expired input acceptable. Confirm the cause and intended allowance, apply any justified correction through the supported process, and retest the time boundary together with the other requirements.</p>
+</details>
+<h2 id="8-is-a-matching-request-id-enough-without-the-right-browser-context">8. Is a matching request ID enough without the right browser context?</h2>
+<p>Atlas retains a usable pending request <code>_req_Q07_BROWSER</code> for browser profile A and its approved Okta provider. A response arrives through profile B. Both required InResponseTo values name that request and the signature check passes, but Atlas's protected browser-association check fails. Its requested-flow policy requires that association, and no unsolicited path is approved for this return.</p>
+<p>Should Atlas create a session because the request ID matches? What should be investigated before explaining the cause?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The matching ID does not satisfy the supplied browser-association requirement. A recognizable request identifier is only part of the expected pending context. Atlas should not create a session by discarding the failed association or silently treating the return as unsolicited.</p>
+<p>Inspect the original browser context, how the return was delivered, relevant tabs or profiles, state-cookie behavior and the application's state transitions. The packet establishes an association failure, but it does not establish whether a user moved the return, state was lost or another cause occurred.</p>
+<p>An approved issuer can supply valid signed information that still does not complete the expected browser attempt. Preserve that distinction when proposing a supported retry or correcting the confirmed state-handling problem.</p>
+</details>
+<h2 id="9-can-a-new-response-id-make-a-used-assertion-fresh">9. Can a new response ID make a used assertion fresh?</h2>
+<p>Atlas accepted bearer assertion <code>_assert_Q07_USED</code> at 15:00:21 UTC. Its presentation deadline is 15:02 UTC. At 15:00:25, Atlas receives another protocol envelope with a different Response ID but the same previously accepted assertion. The receiver's supported replay controls identify that assertion as already used. No claim is made about how the second envelope was produced or whether its other checks would pass.</p>
+<p>Does the different response ID or still-open time window permit accepting the assertion again? Which object needs replay protection?</p>
+<details>
+<summary>Show explanation</summary>
+<p>Neither observation authorizes reuse. The assertion is still within its time window, but the supplied evidence identifies it as a bearer assertion already accepted by Atlas. A different protocol-envelope ID does not turn that assertion into a new one.</p>
+<p>Response IDs and assertion IDs identify different objects. The receiver's controls must protect the bearer assertions it actually relies on over the applicable validity period. Request correlation and timing also serve different purposes from replay prevention. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, §4.1.4.5</a></p>
+<p>Investigate the repeat submission and earlier acceptance before proposing recovery. The packet does not establish whether the repeat came from a browser retry, a defect or unwanted reuse, and accepting it again is not justified by that uncertainty.</p>
+</details>
+<h2 id="10-can-two-nodes-each-be-locally-correct-but-jointly-unsafe">10. Can two nodes each be locally correct but jointly unsafe?</h2>
+<p>Atlas has two receiving nodes that can process submissions for the same logical integration. One bearer assertion reaches both almost simultaneously. Each node checks its own separate empty replay record, accepts the assertion and only then records the ID locally. The required replay-prevention outcome must hold across these nodes.</p>
+<p>A developer says both nodes performed the check, so replay protection works. What does this execution establish? What must a supported deployment prevent without requiring the integration engineer to implement a new replay algorithm?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The execution establishes that local checks did not enforce the required cross-node outcome. Both nodes accepted the same assertion because neither observed a state preventing the competing acceptance.</p>
+<p>The supported deployment must coordinate replay detection and successful processing across nodes that can accept the same information, including concurrent arrivals. Merely adding a check before a later independent write does not establish that coordination.</p>
+<p>Use the maintained implementation's supported state and deployment model, and verify the intended rejection behavior under concurrency. Inspect request completion and session processing alongside replay records. A single-node happy-path test cannot establish the behavior demonstrated here, and the remedy should not be to disable replay checks or improvise cryptography.</p>
+</details>
+<h2 id="11-did-a-lost-cookie-response-undo-an-accepted-assertion">11. Did a lost cookie response undo an accepted assertion?</h2>
+<p>Atlas accepts Devi's assertion, completes its pending request and creates an application session. A subsequent connection failure prevents the browser from receiving the session cookie. Devi resubmits the original response form. Atlas identifies the assertion as previously accepted, and there is still no usable cookie in the browser.</p>
+<p>Should Atlas assume the first acceptance never happened because the browser lacks a session? What does safe recovery need to distinguish?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The browser's missing cookie does not undo the supplied server-side acceptance, request completion or session creation. A user-visible failure and a committed server-side result can coexist.</p>
+<p>Recovery must distinguish the accepted assertion and completed attempt from the browser's inability to use the resulting session. Follow the application's supported recovery process, which may require a new sign-in with fresh context. Reusing the same bearer assertion is not automatically acceptable because the cookie response was lost.</p>
+<p>Inspect the server's processing and session records together with the delivery failure. The packet does not prescribe how Atlas should recover every partial browser outcome, but it rules out assuming that missing browser state proves no previous acceptance occurred.</p>
+</details>
+<h2 id="12-can-an-unfamiliar-condition-be-skipped">12. Can an unfamiliar condition be skipped?</h2>
+<p>Atlas selects an assertion whose required signature and audience checks pass. Its Conditions also contains a restriction that the receiver cannot evaluate. The restriction's semantics have not been established, and no supported rule permits ignoring it. A developer proposes ignoring the unfamiliar restriction while continuing with the known checks.</p>
+<p>Why is that an unsafe interpretation? What should the engineer determine instead?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The receiver cannot conclude that the assertion's use restrictions are satisfied while leaving a condition unevaluated. Ignoring the restriction would change the decision rather than establish permission to rely on the assertion.</p>
+<p>Determine the condition's namespace, meaning, applicable rules and whether the selected implementation supports it. Compare the provider output with the agreed integration requirements. If the receiver cannot process the required restriction, use documented rejection or supported handling rather than inventing a positive result.</p>
+<p>An unfamiliar structure is not necessarily a typo, but neither is it harmless merely because other checks passed. The packet establishes unresolved restriction processing, not an account or certificate failure. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, Conditions processing</a></p>
+</details>
+<h2 id="13-which-denial-occurs-before-or-after-a-session">13. Which denial occurs before or after a session?</h2>
+<p>All four independent Atlas attempts below have recorded successful SAML acceptance. Atlas requires usable application data, one intended account match, and enabled-account entry before session creation, then checks projects permission.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Supplied application result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Required department missing.</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Two accounts match the configured identifier; neither can be selected uniquely.</td>
+</tr>
+<tr>
+<td>C</td>
+<td>The intended account matches but is disabled, so entry is denied.</td>
+</tr>
+<tr>
+<td>D</td>
+<td>Required data and account checks pass; entry is allowed and a session is created; projects permission is absent.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Which cases stop sign-in without a new session? Which denies only the requested resource after session creation? Would enabling an account or granting a role be the default fix?</p>
+<details>
+<summary>Show explanation</summary>
+<p>A, B and C stop before session creation under the supplied application policy. Their boundaries are required data, account ambiguity and account readiness or entry. D establishes a session but denies projects authorization.</p>
+<p>These results do not contradict successful SAML acceptance. They concern later application decisions. Investigate the relevant claim requirements, identity relationship, lifecycle state or permission rule according to the supplied boundary.</p>
+<p>Changing an account's enabled state or granting a role changes access. First establish the intended state and obtain the relevant owner's decision through the supported process. A denial may be the correct policy outcome. Troubleshooting should explain that outcome rather than assume every unsuccessful request deserves additional access.</p>
+</details>
+<h2 id="14-can-a-short-user-error-coexist-with-useful-diagnostics">14. Can a short user error coexist with useful diagnostics?</h2>
+<p>Atlas shows Devi “Unable to sign in” after a rejected response. An authorized support record for the attempt identifies an audience mismatch. A colleague proposes either displaying the full assertion and internal validation trace to every user or deleting all diagnostics because SAML data can be sensitive.</p>
+<p>Are those the only choices? What should a useful evidence record retain, and where should sensitive content be handled?</p>
+<details>
+<summary>Show explanation</summary>
+<p>A brief user-facing message can coexist with useful, access-controlled support evidence. Atlas does not need to disclose a full assertion or internal processing trace to every user to help an authorized engineer locate the failed boundary.</p>
+<p>Record enough approved information to associate the attempt, identify the receiving integration, distinguish the relevant validation result and describe whether acceptance, account processing or session creation occurred. Preserve sensitive message details only as needed under the organization's access, redaction and retention procedures.</p>
+<p>Deleting every diagnostic would make different causes harder to distinguish, while indiscriminate disclosure creates a separate problem. In this packet, the authorized audience-mismatch result is more useful than the generic screen text. It should guide investigation without being expanded into a claim that all other checks passed.</p>
+</details>
+<h2 id="15-does-an-acceptance-checklist-prescribe-one-execution-order">15. Does an acceptance checklist prescribe one execution order?</h2>
+<p>Atlas's review sheet groups checks as input handling, protected content, target/time restrictions, request/replay/authentication requirements, account entry, session creation and resource permission. Its supported construction has an outer signature around encrypted content and a required signature inside the recovered assertion. A teammate proposes implementing these headings as a universal line-by-line cryptographic order.</p>
+<p>For a test attempt, safe processing, required protection, targets, times, request context and replay checks pass. However, the returned authentication evidence does not meet an explicit freshness requirement for this sign-in. Account processing has not been reached.</p>
+<p>Explain both the order problem and the strongest supported result for the attempt. What should a correction and retest establish?</p>
+<details>
+<summary>Show explanation</summary>
+<p>The headings describe logical groups of requirements, not one universal cryptographic execution order. Required outer protection may need verification before decryption, while an inner assertion signature cannot be checked until its content is recovered. Use the documented secure processing of the maintained implementation.</p>
+<p>For this attempt, the supplied failure is unmet authentication freshness. Passing the preceding reported checks does not authorize session creation, and the packet does not establish what account processing would have decided. Recent issuance or an outgoing freshness flag cannot substitute for the missing satisfactory authentication result.</p>
+<p>Confirm the actual requirement, provider configuration and authentication evidence, then correct the established cause through the supported arrangement. Retest the intended freshness result and relevant rejection behavior, followed by the correct account, session and resource outcome. Keep a proposed correction distinct from a completed successful test.</p>
+</details>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, conditions, audiences, subject confirmation and authentication requirements</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, browser SSO acceptance, correlation and replay: §4.1.4</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, applicable processing clarifications</a></li>
+<li><a href="https://www.w3.org/TR/xmldsig-bestpractices/">W3C XML Signature Best Practices</a></li>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/SAML_Security_Cheat_Sheet.html">OWASP SAML security guidance</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/security/idp-add-saml.htm">Okta inbound SAML settings and response-signature verification</a></li>
+</ul>
+</article><nav class="page-navigation" aria-label="Lesson sequence"><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><small>← Previous lesson</small>Trust and protection</a><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><small>Next lesson →</small>Sessions and logout</a></nav></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#1-does-schema-valid-xml-make-unsafe-parsing-acceptable">1. Does schema-valid XML make unsafe parsing acceptable?</a></li><li><a href="#2-can-an-invalid-additional-signature-be-ignored">2. Can an invalid additional signature be ignored?</a></li><li><a href="#3-which-receiver-owns-this-failure">3. Which receiver owns this failure?</a></li><li><a href="#4-does-one-matching-audience-anywhere-suffice">4. Does one matching audience anywhere suffice?</a></li><li><a href="#5-can-confirmation-fields-be-borrowed-from-different-alternatives">5. Can confirmation fields be borrowed from different alternatives?</a></li><li><a href="#6-should-a-proxy-facing-receiver-trust-any-incoming-host-value">6. Should a proxy-facing receiver trust any incoming host value?</a></li><li><a href="#7-did-clock-skew-cause-a-late-presentation">7. Did clock skew cause a late presentation?</a></li><li><a href="#8-is-a-matching-request-id-enough-without-the-right-browser-context">8. Is a matching request ID enough without the right browser context?</a></li><li><a href="#9-can-a-new-response-id-make-a-used-assertion-fresh">9. Can a new response ID make a used assertion fresh?</a></li><li><a href="#10-can-two-nodes-each-be-locally-correct-but-jointly-unsafe">10. Can two nodes each be locally correct but jointly unsafe?</a></li><li><a href="#11-did-a-lost-cookie-response-undo-an-accepted-assertion">11. Did a lost cookie response undo an accepted assertion?</a></li><li><a href="#12-can-an-unfamiliar-condition-be-skipped">12. Can an unfamiliar condition be skipped?</a></li><li><a href="#13-which-denial-occurs-before-or-after-a-session">13. Which denial occurs before or after a session?</a></li><li><a href="#14-can-a-short-user-error-coexist-with-useful-diagnostics">14. Can a short user error coexist with useful diagnostics?</a></li><li><a href="#15-does-an-acceptance-checklist-prescribe-one-execution-order">15. Does an acceptance checklist prescribe one execution order?</a></li><li><a href="#sources">Sources</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

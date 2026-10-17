@@ -1,0 +1,295 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Read assertions, identifiers, attributes and account matching."><meta name="color-scheme" content="light"><title>Responses and identity | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css"><link rel="stylesheet" href="/SAML_Theory/assets/style.css"><script src="/SAML_Theory/assets/app.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary>Browse lessons</summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/" aria-current="page"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><nav class="reading-modes" aria-label="Lesson material"><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/" aria-current="page">Lesson 4</a><a href="/SAML_Theory/questions/lesson-04/">Questions <span>(16)</span></a></nav><article class="prose"><h1 id="lesson-4-responses-assertions-nameid-and-attributes">Lesson 4: Responses, assertions, NameID, and attributes</h1>
+<p>Devi’s browser has returned from Okta and submitted a SAML response to Atlas. Daniel can see a successful status and an identifier that looks familiar. Before he calls the integration healthy, he needs to explain what each part means: whose statement it is, which request it answers, where it can be used, and how Atlas turns the accepted identity into Devi’s account.</p>
+<p>Stay with the same successful attempt: Atlas requested <code>_req_D03_01</code>, Okta returned response <code>_resp_D03_01</code>, and the enclosed assertion is <code>_assert_D03_01</code>. Devi’s agreed application identifier is <code>E1042</code>; Atlas maps it to its existing account <code>atlas-4821</code>. The additional fields below describe this fictional example, not an actual tenant capture or Okta defaults.</p>
+<h2 id="41-separate-the-envelope-from-the-statement-inside-it">4.1 Separate the envelope from the statement inside it</h2>
+<h3 id="read-the-outer-response-first">Read the outer response first</h3>
+<p>A <strong>Response</strong> is a protocol reply. Its status reports the result supplied by the responder. An <strong>assertion</strong> contains statements about a subject and information governing their use. The outer reply and the inner statement have separate identifiers because they are different objects.</p>
+<p><strong>Figure L04-M1: Start with three parts.</strong> Arrows mean containment. This is the returned document’s structure, not a network flow.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L04-M1.svg" alt="L04-M1: Start with three parts" width="895" height="222" loading="lazy"><figcaption><span>L04-M1</span><a href="/SAML_Theory/assets/diagrams/L04-M1.svg" data-diagram="L04-M1: Start with three parts">Open full diagram</a></figcaption></figure><p>Read the response’s issuer and status before interpreting the assertion. A reported success does not mean Atlas has verified a signature, accepted the audience, found an account, or granted projects access. Those are receiving-application decisions. A non-success status gives Daniel a different starting point: investigate the reported protocol failure rather than assuming a usable identity statement must be present.</p>
+<p>A response can contain no assertions, one assertion, or multiple assertions as allowed by the protocol and applicable profile. Encrypted assertions are also possible. Do not build a reading habit around “take the first assertion anywhere in the XML.” Atlas must process the appropriate content under its supported rules. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §§3.2.2 and 3.3.3</a></p>
+<h3 id="read-a-representative-document-from-outside-inward">Read a representative document from outside inward</h3>
+<p>This is an illustrative XML reading copy. <strong>The signature is omitted</strong>, so the document does not meet Atlas’s signed-assertion requirement and is not a message to submit to an application. <code>urn:example:northstar:okta-idp</code> is a conspicuous placeholder for the approved Okta issuer, not a real Okta issuer pattern. The identifiers, times, account data and group names are synthetic. A real integration obtains its issuer from the relevant Okta setup information and verifies the required message protection.</p>
+<pre><code class="language-xml">&lt;samlp:Response
+    xmlns:samlp=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;
+    xmlns:saml=&quot;urn:oasis:names:tc:SAML:2.0:assertion&quot;
+    ID=&quot;_resp_D03_01&quot;
+    Version=&quot;2.0&quot;
+    IssueInstant=&quot;2026-10-16T15:00:20Z&quot;
+    Destination=&quot;https://atlas.northstar.example/saml/acs&quot;
+    InResponseTo=&quot;_req_D03_01&quot;&gt;
+  &lt;saml:Issuer&gt;urn:example:northstar:okta-idp&lt;/saml:Issuer&gt;
+  &lt;samlp:Status&gt;
+    &lt;samlp:StatusCode Value=&quot;urn:oasis:names:tc:SAML:2.0:status:Success&quot; /&gt;
+  &lt;/samlp:Status&gt;
+  &lt;saml:Assertion
+      ID=&quot;_assert_D03_01&quot;
+      Version=&quot;2.0&quot;
+      IssueInstant=&quot;2026-10-16T15:00:20Z&quot;&gt;
+    &lt;saml:Issuer&gt;urn:example:northstar:okta-idp&lt;/saml:Issuer&gt;
+    &lt;saml:Subject&gt;
+      &lt;saml:NameID Format=&quot;urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified&quot;&gt;E1042&lt;/saml:NameID&gt;
+      &lt;saml:SubjectConfirmation Method=&quot;urn:oasis:names:tc:SAML:2.0:cm:bearer&quot;&gt;
+        &lt;saml:SubjectConfirmationData
+            Recipient=&quot;https://atlas.northstar.example/saml/acs&quot;
+            InResponseTo=&quot;_req_D03_01&quot;
+            NotOnOrAfter=&quot;2026-10-16T15:02:00Z&quot; /&gt;
+      &lt;/saml:SubjectConfirmation&gt;
+    &lt;/saml:Subject&gt;
+    &lt;saml:Conditions
+        NotBefore=&quot;2026-10-16T14:59:50Z&quot;
+        NotOnOrAfter=&quot;2026-10-16T15:05:00Z&quot;&gt;
+      &lt;saml:AudienceRestriction&gt;
+        &lt;saml:Audience&gt;https://atlas.northstar.example/saml&lt;/saml:Audience&gt;
+      &lt;/saml:AudienceRestriction&gt;
+    &lt;/saml:Conditions&gt;
+    &lt;saml:AuthnStatement
+        AuthnInstant=&quot;2026-10-16T15:00:15Z&quot;
+        SessionIndex=&quot;_session_D04_01&quot;&gt;
+      &lt;saml:AuthnContext&gt;
+        &lt;saml:AuthnContextClassRef&gt;urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport&lt;/saml:AuthnContextClassRef&gt;
+      &lt;/saml:AuthnContext&gt;
+    &lt;/saml:AuthnStatement&gt;
+    &lt;saml:AttributeStatement&gt;
+      &lt;saml:Attribute Name=&quot;department&quot;
+          NameFormat=&quot;urn:oasis:names:tc:SAML:2.0:attrname-format:basic&quot;&gt;
+        &lt;saml:AttributeValue&gt;Research&lt;/saml:AttributeValue&gt;
+      &lt;/saml:Attribute&gt;
+      &lt;saml:Attribute Name=&quot;groups&quot;
+          NameFormat=&quot;urn:oasis:names:tc:SAML:2.0:attrname-format:basic&quot;&gt;
+        &lt;saml:AttributeValue&gt;Atlas-Readers&lt;/saml:AttributeValue&gt;
+        &lt;saml:AttributeValue&gt;Research-Staff&lt;/saml:AttributeValue&gt;
+      &lt;/saml:Attribute&gt;
+    &lt;/saml:AttributeStatement&gt;
+  &lt;/saml:Assertion&gt;
+&lt;/samlp:Response&gt;
+</code></pre>
+<p>First locate the outer <code>Response</code>. Its <code>ID</code> names this reply; <code>InResponseTo</code> points back to Atlas’s request. <code>Destination</code> addresses the reply to the ACS. <code>IssueInstant</code> records issuance, not expiry. The <code>Z</code> suffix denotes UTC.</p>
+<p>Next locate the assertion. Its own ID names the statement container, and its issuer identifies the authority making those statements. In this direct Okta-to-Atlas example, both issuers identify the expected Okta provider. Do not infer that every federation arrangement must have identical issuers at every layer, or trust a supplied issuer merely because it has the expected text.</p>
+<p>The authentication context class in this reading copy is an illustrative reported value. It is not evidence of the factors used in a real Okta authentication. Atlas’s actual context requirements and Okta’s applicable behavior still need to agree.</p>
+<p><strong>Figure L04-M2: Expand the assertion.</strong> This adds the inner relationships to Figure L04-M1. Arrows still mean containment.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L04-M2.svg" alt="L04-M2: Expand the assertion" width="1361" height="526" loading="lazy"><figcaption><span>L04-M2</span><a href="/SAML_Theory/assets/diagrams/L04-M2.svg" data-diagram="L04-M2: Expand the assertion">Open full diagram</a></figcaption></figure><p>The subject tells Atlas whom the statements concern. Confirmation constrains how that subject may be confirmed when the assertion is presented. Conditions restrict use of the assertion. Authentication information describes authentication; attributes supply additional information. Finding a value is only the first step. Its parent element tells you which question it answers.</p>
+<h3 id="use-status-as-evidence-with-limits">Use status as evidence with limits</h3>
+<p><code>Success</code> is the provider’s protocol result. Other top-level statuses include <code>Requester</code>, concerning the request, and <code>Responder</code>, concerning processing at the responder. A nested code can narrow the result, such as <code>NoAuthnContext</code> when the requested authentication context cannot be satisfied. Human-readable status text may add context, but it is not a substitute for the relevant logs and configuration evidence. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §3.2.2.2</a></p>
+<p>If Atlas reports “account not found” after accepting an assertion, changing a successful protocol status would not repair the account lookup. Daniel should follow the boundary at which processing stopped.</p>
+<h2 id="42-follow-the-identifier-to-the-application-account">4.2 Follow the identifier to the application account</h2>
+<h3 id="nameid-is-a-value-with-an-interpretation">NameID is a value with an interpretation</h3>
+<p>The <strong>Subject</strong> is the entity the assertion concerns. In this example, its <code>NameID</code> is <code>E1042</code>. That does not make <code>E1042</code> Atlas’s internal account ID, Devi’s email address, or her Okta login. Northstar chose an employee identifier for the application-facing identity, and Atlas agreed to interpret it that way.</p>
+<p>In Okta, inspect the relevant user and application profiles, the configured application username, and the Name ID format. Profile mappings have a direction: an application-to-Okta mapping is different from an Okta-to-application mapping. A value present in a profile is not proof that it was emitted into a particular assertion. <a href="https://help.okta.com/oie/en-us/content/topics/users-groups-profiles/usgp-map-attributes.htm">Okta: map profile attributes</a></p>
+<p><strong>Figure L04-M3: Trace the agreed identity relationship.</strong> These arrows describe mapping and lookup, not network traffic. Each connection requires its own agreement and evidence.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L04-M3.svg" alt="L04-M3: Trace the agreed identity relationship" width="276" height="743" loading="lazy"><figcaption><span>L04-M3</span><a href="/SAML_Theory/assets/diagrams/L04-M3.svg" data-diagram="L04-M3: Trace the agreed identity relationship">Open full diagram</a></figcaption></figure><p>The source-to-username connection is a configuration decision. The username-to-NameID connection must be confirmed in the output. The final connection belongs to Atlas: its account store must associate the accepted identity with <code>atlas-4821</code>. The equality of the visible <code>E1042</code> strings helps follow this example, but does not establish those connections by itself.</p>
+<p>Okta documents application username and Name ID format as distinct settings. It also cautions against constructing application usernames from fields end users can edit. For an account-selecting identifier, Northstar needs an authoritative source and controlled changes. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference: Name ID and application username</a></p>
+<h3 id="choose-the-format-for-the-intended-relationship">Choose the format for the intended relationship</h3>
+<p>The <code>Format</code> URI describes identifier semantics. A familiar-looking value does not override that meaning.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>NameID format</th>
+<th>What it tells the receiver</th>
+<th>Practical implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>unspecified</code></td>
+<td>Interpretation is agreed by the implementations.</td>
+<td>Document the actual value, scope and lookup rule; do not assume email.</td>
+</tr>
+<tr>
+<td><code>emailAddress</code></td>
+<td>The content has email-address form.</td>
+<td>Email can change or be reassigned; the format alone does not establish durable account ownership or mailbox verification.</td>
+</tr>
+<tr>
+<td><code>persistent</code></td>
+<td>A lasting opaque identifier scoped to an IdP and an SP or SP affiliation.</td>
+<td>Preserve the relationship; do not substitute a readable username merely because it is stable.</td>
+</tr>
+<tr>
+<td><code>transient</code></td>
+<td>An opaque, temporary identifier.</td>
+<td>Do not use it as a durable account key without a separate supported linking design.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The first two full URIs are <code>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</code> and <code>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</code>. Persistent and transient use <code>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</code> and <code>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</code>. The older version label in the first two URIs does not change the message’s SAML 2.0 version. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §8.3</a></p>
+<p>Persistent identifiers have privacy and relationship semantics, not just a promise that a string rarely changes. Their values must have no guessable relationship to the subject’s underlying identity; the standard does not require one particular generation technique. <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E86</a></p>
+<p>Their values must not later be reassigned to a different principal. This matters when an employee leaves: giving the replacement employee the old person’s identifier can reconnect them to the old application account. <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E78</a></p>
+<p>The example deliberately retains <code>unspecified</code> for <code>E1042</code>. Calling the value “stable” in Northstar’s requirements does not turn an employee number into a standards-defined persistent pseudonym. Changing the format requires agreement about semantics, product support and existing account links.</p>
+<h3 id="the-same-visible-string-can-name-different-people">The same visible string can name different people</h3>
+<p>Imagine Atlas also trusts an independently approved partner IdP. Both providers send <code>E1042</code> under an agreed unspecified format. Northstar’s <code>E1042</code> refers to Devi; the partner’s <code>E1042</code> refers to someone else. A global lookup by the bare string could join the wrong accounts.</p>
+<p>Atlas needs a documented identity scope, such as the trusted issuer plus the agreed identifier. Where present, <code>NameQualifier</code> qualifies the identifier’s administrative/security domain and <code>SPNameQualifier</code> further qualifies its SP or affiliation scope. Their permitted use depends on the format. Do not invent qualifiers or discard supplied scope without understanding the relationship. They are attributes of the identifier, not additional user profile fields to concatenate casually. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §2.2</a></p>
+<p>The practical question is “Which identity in which approved relationship selects this account?” It remains necessary even when no explicit qualifiers appear in the XML.</p>
+<h2 id="43-locate-the-target-and-time-restrictions">4.3 Locate the target and time restrictions</h2>
+<h3 id="four-related-fields-answer-four-different-questions">Four related fields answer four different questions</h3>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field and location</th>
+<th>Question it answers</th>
+<th>Value in this example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Response@Destination</code></td>
+<td>Where is the reply addressed?</td>
+<td>Atlas ACS</td>
+</tr>
+<tr>
+<td><code>SubjectConfirmationData@Recipient</code></td>
+<td>Where may this bearer assertion be presented?</td>
+<td>Atlas ACS</td>
+</tr>
+<tr>
+<td><code>Conditions/AudienceRestriction/Audience</code></td>
+<td>Which relying party is an intended audience?</td>
+<td>Atlas SP entity ID</td>
+</tr>
+<tr>
+<td><code>InResponseTo</code>, on the Response and confirmation data</td>
+<td>Which request does this requested exchange answer?</td>
+<td><code>_req_D03_01</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The <code>@</code> notation here means an XML attribute. The audience is element content. In the reading copy, Destination and Recipient have the same ACS URL, but the audience is <code>https://atlas.northstar.example/saml</code>, without <code>/acs</code>. Each check still has its own purpose. The right delivery address does not establish the right audience or correlation.</p>
+<p>The bearer method does not ask the browser to prove possession of a subject-specific private key. Atlas therefore needs the applicable protection, recipient, time, correlation and replay checks before relying on the assertion. A second submission within the time window is not automatically acceptable merely because it arrived before expiry. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, §§4.1.4.2–4.1.4.5, as amended</a></p>
+<h3 id="read-each-clock-in-its-own-location">Read each clock in its own location</h3>
+<p>The reading copy contains two <code>NotOnOrAfter</code> attributes. One belongs to <code>Conditions</code>; the other belongs to <code>SubjectConfirmationData</code>. They do not merge into one interchangeable “token expiry.”</p>
+<p>With clock tolerance temporarily set aside, the Conditions interval starts at 14:59:50 UTC and excludes 15:05:00 UTC. The bearer confirmation deadline excludes 15:02:00 UTC. An arrival at 15:03:00 is inside the Conditions interval but too late for that bearer confirmation.</p>
+<p>Read the same attempt at four arrival times. These results concern only the illustrated time checks, with no clock tolerance; a “Yes” does not establish overall SAML acceptance.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Arrival time, UTC</th>
+<th>Inside the Conditions interval?</th>
+<th>Before the bearer deadline?</th>
+<th>Consequence for these time checks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>15:00:21</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Both permit processing to continue.</td>
+</tr>
+<tr>
+<td>15:02:00 exactly</td>
+<td>Yes</td>
+<td>No</td>
+<td>The bearer deadline has been reached.</td>
+</tr>
+<tr>
+<td>15:03:00</td>
+<td>Yes</td>
+<td>No</td>
+<td>The later Conditions expiry does not rescue presentation.</td>
+</tr>
+<tr>
+<td>15:05:00 exactly</td>
+<td>No</td>
+<td>No</td>
+<td>Both limits have been reached.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Figure L04-T1: The overlapping limits on October 16, 2026.</strong> Bars represent time intervals, not messages. The bearer row begins at issuance for visual orientation; its XML does not contain a <code>NotBefore</code> attribute. Bar endpoints are excluded at the stated <code>NotOnOrAfter</code> time.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L04-T1.svg" alt="L04-T1: The overlapping limits on October 16, 2026" width="1264" height="196" loading="lazy"><figcaption><span>L04-T1</span><a href="/SAML_Theory/assets/diagrams/L04-T1.svg" data-diagram="L04-T1: The overlapping limits on October 16, 2026">Open full diagram</a></figcaption></figure><p>At the timely arrival, both illustrated time limits permit processing, but all the other requirements still apply. At 15:03:00, the outer Conditions deadline has not rescued the failed bearer deadline. At 15:05:00 exactly, the Conditions interval has ended too. <code>NotBefore</code> includes its starting instant; <code>NotOnOrAfter</code> excludes its ending instant. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">SAML Core, §2.5.1.2</a></p>
+<p>Real receivers account for permitted clock differences under their supported policy. A tolerance is not permission to ignore expiry, and changing it to conceal a persistent clock or delivery problem needs investigation. The browser SSO bearer confirmation rules also prohibit a <code>NotBefore</code> attribute in <code>SubjectConfirmationData</code>; the Conditions placement in this example is deliberate. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, §§4.1.4.2–4.1.4.3</a></p>
+<p>Conditions can contain other restrictions. Do not silently ignore an unfamiliar condition that the receiver cannot evaluate. Multiple audience restrictions also have combination rules; do not flatten a complex document into a single list and assume any matching string settles it. Use the applicable condition rules when those structures appear.</p>
+<h2 id="44-distinguish-authentication-information-from-application-attributes">4.4 Distinguish authentication information from application attributes</h2>
+<h3 id="authentication-happened-at-a-different-time-from-issuance">Authentication happened at a different time from issuance</h3>
+<p>The example’s <code>AuthnStatement</code> says authentication occurred at 15:00:15 UTC. The assertion was issued at 15:00:20 UTC. Those times have different meanings. In an exchange using an existing authentication context, the gap may be larger: a recently issued assertion is not proof that the user just completed fresh authentication.</p>
+<p><code>AuthnContext</code> describes the reported authentication context. Its class reference must be interpreted with the actual request, provider behavior and applicable policy. A successful sign-in, a recent <code>IssueInstant</code>, and an authentication class URI do not independently prove the same thing.</p>
+<p><code>SessionIndex</code> is an issuer-provided reference associated with the authentication session. It can help identify a session in supported SAML operations. It is not Atlas’s browser cookie, a password, or the ID of the assertion. The <code>_session_D04_01</code> value is illustrative; Atlas’s local session identifier is independently managed.</p>
+<p>An optional <code>SessionNotOnOrAfter</code> in an authentication statement indicates an upper bound for sessions derived from that assertion, with processing governed by the applicable profile. It is separate from the assertion’s Conditions deadline. A receiver must understand both the supplied bound and its own session policy; the five-minute Conditions window does not automatically make every application session last five minutes. <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E79</a>, <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">SAML Profiles, §4.1.4.3</a></p>
+<h3 id="read-attribute-names-and-values-separately">Read attribute names and values separately</h3>
+<p>The example’s <code>department</code> attribute has one value, <code>Research</code>. Its <code>groups</code> attribute has two values, <code>Atlas-Readers</code> and <code>Research-Staff</code>. Each <code>AttributeValue</code> is a separate value. A comma-joined string is not automatically equivalent to two XML values.</p>
+<p>The <code>Name</code> identifies the attribute. <code>NameFormat</code> describes the convention for that name; it does not define the data type of the attribute’s value. An optional <code>FriendlyName</code> is a readable label, not a replacement for the agreed technical name. Applications may also require particular value types or serialization. Check the actual contract rather than inferring it from a display label.</p>
+<p>Northstar defines these names and group meanings for Atlas. The SAML standard does not make <code>groups</code> a universal permission field or <code>Atlas-Readers</code> a built-in role. Atlas’s rule is that an accepted <code>Atlas-Readers</code> value can support the reader entitlement for the matched enabled account. A different application could interpret the same group name differently or ignore it.</p>
+<p>Okta supports attribute and group statements for SAML integrations. Group statements need deliberate selection/filtering and an agreed output name. Sending every group can disclose unnecessary organizational information and still fail to provide the value Atlas actually expects. <a href="https://help.okta.com/oie/en-us/content/topics/apps/define-attribute-statements.htm">Okta: define attribute statements</a>, <a href="https://help.okta.com/oie/en-us/content/topics/apps/define-group-attribute-statements.htm">define group attribute statements</a></p>
+<h3 id="an-available-source-is-different-from-a-released-claim">An available source is different from a released claim</h3>
+<p>Suppose Devi’s Okta profile contains a department. That establishes source data, not successful release. Daniel still needs to inspect the statement’s configured source/expression and the resulting SAML output. Atlas must then read the agreed name and apply its own rules.</p>
+<p>Okta’s current documentation calls SAML custom claims attribute statements and distinguishes current claims management from legacy configuration. Use the configuration model applicable to the org instead of moving expressions between interfaces by guesswork. It also documents that an expression evaluating to empty causes the claim to be omitted. Missing output can therefore reflect source or expression behavior, not only a transport problem. <a href="https://help.okta.com/oie/en-us/content/topics/apps/federated-claims-overview.htm">Okta: configure custom claims</a></p>
+<p>An assertion preview helps inspect generated content. It does not establish that a specific browser attempt delivered that content, that Atlas accepted it, or that it selected the expected account. For those conclusions, correlate the live attempt’s permitted evidence across Okta, browser and application boundaries.</p>
+<h2 id="45-turn-accepted-information-into-a-usable-account">4.5 Turn accepted information into a usable account</h2>
+<h3 id="keep-account-matching-deliberate">Keep account matching deliberate</h3>
+<p>Atlas’s agreed match uses the approved identity relationship and employee identifier. It does not fall back to a display name if <code>E1042</code> fails. Its contract treats the example identifier as an exact value; Daniel should not silently lowercase, trim, or rewrite it to make a test pass.</p>
+<p>Other applications may document normalization rules. Those rules need to be explicit, consistently applied and assessed for collisions. If two incoming values collapse to the same local value, a seemingly helpful normalization can become an account-selection error. Email changes and identifier reassignment need the same care. A correct signature cannot repair an unsafe linking rule.</p>
+<p><strong>Figure L04-D1: From accepted identity to the resource result.</strong> This begins after SAML acceptance and shows Atlas’s example application decisions. It is not the complete SAML validation algorithm.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L04-D1.svg" alt="L04-D1: From accepted identity to the resource result" width="692" height="1770" loading="lazy"><figcaption><span>L04-D1</span><a href="/SAML_Theory/assets/diagrams/L04-D1.svg" data-diagram="L04-D1: From accepted identity to the resource result">Open full diagram</a></figcaption></figure><p>The first decision concerns application-required information, beyond the SAML acceptance assumed at the start. The account lookup must then identify an appropriate unique account. Atlas checks entry requirements before creating its session, and projects permission when the resource is requested. A failure at each boundary needs different evidence and a different correction.</p>
+<p>An application supporting <strong>just-in-time creation</strong>, or <strong>JIT</strong>, may create an account during sign-in under configured rules. That is an application capability and policy, not a consequence of merely receiving a NameID or <code>AllowCreate=&quot;true&quot;</code> in a request. Northstar’s current Atlas example uses an existing account. Ongoing provisioning separately handles lifecycle operations such as updates and disablement where configured. Okta assignment, downstream account readiness and resource permission remain separate observations.</p>
+<h3 id="investigate-a-missing-attribute-without-inventing-a-cause">Investigate a missing attribute without inventing a cause</h3>
+<p>Consider an independent fictional test. Atlas requires <code>department</code> for entry and has an enabled account matched by employee identifier. The supplied evidence says:</p>
+<ol>
+<li>Okta returned protocol <code>Success</code>.</li>
+<li>Atlas recorded successful SAML acceptance and matched <code>E1042</code> to <code>atlas-4821</code>.</li>
+<li>The captured assertion has <code>groups</code> but no <code>department</code> attribute.</li>
+<li>Atlas’s application diagnostic reports “required department missing”; it created no application session.</li>
+</ol>
+<p>Which boundary failed, and what should Daniel inspect next?</p>
+<p>The known failure is application-required data after the recorded SAML acceptance and account match. Daniel should compare Atlas’s exact requirement with the claim configuration, source data, expression result and emitted attribute names. An omitted empty expression, a different attribute name or an unconfigured statement are possibilities. The packet does not establish which one occurred.</p>
+<p>Changing the ACS or signing key does not address the supplied evidence. Changing Atlas to accept every missing department would change its entry policy. The justified correction depends on the agreed requirement and the confirmed cause. A retest should show the intended output, successful application processing, the correct account and the permitted resource.</p>
+<h3 id="recognize-encrypted-content-without-confusing-its-role">Recognize encrypted content without confusing its role</h3>
+<p>If assertion encryption is enabled, the response can carry <code>EncryptedAssertion</code> in place of readable assertion content. Authorized decryption recovers the inner assertion for processing; it does not establish trust or satisfy every acceptance requirement. Individual encrypted identifiers or attributes also exist in SAML, but their use depends on supported integration behavior.</p>
+<p><strong>Figure L04-M4: A response with an encrypted assertion.</strong> The outer envelope remains distinct from the protected inner content. This shows containment and processing, not a browser exchange or signature placement.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L04-M4.svg" alt="L04-M4: A response with an encrypted assertion" width="276" height="929" loading="lazy"><figcaption><span>L04-M4</span><a href="/SAML_Theory/assets/diagrams/L04-M4.svg" data-diagram="L04-M4: A response with an encrypted assertion">Open full diagram</a></figcaption></figure><p>The figure does not prescribe a universal cryptographic processing order: outer protection may need verification before decryption, and the actual signed layers matter. Okta exposes separate response-signing, assertion-signing and assertion-encryption options. An encrypted capture may conceal the NameID from a trace viewer, but it has not made issuer, target, time, account or permission questions disappear. <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference: protection settings</a>, <a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">SAML Errata 05, E93</a></p>
+<h3 id="explain-the-evidence-in-order">Explain the evidence in order</h3>
+<p>Return to Devi’s successful transaction. The response answers <code>_req_D03_01</code>; its assertion concerns <code>E1042</code>, targets Atlas and constrains its use. Atlas still needs to establish that the required content is trustworthy and acceptable. It then interprets the agreed identity, finds <code>atlas-4821</code>, applies its entry policy, creates its own session and evaluates projects permission.</p>
+<p>To check your reading, locate the response ID, assertion ID and both request-correlation values in the XML. Then explain why an arrival at 15:03:00 fails the illustrated bearer deadline despite the later Conditions expiry. Finally, explain why another trusted issuer’s <code>E1042</code> must not automatically select Devi’s account. Each answer depends on a relationship between fields, not simply recognizing a field name.</p>
+<h3 id="terms-to-keep-straight">Terms to keep straight</h3>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Distinction</th>
+<th>What to retain</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Response / assertion</td>
+<td>Protocol reply / statements and their use restrictions</td>
+</tr>
+<tr>
+<td>NameID format / NameID value</td>
+<td>Identifier semantics / the actual supplied identifier</td>
+</tr>
+<tr>
+<td>Issuer / audience / recipient</td>
+<td>Authority making the statement / intended relying party / presentation location</td>
+</tr>
+<tr>
+<td>IssueInstant / AuthnInstant</td>
+<td>Issuance time / reported authentication time</td>
+</tr>
+<tr>
+<td>Conditions expiry / bearer deadline</td>
+<td>Assertion-use limit / presentation-confirmation limit</td>
+</tr>
+<tr>
+<td>SessionIndex / Atlas cookie</td>
+<td>SAML session reference / browser information for the application’s local session</td>
+</tr>
+<tr>
+<td>Attribute name / value / local role</td>
+<td>Agreed claim identifier / supplied data / application interpretation</td>
+</tr>
+<tr>
+<td>Protocol success / usable access</td>
+<td>Provider-reported result / accepted identity, account, session and resource permission</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf">OASIS SAML Core: identifiers, assertions, conditions, statements and responses</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">OASIS SAML Profiles: Web Browser SSO processing</a></li>
+<li><a href="https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.pdf">OASIS SAML Errata 05: identifier semantics, session bounds and protection</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta Identity Engine SAML field reference</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/users-groups-profiles/usgp-map-attributes.htm">Okta profile attribute mappings</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/federated-claims-overview.htm">Okta custom claims</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/define-attribute-statements.htm">Okta attribute statements</a></li>
+<li><a href="https://help.okta.com/oie/en-us/content/topics/apps/define-group-attribute-statements.htm">Okta group attribute statements</a></li>
+</ul>
+</article><nav class="page-navigation" aria-label="Lesson sequence"><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><small>← Previous lesson</small>SP-initiated sign-in</a><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><small>Next lesson →</small>Bindings and alternative paths</a></nav></section><aside class="toc" aria-label="On this page"><details open><summary>On this page</summary><ul><li><a href="#41-separate-the-envelope-from-the-statement-inside-it">4.1 Separate the envelope from the statement inside it</a></li><li><a href="#42-follow-the-identifier-to-the-application-account">4.2 Follow the identifier to the application account</a></li><li><a href="#43-locate-the-target-and-time-restrictions">4.3 Locate the target and time restrictions</a></li><li><a href="#44-distinguish-authentication-information-from-application-attributes">4.4 Distinguish authentication information from application attributes</a></li><li><a href="#45-turn-accepted-information-into-a-usable-account">4.5 Turn accepted information into a usable account</a></li><li><a href="#references">References</a></li></ul></details></aside></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>
