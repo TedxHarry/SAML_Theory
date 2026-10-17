@@ -3,7 +3,13 @@
   "version": "alpha",
   "name": "SAML Theory",
   "description": "An illustrated engineering field guide for learning SAML with Okta.",
-  "colors": { "primary": "#245bc4", "accent": "#14746f", "ink": "#14263d", "muted": "#53667d", "background": "#f6f9fc", "surface": "#ffffff" },
+  "colors": {
+    "primary": "#245bc4", "primary-soft": "#eef4ff",
+    "accent": "#14746f", "accent-soft": "#edf8f5",
+    "practice": "#6b43a6", "practice-soft": "#f4effc",
+    "error": "#a92f36", "error-soft": "#fff5f5",
+    "ink": "#14263d", "muted": "#53667d", "background": "#f6f9fc", "surface": "#ffffff"
+  },
   "typography": {
     "sans": { "fontFamily": "Manrope, system-ui, sans-serif" },
     "serif": { "fontFamily": "'Source Serif 4', Georgia, serif" },
@@ -31,7 +37,9 @@ The signature is the three-part connection rail. Avoid dashboard metrics, promot
 
 ## Colors
 
-Cool paper and white surfaces, dark blue ink, restrained blue links and teal technical accents. Borders derive from ink with color-mix. Focus uses primary with a visible outline. Forced colors preserve system colors. There is one light theme; no incomplete theme toggle.
+Cool paper and white surfaces keep long prose in dark blue ink. Blue marks lesson sections, tables and technical fields; teal marks supporting explanations and diagram captions; violet marks practice questions and quizzes. Their soft companion surfaces separate those roles without coloring whole pages. Teal and rose distinguish correct and incorrect quiz results, always accompanied by explicit written feedback. Do not use random colors for individual questions, infer warnings from arbitrary text, or recolor the protocol participants in existing diagrams.
+
+The frontmatter colors generate identically named CSS custom properties through scripts/build.mjs. Shared prose, reading navigation, tables, disclosures and quiz styles consume these properties. Borders derive from ink with color-mix. Focus uses primary with a visible outline. Forced colors preserve system colors. There is one light theme; no incomplete theme toggle.
 
 ## Typography
 

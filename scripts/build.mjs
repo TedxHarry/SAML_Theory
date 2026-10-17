@@ -306,7 +306,7 @@ for (const d of documents) {
     shell(
       d.title,
       d.route,
-      `<div class="reading-layout"><section>${modes}<article class="prose${d.kind === "Quizzes" ? " quiz-page" : ""}">${html}</article>${prevNext}</section></div>${d.kind === "Quizzes" ? `<script type="module" src="${base}assets/quiz.js?v=${uiVersion}"></script>` : ""}`,
+      `<div class="reading-layout"><section>${modes}<article class="prose ${d.kind === "Quizzes" ? "quiz-page" : d.kind.toLowerCase() + "-page"}">${html}</article>${prevNext}</section></div>${d.kind === "Quizzes" ? `<script type="module" src="${base}assets/quiz.js?v=${uiVersion}"></script>` : ""}`,
       d,
     ),
   );
