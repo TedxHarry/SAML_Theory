@@ -5,7 +5,12 @@ const root = path.resolve("docs");
 const manifest = JSON.parse(
   fs.readFileSync(path.join(root, "build-manifest.json"), "utf8"),
 );
-assert.equal(manifest.documents.length, 31);
+assert.equal(manifest.documents.length, 41);
+assert.equal(manifest.documents.filter((d) => d.kind === "Quizzes").length, 10);
+assert.equal(
+  manifest.documents.reduce((n, d) => n + (d.quizzes || 0), 0),
+  200,
+);
 assert.equal(
   manifest.documents.reduce((n, d) => n + (d.questions || 0), 0),
   155,
@@ -19,10 +24,11 @@ function walk(dir) {
   }
 }
 walk(root);
-assert.equal(pages.length, 35);
+assert.equal(pages.length, 45);
 let links = 0;
 let diagrams = 0;
 let answers = 0;
+let quizCards = 0;
 const decode = (s) =>
   s.replaceAll("&amp;", "&").replaceAll("&quot;", '"').replaceAll("&#39;", "'");
 for (const file of pages) {
@@ -32,6 +38,7 @@ for (const file of pages) {
   assert(!text.includes("\u2014"));
   assert(!/C:[\\/]|work\/research/.test(text), `Private path in ${file}`);
   diagrams += (text.match(/<figure class="diagram"/g) || []).length;
+  quizCards += (text.match(/class="quiz-card"/g) || []).length;
   if (file.includes(`${path.sep}questions${path.sep}`))
     answers += (text.match(/<summary>Show explanation<\/summary>/g) || [])
       .length;
@@ -67,12 +74,14 @@ for (const file of pages) {
 }
 assert.equal(diagrams, 66);
 assert.equal(answers, 155);
+assert.equal(quizCards, 200);
 console.log(
   JSON.stringify(
     {
       generatedPages: pages.length,
-      courseFiles: 31,
+      courseFiles: 41,
       questions: 155,
+      interactiveQuizQuestions: quizCards,
       diagrams,
       localLinksAndAssets: links,
       independentExpandableAnswers: answers,

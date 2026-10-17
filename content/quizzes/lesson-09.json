@@ -1,0 +1,566 @@
+{
+  "schemaVersion": 1,
+  "lesson": 9,
+  "questions": [
+    {
+      "id": "L09-Q01",
+      "topic": "Requirements",
+      "prompt": "Before connecting Okta to a new application, which fact set is most useful to establish?",
+      "correctId": "319ba5549d",
+      "options": [
+        {
+          "id": "319ba5549d",
+          "text": "Environment, provider roles, endpoints, identifiers, account rules, required claims and access requirements",
+          "explanation": "These define the actual trust and account contract rather than merely the transport settings."
+        },
+        {
+          "id": "47554941dd",
+          "text": "Only the application's logo dimensions",
+          "explanation": "Branding does not define federation behavior."
+        },
+        {
+          "id": "c06f6dca09",
+          "text": "Only the number of employees",
+          "explanation": "User count alone does not establish the integration contract."
+        },
+        {
+          "id": "a747e1fd3a",
+          "text": "Only whether a sample XML file opens",
+          "explanation": "Readability is not a requirements agreement."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q02",
+      "topic": "Environment separation",
+      "prompt": "Staging and production use different entity IDs and ACS URLs. What should a handover preserve?",
+      "correctId": "26671decda",
+      "options": [
+        {
+          "id": "26671decda",
+          "text": "An explicit mapping of each environment to its own settings and owners",
+          "explanation": "Clear environment mapping prevents valid-looking settings from being applied to the wrong trust relationship."
+        },
+        {
+          "id": "153f2bed31",
+          "text": "One unlabeled screenshot containing mixed settings",
+          "explanation": "Ambiguous evidence invites environment confusion."
+        },
+        {
+          "id": "ab778b4dea",
+          "text": "A rule to accept both audiences everywhere",
+          "explanation": "That weakens environment separation rather than documenting it."
+        },
+        {
+          "id": "da9e624056",
+          "text": "Only the most recently used URL",
+          "explanation": "Recency does not identify the correct environment."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q03",
+      "topic": "Identity contract",
+      "prompt": "An app team proposes matching users by display name because it is easy to read. What should be resolved?",
+      "correctId": "a1d1d687a4",
+      "options": [
+        {
+          "id": "a1d1d687a4",
+          "text": "A unique, stable, scoped identifier and a defined account-matching rule",
+          "explanation": "Readable names can be duplicated or changed; identity resolution needs a stronger agreement."
+        },
+        {
+          "id": "4d998ba0e3",
+          "text": "Only require a nonempty display name",
+          "explanation": "A nonempty value can still be duplicated, mutable or incorrectly scoped."
+        },
+        {
+          "id": "11fe4ace24",
+          "text": "A rule to select the most privileged duplicate",
+          "explanation": "Privilege is not evidence of identity."
+        },
+        {
+          "id": "1961ee78fb",
+          "text": "A promise that signatures prevent duplicate names",
+          "explanation": "Cryptographic protection does not make name values unique."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q04",
+      "topic": "Lifecycle agreement",
+      "prompt": "A new integration disables JIT provisioning. What should the rollout plan include?",
+      "correctId": "319b047226",
+      "options": [
+        {
+          "id": "319b047226",
+          "text": "How eligible accounts will be created, assigned, changed and disabled through the agreed lifecycle process",
+          "explanation": "A SAML response cannot resolve an absent account when automatic creation is not enabled."
+        },
+        {
+          "id": "5b4454908b",
+          "text": "An assumption that first sign-in creates every account anyway",
+          "explanation": "That contradicts the stated configuration."
+        },
+        {
+          "id": "dd384f5aae",
+          "text": "Only a longer assertion lifetime",
+          "explanation": "Timing does not create accounts."
+        },
+        {
+          "id": "9e9a6b7e43",
+          "text": "An assumption that app assignment is the same as downstream account creation",
+          "explanation": "Assignment and provisioning are separate unless the actual integration explicitly connects them."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q05",
+      "topic": "Data minimization",
+      "prompt": "An application needs employee ID and department for its agreed functions. A proposed assertion also includes home address and personal phone. What should the team do?",
+      "correctId": "c73df5a469",
+      "options": [
+        {
+          "id": "c73df5a469",
+          "text": "Release only justified attributes required by the integration",
+          "explanation": "Unnecessary personal data increases exposure without helping the defined access function."
+        },
+        {
+          "id": "56a6ad4202",
+          "text": "Send all available profile fields for convenience",
+          "explanation": "Availability is not a reason to disclose every field."
+        },
+        {
+          "id": "feded6a50d",
+          "text": "Encrypt the assertion and stop reviewing attribute need",
+          "explanation": "Encryption does not make unnecessary disclosure necessary."
+        },
+        {
+          "id": "d747de67af",
+          "text": "Move the extra data into RelayState",
+          "explanation": "That relocates exposure instead of removing it."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q06",
+      "topic": "Policy ownership",
+      "prompt": "The IdP team controls authentication policy, and the app team controls local resource roles. What should planning capture?",
+      "correctId": "266cbeb74d",
+      "options": [
+        {
+          "id": "266cbeb74d",
+          "text": "Which team owns each requirement, configuration decision and failure boundary",
+          "explanation": "Clear ownership prevents authentication success from being confused with application authorization readiness."
+        },
+        {
+          "id": "653042894c",
+          "text": "A rule that either team can silently override all settings",
+          "explanation": "That removes controlled ownership and evidence."
+        },
+        {
+          "id": "247ee06fd9",
+          "text": "Only the signing-certificate owner, because claims and roles are automatic",
+          "explanation": "Claims issuance and local authorization require their own ownership and configuration."
+        },
+        {
+          "id": "d01f426370",
+          "text": "No app-team participation because SAML is involved",
+          "explanation": "The SP still owns crucial account and authorization decisions."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q07",
+      "topic": "Session-state testing",
+      "prompt": "A sign-in works while the tester already has an active app session. What additional test is needed?",
+      "correctId": "1685113811",
+      "options": [
+        {
+          "id": "1685113811",
+          "text": "A controlled new sign-in with relevant app and IdP session states recorded",
+          "explanation": "The existing app session may have bypassed the federation path being tested."
+        },
+        {
+          "id": "a2587ec85f",
+          "text": "Only refresh the same authenticated page",
+          "explanation": "That can continue to test session reuse rather than federation."
+        },
+        {
+          "id": "fa2d67ef4b",
+          "text": "Only change the page theme",
+          "explanation": "Theme changes do not create a controlled authentication baseline."
+        },
+        {
+          "id": "d180626a4c",
+          "text": "Conclude all SAML paths have passed",
+          "explanation": "One existing-session path is insufficient evidence."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q08",
+      "topic": "Negative tests",
+      "prompt": "Why include wrong-audience, expired, replayed and incorrectly correlated responses in a test plan?",
+      "correctId": "3ecf33fbce",
+      "options": [
+        {
+          "id": "3ecf33fbce",
+          "text": "To verify that the receiver rejects cases outside the trust and acceptance contract",
+          "explanation": "Success-path testing alone does not show enforcement of the intended boundaries."
+        },
+        {
+          "id": "e2e0093fb9",
+          "text": "To make production accept more kinds of malformed messages",
+          "explanation": "The purpose is to confirm rejection, not broaden acceptance."
+        },
+        {
+          "id": "5c36d288f2",
+          "text": "To replace all positive sign-in tests",
+          "explanation": "Positive and rejection tests establish different facts."
+        },
+        {
+          "id": "c7ee69aa9e",
+          "text": "To prove every authentication policy was evaluated correctly",
+          "explanation": "These rejection tests exercise receiver boundaries; policy assurance requires its own relevant evidence."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q09",
+      "topic": "Preview versus live",
+      "prompt": "Okta's attribute preview shows employeeNumber, but the live SP sign-in still fails. What evidence is needed next?",
+      "correctId": "ee9e127c05",
+      "options": [
+        {
+          "id": "ee9e127c05",
+          "text": "The actual issued response and receiver result for the same controlled sign-in",
+          "explanation": "Preview is useful configuration evidence, but runtime issuance and consumption must be confirmed."
+        },
+        {
+          "id": "51e6bde2b9",
+          "text": "Only another screenshot of the same preview",
+          "explanation": "Repeating preview does not establish live delivery or mapping."
+        },
+        {
+          "id": "6c6da79989",
+          "text": "Only the IdP metadata file",
+          "explanation": "Metadata helps describe trust and endpoints, but does not prove the actual released claims and local matching outcome."
+        },
+        {
+          "id": "ca9afa0636",
+          "text": "A declaration that preview guarantees acceptance",
+          "explanation": "The receiver can still reject the message or account mapping."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q10",
+      "topic": "Rollout evidence",
+      "prompt": "A change ticket says K2 is configured centrally. What evidence best establishes rollover readiness?",
+      "correctId": "1671065d6f",
+      "options": [
+        {
+          "id": "1671065d6f",
+          "text": "K2 is trusted by every active validating runtime, and controlled K2 sign-ins pass",
+          "explanation": "Saved configuration and actual runtime adoption are distinct."
+        },
+        {
+          "id": "a680e65d87",
+          "text": "The certificate file has a new name",
+          "explanation": "A name does not establish adoption."
+        },
+        {
+          "id": "a4b0ced453",
+          "text": "One browser has loaded the settings page",
+          "explanation": "Browser viewing is not server-side verification readiness."
+        },
+        {
+          "id": "fa68a396a8",
+          "text": "One successful K2 login on one of several nodes",
+          "explanation": "One node's result does not establish readiness across all active validators."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q11",
+      "topic": "Recovery planning",
+      "prompt": "A planned change has no tested recovery path and could block all administrators from the app. What should happen before release?",
+      "correctId": "99d304f9ce",
+      "options": [
+        {
+          "id": "99d304f9ce",
+          "text": "Establish and verify an authorized recovery route with clear ownership and criteria",
+          "explanation": "Recovery needs to be concrete before an access-affecting change is activated."
+        },
+        {
+          "id": "da0153bcab",
+          "text": "Disable all validation preemptively",
+          "explanation": "Removing trust checks is not a sound recovery plan."
+        },
+        {
+          "id": "9f4512db5d",
+          "text": "Rely on the same federated admin route being changed",
+          "explanation": "That route may be unavailable during the failure the recovery plan needs to address."
+        },
+        {
+          "id": "81890d629a",
+          "text": "Give every user the provider's private key",
+          "explanation": "Private-key distribution would create a serious trust failure."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q12",
+      "topic": "Rollback criteria",
+      "prompt": "A rollout's old signing key is uncompromised, but the new key fails on one node. Which response is best planned in advance?",
+      "correctId": "7a69e38dd7",
+      "options": [
+        {
+          "id": "7a69e38dd7",
+          "text": "A bounded recovery or rollback procedure tied to observed failure and the key-trust state",
+          "explanation": "A useful rollback plan names what changes, who acts and what proves recovery."
+        },
+        {
+          "id": "32d044acdc",
+          "text": "Always keep both keys trusted forever",
+          "explanation": "Indefinite overlap avoids a retirement decision rather than defining recovery."
+        },
+        {
+          "id": "8334c91cb1",
+          "text": "Always delete every trusted key immediately",
+          "explanation": "That may turn a partial failure into complete outage."
+        },
+        {
+          "id": "a3c9943d97",
+          "text": "Change all users' department attributes",
+          "explanation": "That is unrelated to the failing verification node."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q13",
+      "topic": "Multiple acceptance boundaries",
+      "prompt": "A test user can sign in but sees an unexpected finance role. Is the integration ready just because authentication passed?",
+      "correctId": "82206e9ba8",
+      "options": [
+        {
+          "id": "82206e9ba8",
+          "text": "No; identity mapping and authorization outcomes must also match the requirements",
+          "explanation": "A wrong account or wrong role can be a more serious failure than a visible sign-in error."
+        },
+        {
+          "id": "d481a38eb9",
+          "text": "Yes; any application role is acceptable after SSO",
+          "explanation": "Authentication does not justify unintended permissions."
+        },
+        {
+          "id": "bec8db4eed",
+          "text": "Yes; a signed groups attribute cannot be mis-mapped",
+          "explanation": "Protected values can still be mapped incorrectly by the application."
+        },
+        {
+          "id": "231eb7096d",
+          "text": "Only confirm that the account's display name looks familiar",
+          "explanation": "A familiar label does not prove the correct unique identity and permission set."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q14",
+      "topic": "Logout requirements",
+      "prompt": "A business requirement says \"logout everywhere.\" What must be clarified before implementation?",
+      "correctId": "2b85278e60",
+      "options": [
+        {
+          "id": "2b85278e60",
+          "text": "Which sessions, apps and devices are in scope, what mechanisms support them and how completion is confirmed",
+          "explanation": "A broad phrase must be translated into supported and testable session outcomes."
+        },
+        {
+          "id": "239b9f57bf",
+          "text": "Only the text of the logout button",
+          "explanation": "Button text cannot establish cross-system session termination."
+        },
+        {
+          "id": "10c8a79a8c",
+          "text": "An assumption that local logout covers all providers",
+          "explanation": "Local and federated session scopes differ."
+        },
+        {
+          "id": "6a6dc41433",
+          "text": "Assume account deactivation will satisfy every logout requirement",
+          "explanation": "Lifecycle changes and immediate session termination have different scope and support requirements."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q15",
+      "topic": "Change isolation",
+      "prompt": "An integration has a failing NameID match and a proposed certificate rollover. What improves diagnosis?",
+      "correctId": "9bc45ac220",
+      "options": [
+        {
+          "id": "9bc45ac220",
+          "text": "Separate the changes where practical and record a controlled baseline for each boundary",
+          "explanation": "Changing unrelated trust and identity settings at once obscures causes and recovery evidence."
+        },
+        {
+          "id": "d1e711af54",
+          "text": "Change every setting until one attempt succeeds",
+          "explanation": "Uncontrolled changes produce weak causal evidence."
+        },
+        {
+          "id": "cd17deaf30",
+          "text": "Disable signature validation to simplify all tests",
+          "explanation": "That invalidates important security checks."
+        },
+        {
+          "id": "a1ee1817b7",
+          "text": "Test only with a pre-existing local session",
+          "explanation": "That may skip both changed federation behaviors."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q16",
+      "topic": "Monitoring",
+      "prompt": "What should a release's monitoring plan compare?",
+      "correctId": "c33291d290",
+      "options": [
+        {
+          "id": "c33291d290",
+          "text": "Issuer-side events, receiver outcomes and user-visible results for the same controlled attempts",
+          "explanation": "Cross-boundary evidence helps distinguish issuance, acceptance, account and access failures."
+        },
+        {
+          "id": "66da040d4a",
+          "text": "Only whether the public home page loads",
+          "explanation": "Availability of a public page does not prove federation success."
+        },
+        {
+          "id": "6ef9620d06",
+          "text": "Only the count of successful IdP events",
+          "explanation": "Issuer-side counts do not by themselves confirm receiver acceptance and the intended local account outcome."
+        },
+        {
+          "id": "c49c3a553b",
+          "text": "Only one unrelated historical log entry",
+          "explanation": "Uncorrelated evidence cannot establish the current result."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q17",
+      "topic": "Handover quality",
+      "prompt": "Which handover entry is most useful to the next engineer?",
+      "correctId": "dd66f78ef8",
+      "options": [
+        {
+          "id": "dd66f78ef8",
+          "text": "The exact environment, expected values, owners, test evidence, known limitations and recovery procedure",
+          "explanation": "A handover should support investigation and safe change without reconstructing the project from memory."
+        },
+        {
+          "id": "97a8f0d2f0",
+          "text": "\"SSO works\" with no date or test context",
+          "explanation": "That statement does not establish what was tested or where."
+        },
+        {
+          "id": "9d63d0e545",
+          "text": "A collection of private keys",
+          "explanation": "Secrets do not belong in routine handover documentation."
+        },
+        {
+          "id": "9c3cae2660",
+          "text": "An unlabeled assertion copied from an unknown tenant",
+          "explanation": "Unknown provenance makes evidence difficult to use safely."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q18",
+      "topic": "Release criteria",
+      "prompt": "A required replay-rejection test has not run, but one positive sign-in passed. What should the release status say?",
+      "correctId": "b2ce4ae3f1",
+      "options": [
+        {
+          "id": "b2ce4ae3f1",
+          "text": "The defined acceptance evidence is incomplete",
+          "explanation": "A missing required test cannot be converted into a pass by success elsewhere."
+        },
+        {
+          "id": "ab9e5aff49",
+          "text": "All requirements are proved because one user signed in",
+          "explanation": "A positive baseline does not establish that a replayed response is rejected for the intended reason."
+        },
+        {
+          "id": "4dcd95b886",
+          "text": "Replay protection is unnecessary for signed messages",
+          "explanation": "Signed assertions can be replayed unless reuse is detected."
+        },
+        {
+          "id": "21dc65bb06",
+          "text": "The failed evidence should be removed from the plan",
+          "explanation": "Removing a requirement after the fact hides the gap."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q19",
+      "topic": "Identifier changes",
+      "prompt": "An organization plans to change the value used as NameID from email to employee ID. What needs assessment?",
+      "correctId": "26f96f6cb4",
+      "options": [
+        {
+          "id": "26f96f6cb4",
+          "text": "Both issuance and the SP's mapping, account-linking, uniqueness and migration behavior",
+          "explanation": "Changing the identifier can change which account is resolved, not merely the appearance of XML."
+        },
+        {
+          "id": "42f2615aad",
+          "text": "Only whether employee IDs contain digits",
+          "explanation": "Syntax alone does not cover identity continuity."
+        },
+        {
+          "id": "e7efbe9b83",
+          "text": "Only the signing algorithm",
+          "explanation": "Signing preserves the new value but does not migrate local account associations."
+        },
+        {
+          "id": "5e059bdb86",
+          "text": "Nothing if both values identify the same human informally",
+          "explanation": "The receiver uses configured matching rules rather than human intuition."
+        }
+      ]
+    },
+    {
+      "id": "L09-Q20",
+      "topic": "Evidence versus proposal",
+      "prompt": "A handover states, \"We plan to enable front-channel logout next month.\" How should this be interpreted?",
+      "correctId": "10359e43fa",
+      "options": [
+        {
+          "id": "10359e43fa",
+          "text": "As a future proposal, not proof that the current integration terminates participating app sessions",
+          "explanation": "Documented intent and verified current behavior are different states."
+        },
+        {
+          "id": "91a42d0875",
+          "text": "As a completed end-to-end logout test",
+          "explanation": "A plan is not execution evidence."
+        },
+        {
+          "id": "8b6c819a03",
+          "text": "As proof every browser supports the feature",
+          "explanation": "That needs separate verification."
+        },
+        {
+          "id": "bc40721546",
+          "text": "As a reason to delete current session test results",
+          "explanation": "Current evidence remains necessary."
+        }
+      ]
+    }
+  ]
+}

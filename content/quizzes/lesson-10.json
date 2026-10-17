@@ -1,0 +1,566 @@
+{
+  "schemaVersion": 1,
+  "lesson": 10,
+  "questions": [
+    {
+      "id": "L10-Q01",
+      "topic": "Investigation start",
+      "prompt": "A user reports \"SAML is broken.\" What is the most useful first investigation step?",
+      "correctId": "fd7877e146",
+      "options": [
+        {
+          "id": "fd7877e146",
+          "text": "Establish the exact app, environment, user, time, entry path, session state and visible outcome",
+          "explanation": "A specific controlled attempt provides a basis for correlating evidence and locating the failing boundary."
+        },
+        {
+          "id": "9f7aafbb00",
+          "text": "Change every SAML setting immediately",
+          "explanation": "Uncontrolled changes obscure the original symptom and cause."
+        },
+        {
+          "id": "ea89b5136b",
+          "text": "Assume the signing certificate expired",
+          "explanation": "That is only one possible cause and needs evidence."
+        },
+        {
+          "id": "98578ac07f",
+          "text": "Ask for the user's password",
+          "explanation": "Passwords are not needed for ordinary protocol evidence review."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q02",
+      "topic": "Last success and first failure",
+      "prompt": "An Okta log shows response issuance, and Atlas logs reject its audience. Where is the first confirmed failure?",
+      "correctId": "4dcccb836b",
+      "options": [
+        {
+          "id": "4dcccb836b",
+          "text": "Atlas's response-acceptance boundary",
+          "explanation": "The message was issued, but the receiver rejected a targeting condition."
+        },
+        {
+          "id": "67c1a24eaf",
+          "text": "The user's initial password entry necessarily failed",
+          "explanation": "Issuance evidence does not support that conclusion."
+        },
+        {
+          "id": "c788278aca",
+          "text": "The browser never reached Okta",
+          "explanation": "The issuer event contradicts that claim."
+        },
+        {
+          "id": "d703fb1716",
+          "text": "Atlas's report authorization after a successful session",
+          "explanation": "Acceptance failed before that later boundary."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q03",
+      "topic": "Issuer log limits",
+      "prompt": "Okta records successful authentication and app access processing. What can that event alone fail to prove?",
+      "correctId": "0fe2f53888",
+      "options": [
+        {
+          "id": "0fe2f53888",
+          "text": "That the SP accepted the exact response and created the correct local session",
+          "explanation": "Issuer-side success does not establish every downstream receiver and account outcome."
+        },
+        {
+          "id": "53b8e0440a",
+          "text": "That an Okta event occurred",
+          "explanation": "The record directly establishes that observed issuer event."
+        },
+        {
+          "id": "25a99c25f7",
+          "text": "That evidence needs a timestamp",
+          "explanation": "Timestamps help correlate events."
+        },
+        {
+          "id": "e04c512188",
+          "text": "That the app has its own validation boundary",
+          "explanation": "The SP retains that responsibility."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q04",
+      "topic": "Missing events",
+      "prompt": "No matching Okta event appears in the engineer's current System Log search. What should happen before concluding no request reached Okta?",
+      "correctId": "32749af869",
+      "options": [
+        {
+          "id": "32749af869",
+          "text": "Check org, time zone, time range, query filters and the actual entry path",
+          "explanation": "An empty search can result from scope or query choices, not only absence of an event."
+        },
+        {
+          "id": "7e3068ed21",
+          "text": "Conclude the browser never visited any IdP",
+          "explanation": "The search does not establish that broad conclusion."
+        },
+        {
+          "id": "958041bb61",
+          "text": "Increase the assertion lifetime before checking the search scope",
+          "explanation": "Validity-window changes do not establish why the current log query returned no matching events."
+        },
+        {
+          "id": "4bde4c9ff5",
+          "text": "Delete all user assignments",
+          "explanation": "That is an unsupported change unrelated to evidence collection."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q05",
+      "topic": "Identifier correlation",
+      "prompt": "A trace contains an AuthnRequest ID, a Response ID, an Assertion ID and an Okta event ID. How should they be used?",
+      "correctId": "fb71a6fdd3",
+      "options": [
+        {
+          "id": "fb71a6fdd3",
+          "text": "Keep each identifier's type and correlate using the fields and timestamps that actually connect the events",
+          "explanation": "Different IDs identify different objects and are not expected to be identical."
+        },
+        {
+          "id": "03e1163092",
+          "text": "Assume all four must have the same string",
+          "explanation": "They belong to distinct systems or protocol objects."
+        },
+        {
+          "id": "9a34cb6959",
+          "text": "Replace every ID with the user's email before comparing",
+          "explanation": "That destroys useful transaction evidence."
+        },
+        {
+          "id": "2ebb9d12db",
+          "text": "Use the Response ID as InResponseTo for every comparison",
+          "explanation": "InResponseTo refers to the relevant request, not to the newly issued Response's own ID."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q06",
+      "topic": "Attribute failure",
+      "prompt": "A live assertion lacks employeeNumber, although the Okta profile has it. What is the best next check?",
+      "correctId": "6ede2fca10",
+      "options": [
+        {
+          "id": "6ede2fca10",
+          "text": "The app-specific attribute mapping and actual source value used for that sign-in",
+          "explanation": "A profile value must be correctly mapped and released in the live message."
+        },
+        {
+          "id": "e5e199aee4",
+          "text": "The SP's role mapping before checking actual issuance",
+          "explanation": "A consumption rule cannot explain a field that is already absent from the captured issued message."
+        },
+        {
+          "id": "ea447d060f",
+          "text": "Whether the assertion XML is pretty-printed",
+          "explanation": "Whitespace does not create the missing attribute."
+        },
+        {
+          "id": "2211f7c73f",
+          "text": "Every browser's cookie names",
+          "explanation": "Cookie names are unrelated to selecting that attribute."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q07",
+      "topic": "Account mismatch",
+      "prompt": "The assertion contains the expected NameID, but Atlas resolves a different local account. Where should the investigation focus?",
+      "correctId": "1ea4df8b2e",
+      "options": [
+        {
+          "id": "1ea4df8b2e",
+          "text": "Atlas's matching rule, identifier normalization, uniqueness and account-linking data",
+          "explanation": "Correct issuance can still be consumed through an incorrect local identity mapping."
+        },
+        {
+          "id": "b31e2d697d",
+          "text": "Only Okta's signature algorithm",
+          "explanation": "A valid signature cannot fix an SP-side lookup rule."
+        },
+        {
+          "id": "cd67fe6220",
+          "text": "Only whether TLS was enabled",
+          "explanation": "Transport security does not determine local identity resolution."
+        },
+        {
+          "id": "3d7b7ab58d",
+          "text": "Only the NameID format URI, without the receiver's lookup rule",
+          "explanation": "Format matters, but the wrong local match requires checking how the receiver actually uses the value."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q08",
+      "topic": "Policy versus assignment",
+      "prompt": "A user is assigned to the app in Okta but is denied by an applicable authentication policy. What does assignment establish?",
+      "correctId": "7e386b2b8a",
+      "options": [
+        {
+          "id": "7e386b2b8a",
+          "text": "Eligibility for the assigned app does not guarantee satisfaction of authentication policy",
+          "explanation": "Assignment and policy evaluation are separate requirements."
+        },
+        {
+          "id": "f585c3deb4",
+          "text": "The policy must be ignored",
+          "explanation": "Assignment does not override policy."
+        },
+        {
+          "id": "50e7652302",
+          "text": "The SP must create an administrator account",
+          "explanation": "An IdP policy denial does not instruct local provisioning."
+        },
+        {
+          "id": "adb8109f0d",
+          "text": "The app's local role mapping must have caused the IdP policy denial",
+          "explanation": "A local app role and an issuer-side authentication policy operate at different boundaries."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q09",
+      "topic": "Signature failure",
+      "prompt": "Atlas reports \"no trusted verification key\" after a signing-key change. What should be checked first?",
+      "correctId": "244611cdb5",
+      "options": [
+        {
+          "id": "244611cdb5",
+          "text": "The actual issuer, signing key and trusted-key adoption at the validating runtime",
+          "explanation": "A precise verification error should be investigated at its trust boundary."
+        },
+        {
+          "id": "fc1d2e4266",
+          "text": "The user's home address",
+          "explanation": "That attribute does not establish signing trust."
+        },
+        {
+          "id": "13e72dc04b",
+          "text": "The report permission list",
+          "explanation": "Resource roles are later than signature acceptance."
+        },
+        {
+          "id": "dedbeb23d1",
+          "text": "Only the certificate filename in a central document",
+          "explanation": "A document label does not prove which key the validating runtime actually trusts."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q10",
+      "topic": "Decryption failure",
+      "prompt": "Atlas cannot decrypt an EncryptedAssertion after its encryption certificate changed. What evidence matters most?",
+      "correctId": "67dd7b628a",
+      "options": [
+        {
+          "id": "67dd7b628a",
+          "text": "Which recipient public key was used and whether Atlas has the matching usable private key",
+          "explanation": "The encryption direction and runtime key pairing directly explain decryption capability."
+        },
+        {
+          "id": "382b2c7aa6",
+          "text": "Only Okta's assertion-signing public key",
+          "explanation": "Signing verification and recipient decryption use different key roles."
+        },
+        {
+          "id": "e256689ef4",
+          "text": "Only the user's display name",
+          "explanation": "Identity text does not decrypt content."
+        },
+        {
+          "id": "618769aae0",
+          "text": "Whether the response has a Success status",
+          "explanation": "Reported protocol success does not establish that Atlas has the required private decryption key."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q11",
+      "topic": "Timing diagnosis",
+      "prompt": "An assertion expires before Atlas processes it. What is the useful evidence set?",
+      "correctId": "e81fbe7ebb",
+      "options": [
+        {
+          "id": "e81fbe7ebb",
+          "text": "Issue and validity timestamps, receipt and processing times, synchronized clocks and relevant queue delays",
+          "explanation": "This distinguishes a clock problem from late delivery or delayed processing."
+        },
+        {
+          "id": "352e3b34c8",
+          "text": "Only AuthnInstant, ignoring the actual acceptance deadlines",
+          "explanation": "Authentication event time and the applicable validity windows have distinct meanings."
+        },
+        {
+          "id": "a74c25f57c",
+          "text": "Only a screenshot of a successful login from last month",
+          "explanation": "Historical success does not measure current timing."
+        },
+        {
+          "id": "e917418e4f",
+          "text": "A larger timeout chosen without measuring the delay",
+          "explanation": "Changing limits before measuring can conceal the cause."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q12",
+      "topic": "Intermittent rollover",
+      "prompt": "After K2 activation, two of every few sign-ins fail verification. One SP node still trusts only K1. What is the strongest supported diagnosis?",
+      "correctId": "2f1696bce2",
+      "options": [
+        {
+          "id": "2f1696bce2",
+          "text": "Inconsistent K2 trust adoption across validating nodes",
+          "explanation": "The node-specific configuration explains the intermittent pattern and should be verified with correlated attempts."
+        },
+        {
+          "id": "90a1fb8683",
+          "text": "Every user's password changed randomly",
+          "explanation": "The evidence points to receiver trust, not credential changes."
+        },
+        {
+          "id": "eaf9352cd3",
+          "text": "K2 must be invalid on all nodes",
+          "explanation": "Some nodes successfully verify it."
+        },
+        {
+          "id": "64baaa5344",
+          "text": "The NameID format is necessarily wrong",
+          "explanation": "No supplied evidence links the failure to identifier format."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q13",
+      "topic": "Repeated sign-in loop",
+      "prompt": "The SP accepts the assertion and creates a session, but the next request is treated as unauthenticated. What should be checked next?",
+      "correctId": "879fdda05f",
+      "options": [
+        {
+          "id": "879fdda05f",
+          "text": "Whether the session cookie is stored and returned as expected and the server recognizes the session",
+          "explanation": "The confirmed success moved the investigation to session continuity rather than assertion issuance."
+        },
+        {
+          "id": "e481fc1637",
+          "text": "Only the original AuthnRequest's XML indentation",
+          "explanation": "That does not explain losing a newly created session."
+        },
+        {
+          "id": "0f635414c0",
+          "text": "Disable audience checking",
+          "explanation": "Audience checks already passed and are unrelated to session continuity."
+        },
+        {
+          "id": "051e4e613a",
+          "text": "Change the IdP's signing key immediately",
+          "explanation": "That is not supported by the observed acceptance success."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q14",
+      "topic": "Expected rejection",
+      "prompt": "A deliberate wrong-audience test is rejected by Atlas while a valid baseline succeeds. How should the result be recorded?",
+      "correctId": "bd712bde0c",
+      "options": [
+        {
+          "id": "bd712bde0c",
+          "text": "A successful rejection test for the audience boundary",
+          "explanation": "A negative test passes when the prohibited case is refused for the intended reason."
+        },
+        {
+          "id": "c374e06a0a",
+          "text": "As proof that all SAML sign-in is broken",
+          "explanation": "The baseline and intended rejection indicate the opposite."
+        },
+        {
+          "id": "422e73c067",
+          "text": "As a reason to remove audience validation",
+          "explanation": "That would remove the boundary being tested."
+        },
+        {
+          "id": "a385c113cf",
+          "text": "As proof every receiver check is correct",
+          "explanation": "The result supports the audience boundary tested; other checks need their own evidence."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q15",
+      "topic": "Existing-session trap",
+      "prompt": "A tester reloads an app after changing SAML settings and sees the home page. The existing app session remained active. What is missing?",
+      "correctId": "8f285c0415",
+      "options": [
+        {
+          "id": "8f285c0415",
+          "text": "Evidence that a new SAML exchange exercised the changed configuration",
+          "explanation": "An existing session can make a broken new sign-in path appear healthy."
+        },
+        {
+          "id": "12df7cbcce",
+          "text": "Proof the home page can render",
+          "explanation": "That was observed, but it is not the changed integration test."
+        },
+        {
+          "id": "7b32e66cff",
+          "text": "Another test that reuses the same active app session",
+          "explanation": "Repeated session reuse still may not exercise the changed federation configuration."
+        },
+        {
+          "id": "e56f282f8b",
+          "text": "A rule that active sessions always validate fresh assertions",
+          "explanation": "They do not necessarily perform a new exchange on every request."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q16",
+      "topic": "Broker boundary",
+      "prompt": "An external IdP authenticates successfully to Okta, but Atlas rejects the assertion issued by Okta. Which leg needs investigation?",
+      "correctId": "7541528a6b",
+      "options": [
+        {
+          "id": "7541528a6b",
+          "text": "The downstream Okta-to-Atlas exchange and Atlas acceptance",
+          "explanation": "Upstream success does not prove the separate downstream trust and targeting requirements."
+        },
+        {
+          "id": "9bc810ebe4",
+          "text": "Only the upstream password prompt",
+          "explanation": "The supplied failure is downstream of it."
+        },
+        {
+          "id": "e6dbbfbf2c",
+          "text": "Neither leg because brokers remove SP validation",
+          "explanation": "Each federation relationship retains its own receiver checks; a broker does not remove Atlas's acceptance boundary."
+        },
+        {
+          "id": "9a84f351ef",
+          "text": "Only the browser's bookmark folder",
+          "explanation": "That does not explain the stated rejection."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q17",
+      "topic": "Logout evidence",
+      "prompt": "Atlas confirms local logout. Ledger never responds to its logout request. What is the accurate status?",
+      "correctId": "ce5ba48bc9",
+      "options": [
+        {
+          "id": "ce5ba48bc9",
+          "text": "Atlas logout is confirmed; Ledger termination is unconfirmed",
+          "explanation": "Report each participant according to actual evidence rather than inferring universal completion."
+        },
+        {
+          "id": "1b8734f389",
+          "text": "Every session everywhere is definitely ended",
+          "explanation": "That exceeds the confirmation available."
+        },
+        {
+          "id": "58b09847e8",
+          "text": "Atlas logout necessarily failed",
+          "explanation": "Another participant's missing confirmation does not erase Atlas's confirmed local result."
+        },
+        {
+          "id": "e1ab709da7",
+          "text": "Ledger termination is confirmed because the initiating app logged out",
+          "explanation": "A confirmed initiating-app outcome does not prove completion by an unresponsive participant."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q18",
+      "topic": "Evidence handling",
+      "prompt": "A support case needs a SAML trace containing identifiers, personal attributes and session-related values. How should it be shared?",
+      "correctId": "c91c33b8a9",
+      "options": [
+        {
+          "id": "c91c33b8a9",
+          "text": "Use the approved secure process, minimize sensitive data and preserve an original when integrity analysis requires it",
+          "explanation": "Sanitized copies can support discussion, but modifying signed XML prevents using that altered copy to prove original signature validity."
+        },
+        {
+          "id": "4381fcc5f5",
+          "text": "Paste all session cookies into a public issue",
+          "explanation": "That exposes credentials or sensitive session data."
+        },
+        {
+          "id": "4fea583b5e",
+          "text": "Delete arbitrary XML nodes and claim the edited copy proves the original signature",
+          "explanation": "Editing protected content changes the evidence needed for verification."
+        },
+        {
+          "id": "c8383a8c56",
+          "text": "Share the provider's private key with every reviewer",
+          "explanation": "Reviewers ordinarily need evidence and public trust material, not private signing keys."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q19",
+      "topic": "Controlled retest",
+      "prompt": "An engineer changes the ACS mapping to address a confirmed recipient mismatch. What makes the retest useful?",
+      "correctId": "1775b5e223",
+      "options": [
+        {
+          "id": "1775b5e223",
+          "text": "Repeat a controlled new sign-in, correlate its evidence and confirm both acceptance and intended account access",
+          "explanation": "A successful retest must exercise the change and verify the resulting identity and access outcome."
+        },
+        {
+          "id": "8efbb6978a",
+          "text": "Refresh an unrelated public page",
+          "explanation": "That does not test the federation path."
+        },
+        {
+          "id": "57524dfdea",
+          "text": "Stop when the settings page saves",
+          "explanation": "Saving proves configuration persistence, not end-to-end behavior."
+        },
+        {
+          "id": "5f7f92a472",
+          "text": "Disable every other validation check for the test",
+          "explanation": "That would prevent the test from confirming real acceptance behavior."
+        }
+      ]
+    },
+    {
+      "id": "L10-Q20",
+      "topic": "Combined case",
+      "prompt": "Okta switched to K2. Atlas node A trusts K2, but node B trusts only K1. Separately, one user's accepted NameID maps to two Atlas accounts. Which plan addresses the evidence?",
+      "correctId": "eedfe61a6d",
+      "options": [
+        {
+          "id": "eedfe61a6d",
+          "text": "Fix and verify K2 adoption on every validator, then resolve the ambiguous account mapping with separate retests",
+          "explanation": "There are two evidenced boundaries: cryptographic trust adoption and local identity resolution. One change does not automatically fix both."
+        },
+        {
+          "id": "21a271211c",
+          "text": "Only increase assertion lifetime",
+          "explanation": "That addresses neither stated cause."
+        },
+        {
+          "id": "a89e8c88fc",
+          "text": "Only trust every certificate supplied in messages",
+          "explanation": "That weakens trust and does not resolve duplicate accounts."
+        },
+        {
+          "id": "5415978791",
+          "text": "Only remove the duplicate account and leave node B unchanged",
+          "explanation": "Resolving account ambiguity does not fix node B's independently evidenced signing-key trust failure."
+        }
+      ]
+    }
+  ]
+}

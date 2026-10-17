@@ -3,6 +3,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import MarkdownIt from "markdown-it";
 import GithubSlugger from "github-slugger";
+import { loadQuiz, renderQuiz, quizSearchText } from "./quizzes.mjs";
 
 const root = process.cwd();
 const out = path.join(root, "docs");
@@ -21,6 +22,7 @@ const design = JSON.parse(fs.readFileSync("DESIGN.md", "utf8").split("---")[1]);
 const uiVersion = hash(
   fs.readFileSync("site/style.css", "utf8") +
     fs.readFileSync("site/app.js", "utf8") +
+    fs.readFileSync("site/quiz.js", "utf8") +
     JSON.stringify(design),
 ).slice(0, 12);
 const config = {
@@ -154,6 +156,14 @@ config.lessons.forEach(([slug, title, description], i) => {
     kind: "Questions",
     number: i + 1,
   });
+  documents.push({
+    source: `quizzes/lesson-${number}.json`,
+    route: `quizzes/lesson-${number}/`,
+    title: `${title}: quizzes`,
+    description: `Explore Lesson ${i + 1} concepts through independent multiple-choice questions with immediate explanations.`,
+    kind: "Quizzes",
+    number: i + 1,
+  });
 });
 config.references.forEach(([slug, title, description]) =>
   documents.push({
@@ -167,13 +177,22 @@ config.references.forEach(([slug, title, description]) =>
 const bySource = new Map(documents.map((d) => [d.source, d]));
 const lessonDocs = documents.filter((d) => d.kind === "Lesson");
 const questions = documents.filter((d) => d.kind === "Questions");
+const quizzes = documents.filter((d) => d.kind === "Quizzes");
+const quizData = new Map(
+  quizzes.map((d) => [
+    d.source,
+    loadQuiz(path.join("content", d.source), d.number),
+  ]),
+);
 const refs = documents.filter((d) => d.kind === "Reference");
 const sourceTexts = new Map(
   documents.map((d) => [
     d.source,
-    fs
-      .readFileSync(path.join("content", d.source), "utf8")
-      .replaceAll("\r\n", "\n"),
+    d.kind === "Quizzes"
+      ? quizSearchText(quizData.get(d.source))
+      : fs
+          .readFileSync(path.join("content", d.source), "utf8")
+          .replaceAll("\r\n", "\n"),
   ]),
 );
 const countQuestions = (d) =>
@@ -185,7 +204,7 @@ fs.cpSync("site/fonts", path.join(out, "assets/fonts"), { recursive: true });
 fs.cpSync("site/diagrams", path.join(out, "assets/diagrams"), {
   recursive: true,
 });
-for (const file of ["style.css", "app.js"])
+for (const file of ["style.css", "app.js", "quiz.js"])
   fs.copyFileSync(`site/${file}`, path.join(out, "assets", file));
 const vars = Object.entries(design.colors)
   .map(([k, v]) => `--${k}:${v};`)
@@ -271,10 +290,13 @@ function write(route, html) {
 }
 
 for (const d of documents) {
-  const { html } = render(d);
+  const html =
+    d.kind === "Quizzes"
+      ? renderQuiz(quizData.get(d.source), d.title)
+      : render(d).html;
   const n = d.number;
   const modes = n
-    ? `<nav class="reading-modes" aria-label="Lesson material"><a href="${base + lessonDocs[n - 1].route}"${d.kind === "Lesson" ? ' aria-current="page"' : ""}>Lesson ${n}</a><a href="${base + questions[n - 1].route}"${d.kind === "Questions" ? ' aria-current="page"' : ""}>Questions <span>(${countQuestions(questions[n - 1])})</span></a></nav>`
+    ? `<nav class="reading-modes" aria-label="Lesson material"><a href="${base + lessonDocs[n - 1].route}"${d.kind === "Lesson" ? ' aria-current="page"' : ""}>Lesson ${n}</a><a href="${base + questions[n - 1].route}"${d.kind === "Questions" ? ' aria-current="page"' : ""}>Questions <span>(${countQuestions(questions[n - 1])})</span></a><a href="${base + quizzes[n - 1].route}"${d.kind === "Quizzes" ? ' aria-current="page"' : ""}>Quizzes <span>(${quizData.get(quizzes[n - 1].source).questions.length})</span></a></nav>`
     : `<div class="eyebrow">Reference library</div>`;
   const prevNext = n
     ? `<nav class="page-navigation" aria-label="Lesson sequence">${n > 1 ? `<a href="${base + lessonDocs[n - 2].route}"><small>← Previous lesson</small>${escape(lessonDocs[n - 2].title)}</a>` : "<span></span>"}${n < 10 ? `<a href="${base + lessonDocs[n].route}"><small>Next lesson →</small>${escape(lessonDocs[n].title)}</a>` : `<a href="${base}reference/"><small>Keep nearby →</small>Reference library</a>`}</nav>`
@@ -284,7 +306,7 @@ for (const d of documents) {
     shell(
       d.title,
       d.route,
-      `<div class="reading-layout"><section>${modes}<article class="prose">${html}</article>${prevNext}</section></div>`,
+      `<div class="reading-layout"><section>${modes}<article class="prose${d.kind === "Quizzes" ? " quiz-page" : ""}">${html}</article>${prevNext}</section></div>${d.kind === "Quizzes" ? `<script type="module" src="${base}assets/quiz.js?v=${uiVersion}"></script>` : ""}`,
       d,
     ),
   );
@@ -301,7 +323,7 @@ write(
   shell(
     "Learn SAML with Okta",
     "",
-    `<div class="home"><section class="hero"><div><div class="eyebrow">SAML with Okta · Theory course</div><h1>Understand the exchange.<br>Think like an engineer.</h1><p class="intro">Follow Devi from her browser to Okta and into Atlas. Learn what each message means, why an application accepts it, and how to investigate when the journey stops.</p><a class="primary-link" href="${base + lessonDocs[0].route}">Start with Lesson 1 <span aria-hidden="true">→</span></a></div><div class="connection" aria-label="Three recurring participants"><div>Browser<small>The visible journey</small></div><div>Okta<small>Identity provider</small></div><div>Application<small>Trust and access</small></div></div></section><section aria-labelledby="course-outline"><div class="section-heading"><h2 id="course-outline">Your learning path</h2><small>10 lessons · Questions for every lesson</small></div><div class="course-list">${rows}</div></section><section class="reference-link"><strong>Need a field, flow or troubleshooting reminder?</strong><p>Use the reference library for message anatomy, trust, sessions, test planning and official sources.</p><a href="${base}reference/">Open the reference library →</a></section></div>`,
+    `<div class="home"><section class="hero"><div><div class="eyebrow">SAML with Okta · Theory course</div><h1>Understand the exchange.<br>Think like an engineer.</h1><p class="intro">Follow Devi from her browser to Okta and into Atlas. Learn what each message means, why an application accepts it, and how to investigate when the journey stops.</p><a class="primary-link" href="${base + lessonDocs[0].route}">Start with Lesson 1 <span aria-hidden="true">→</span></a></div><div class="connection" aria-label="Three recurring participants"><div>Browser<small>The visible journey</small></div><div>Okta<small>Identity provider</small></div><div>Application<small>Trust and access</small></div></div></section><section aria-labelledby="course-outline"><div class="section-heading"><h2 id="course-outline">Your learning path</h2><small>10 lessons · 200 interactive quiz questions</small></div><div class="course-list">${rows}</div></section><section class="reference-link"><strong>Need a field, flow or troubleshooting reminder?</strong><p>Use the reference library for message anatomy, trust, sessions, test planning and official sources.</p><a href="${base}reference/">Open the reference library →</a></section></div>`,
   ),
 );
 write(
@@ -328,7 +350,7 @@ write(
   shell(
     "Search the course",
     "search/",
-    `<div class="home"><div class="eyebrow">Find an explanation</div><div class="prose"><h1>Search the course</h1><p>Search lessons, questions and references. Try “RelayState”, “NameID” or “logout”.</p></div><label for="course-search" class="search-label">Search terms</label><div class="search-controls"><input type="search" id="course-search" autocomplete="off" placeholder="Search SAML with Okta"><button id="clear-search" type="button" onclick="document.querySelector('#course-search').value='';document.querySelector('#course-search').dispatchEvent(new Event('input'));document.querySelector('#course-search').focus()" hidden>Clear search</button></div><p id="search-count" class="search-count" role="status">Browse all ${documents.length} course pages below.</p><div id="no-results" class="empty" hidden>No matching pages. Try a shorter term, or browse the reference library.</div><ul class="search-results" id="search-results">${index.map((d) => `<li><small>${d.kind}</small><a href="${d.url}">${escape(d.title)}</a><p>${escape(d.description)}</p></li>`).join("")}</ul><script type="application/json" id="search-data">${JSON.stringify(index).replaceAll("<", "\\u003c")}</script><noscript><p>Search filtering requires JavaScript. All course links remain available above.</p></noscript></div>`,
+    `<div class="home"><div class="eyebrow">Find an explanation</div><div class="prose"><h1>Search the course</h1><p>Search lessons, questions, quizzes and references. Try “RelayState”, “NameID” or “logout”.</p></div><label for="course-search" class="search-label">Search terms</label><div class="search-controls"><input type="search" id="course-search" autocomplete="off" placeholder="Search SAML with Okta"><button id="clear-search" type="button" onclick="document.querySelector('#course-search').value='';document.querySelector('#course-search').dispatchEvent(new Event('input'));document.querySelector('#course-search').focus()" hidden>Clear search</button></div><p id="search-count" class="search-count" role="status">Browse all ${documents.length} course pages below.</p><div id="no-results" class="empty" hidden>No matching pages. Try a shorter term, or browse the reference library.</div><ul class="search-results" id="search-results">${index.map((d) => `<li><small>${d.kind}</small><a href="${d.url}">${escape(d.title)}</a><p>${escape(d.description)}</p></li>`).join("")}</ul><script type="application/json" id="search-data">${JSON.stringify(index).replaceAll("<", "\\u003c")}</script><noscript><p>Search filtering requires JavaScript. All course links remain available above.</p></noscript></div>`,
   ),
 );
 fs.writeFileSync(
@@ -360,6 +382,10 @@ fs.writeFileSync(
       documents: documents.map((d) => ({
         ...d,
         questions: d.kind === "Questions" ? countQuestions(d) : undefined,
+        quizzes:
+          d.kind === "Quizzes"
+            ? quizData.get(d.source).questions.length
+            : undefined,
       })),
       diagrams: Object.values(manifest).length,
     },

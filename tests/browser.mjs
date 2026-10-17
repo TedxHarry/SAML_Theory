@@ -57,7 +57,7 @@ try {
     );
   }
   results.push(
-    "All 34 navigable pages load without page-level overflow or script exceptions.",
+    `All ${manifest.documents.length + 3} navigable pages load without page-level overflow or script exceptions.`,
   );
   await page.goto(base);
   await page.evaluate(() => document.fonts.ready);
@@ -116,6 +116,130 @@ try {
   await summaries.nth(1).click();
   assert.equal(await page.locator("article details[open]").count(), 2);
   await audit(page, "questions");
+  await page.getByRole("link", { name: "Quizzes (20)" }).click();
+  assert(page.url().endsWith("/quizzes/lesson-01/"));
+  assert.equal(
+    await page.locator('.reading-modes [aria-current="page"]').innerText(),
+    "Quizzes (20)",
+  );
+  const quizBanks = manifest.documents.filter((d) => d.kind === "Quizzes");
+  const positions = new Set();
+  for (const bank of quizBanks) {
+    await page.goto(base + bank.route);
+    const data = JSON.parse(await page.locator("#quiz-data").textContent());
+    assert.equal(await page.locator(".quiz-card").count(), bank.quizzes);
+    for (const q of data.questions) {
+      const order = await page
+        .locator(`#${q.id} input`)
+        .evaluateAll((nodes) => nodes.map((n) => n.value));
+      positions.add(order.indexOf(q.correctId));
+    }
+    const q = data.questions[0];
+    const card = page.locator(`#${q.id}`);
+    const wrong = q.options.find((o) => o.id !== q.correctId);
+    await card.locator(`input[value="${wrong.id}"]`).check();
+    assert(
+      (await card.locator(".quiz-result").innerText()).includes(
+        "Your selected answer is incorrect",
+      ),
+    );
+    assert(
+      (await card.locator(".quiz-result").innerText()).includes(
+        wrong.explanation,
+      ),
+    );
+    assert(
+      (await card.locator(".quiz-result").innerText()).includes(
+        q.options.find((o) => o.id === q.correctId).text,
+      ),
+    );
+    assert.equal(
+      await page.locator("#quiz-progress").innerText(),
+      "1 of 20 answered",
+    );
+    assert.equal(await page.locator(".quiz-feedback:visible").count(), 1);
+    const groupBox = await card.locator("fieldset").boundingBox();
+    const feedbackBox = await card.locator(".quiz-feedback").boundingBox();
+    assert(feedbackBox.y >= groupBox.y + groupBox.height);
+    await card.locator(`input[value="${q.correctId}"]`).check();
+    assert.equal(await card.locator(".quiz-verdict").innerText(), "Correct.");
+    assert(
+      (await card.locator(".quiz-announcement").textContent()).includes(
+        "Correct answer:",
+      ),
+    );
+    assert.equal(
+      await page.locator("#quiz-progress").innerText(),
+      "1 of 20 answered",
+    );
+    await card.getByText("Understand every option", { exact: true }).click();
+    assert.equal(await card.locator(".quiz-rationales li").count(), 4);
+  }
+  assert.equal(
+    positions.size,
+    4,
+    "Correct answers must appear across all four positions",
+  );
+  await page.goto(base + "quizzes/lesson-01/");
+  const firstCard = page.locator(".quiz-card").first();
+  const orderBefore = await firstCard
+    .locator("input")
+    .evaluateAll((nodes) => nodes.map((n) => n.value));
+  await firstCard.locator("input").first().focus();
+  await page.keyboard.press("Space");
+  await page.keyboard.press("ArrowDown");
+  assert.equal(
+    await firstCard.locator("input:checked").inputValue(),
+    orderBefore[1],
+  );
+  const firstFeedback = await firstCard.locator(".quiz-result").innerText();
+  await page.locator(".quiz-card").nth(1).locator("input").first().check();
+  assert.equal(
+    await firstCard.locator(".quiz-result").innerText(),
+    firstFeedback,
+  );
+  assert.equal(
+    await page.locator("#quiz-progress").innerText(),
+    "2 of 20 answered",
+  );
+  await firstCard.getByText("Understand every option", { exact: true }).click();
+  await audit(page, "quizzes-feedback");
+  await page.evaluate(() => scrollTo(0, 0));
+  await page.screenshot({ path: `${dir}/quizzes-desktop.png` });
+  await page.reload();
+  assert.equal(await page.locator("input:checked").count(), 0);
+  assert.equal(await page.locator(".quiz-feedback:visible").count(), 0);
+  const orderAfter = await firstCard
+    .locator("input")
+    .evaluateAll((nodes) => nodes.map((n) => n.value));
+  // Randomness itself is covered deterministically in the unit suite; test the live page uses it too.
+  const randomPage = await context.newPage();
+  await randomPage.addInitScript(() => {
+    Math.random = () => 0.999;
+  });
+  await randomPage.goto(base + "quizzes/lesson-01/");
+  const highOrder = await randomPage
+    .locator(".quiz-card")
+    .first()
+    .locator("input")
+    .evaluateAll((nodes) => nodes.map((n) => n.value));
+  const lowPage = await context.newPage();
+  await lowPage.addInitScript(() => {
+    Math.random = () => 0;
+  });
+  await lowPage.goto(base + "quizzes/lesson-01/");
+  const lowOrder = await lowPage
+    .locator(".quiz-card")
+    .first()
+    .locator("input")
+    .evaluateAll((nodes) => nodes.map((n) => n.value));
+  assert.notDeepEqual(highOrder, lowOrder);
+  assert.deepEqual([...orderBefore].sort(), [...orderAfter].sort());
+  await randomPage.close();
+  await lowPage.close();
+  results.push(
+    "All 10 quiz banks: correct/incorrect feedback, answer changes, four explanations, independent state, keyboard selection, shuffled positions and fresh-visit reset pass.",
+  );
   await page.getByRole("link", { name: "Search", exact: true }).click();
   const input = page.getByRole("searchbox", { name: "Search terms" });
   await input.fill("RelayState");
@@ -126,7 +250,10 @@ try {
   await input.fill("no-such-topic-zzz");
   assert.equal(await page.locator("#no-results").isVisible(), true);
   await page.getByRole("button", { name: "Clear search" }).click();
-  assert.equal(await page.locator("#search-results li").count(), 31);
+  assert.equal(
+    await page.locator("#search-results li").count(),
+    manifest.documents.length,
+  );
   assert.equal(
     await input.evaluate((el) => el === document.activeElement),
     true,
@@ -140,6 +267,7 @@ try {
     ["home", ""],
     ["lesson", manifest.documents[0].route],
     ["questions", "questions/lesson-01/"],
+    ["quizzes", "quizzes/lesson-01/"],
     ["reference", "reference/"],
   ]) {
     await page.goto(base + route);
@@ -157,6 +285,35 @@ try {
     });
     await audit(page, `${name}-mobile`);
   }
+  await page.goto(base + "quizzes/lesson-01/");
+  await page.locator(".quiz-card").first().locator("input").first().check();
+  await page
+    .locator(".quiz-card")
+    .first()
+    .getByText("Understand every option", { exact: true })
+    .click();
+  await audit(page, "quizzes-mobile-feedback");
+  await page.locator(".quiz-card").first().locator("input:checked").focus();
+  await page.screenshot({ path: `${dir}/quizzes-mobile-viewport.png` });
+  await page
+    .locator(".quiz-card")
+    .first()
+    .screenshot({ path: `${dir}/quiz-card-mobile.png` });
+  await page.setViewportSize({ width: 320, height: 740 });
+  for (const bank of quizBanks) {
+    await page.goto(base + bank.route);
+    assert.equal(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth + 1,
+      ),
+      true,
+      `Narrow quiz: ${bank.route}`,
+    );
+    const tabs = page.locator(".reading-modes a");
+    assert.equal(await tabs.count(), 3);
+    for (const tab of await tabs.all()) assert(await tab.isVisible());
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(base + manifest.documents[0].route);
   await page.getByText("Browse lessons", { exact: true }).click();
   assert.equal(await page.locator(".course-menu").getAttribute("open"), "");
@@ -179,6 +336,18 @@ try {
   await fallback.goto(base + "questions/lesson-01/");
   await fallback.locator("article summary").first().click();
   assert.equal(await fallback.locator("article details[open]").count(), 1);
+  await fallback.goto(base + "quizzes/lesson-01/");
+  assert.equal(await fallback.locator(".quiz-options:visible").count(), 0);
+  await fallback
+    .getByText("Show answer and explanations", { exact: true })
+    .first()
+    .click();
+  assert.equal(await fallback.locator(".quiz-card details[open]").count(), 1);
+  assert(
+    (await fallback.locator(".quiz-card details[open]").innerText()).includes(
+      "Correct answer:",
+    ),
+  );
   await fallback.goto(base + manifest.documents[0].route);
   await fallback
     .getByRole("link", { name: "Open full diagram" })

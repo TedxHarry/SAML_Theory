@@ -1,0 +1,566 @@
+{
+  "schemaVersion": 1,
+  "lesson": 6,
+  "questions": [
+    {
+      "id": "L06-Q01",
+      "topic": "Signing purpose",
+      "prompt": "An assertion is signed but not encrypted. Which protection does a properly verified signature provide?",
+      "correctId": "50f5f6da93",
+      "options": [
+        {
+          "id": "50f5f6da93",
+          "text": "Integrity and authentication of the protected content under the trusted signing key",
+          "explanation": "Verification links the protected content to the expected signer and detects unauthorized changes."
+        },
+        {
+          "id": "7d65a7b25d",
+          "text": "Secrecy of every attribute from anyone holding the XML",
+          "explanation": "Signing does not hide readable content."
+        },
+        {
+          "id": "08621eea57",
+          "text": "Automatic authorization for all resources",
+          "explanation": "A signature does not define the application's access policy."
+        },
+        {
+          "id": "8fd64a69ed",
+          "text": "Guaranteed deletion of every browser copy",
+          "explanation": "A signature does not erase captured data."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q02",
+      "topic": "Encryption purpose",
+      "prompt": "Atlas decrypts an assertion with its private key. What protection is encryption primarily intended to provide?",
+      "correctId": "e5b36222df",
+      "options": [
+        {
+          "id": "e5b36222df",
+          "text": "Confidentiality of the encrypted content for the intended recipient",
+          "explanation": "Encryption limits readability, while issuer authenticity and acceptance require additional checks."
+        },
+        {
+          "id": "f50202104d",
+          "text": "Proof that every field outside the encrypted assertion is trusted",
+          "explanation": "Protection applies to the relevant layer, not arbitrary surrounding fields."
+        },
+        {
+          "id": "081872006b",
+          "text": "Proof that the user has an active Atlas account",
+          "explanation": "Account eligibility is not a cryptographic decryption result."
+        },
+        {
+          "id": "aefe1515f2",
+          "text": "A permanent replacement for HTTPS",
+          "explanation": "Transport protection remains important even when XML content is encrypted."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q03",
+      "topic": "Key ownership",
+      "prompt": "Okta signs assertions sent to Atlas. Who should hold the signing private key?",
+      "correctId": "9813bc07d6",
+      "options": [
+        {
+          "id": "9813bc07d6",
+          "text": "Okta's signing infrastructure",
+          "explanation": "The signer controls the private key; Atlas verifies using independently trusted public-key material."
+        },
+        {
+          "id": "775bcf187c",
+          "text": "Every user's browser",
+          "explanation": "Browsers should not receive the provider's signing private key."
+        },
+        {
+          "id": "2a21f9cb08",
+          "text": "Atlas's public metadata file",
+          "explanation": "Metadata distributes appropriate public material rather than the signing private key."
+        },
+        {
+          "id": "57cbf0e835",
+          "text": "Atlas's verification service",
+          "explanation": "The receiver needs trusted public material for verification, not control of the sender's signing private key."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q04",
+      "topic": "Decryption ownership",
+      "prompt": "Okta encrypts assertions for Atlas. Which key arrangement fits that direction?",
+      "correctId": "06fb16a813",
+      "options": [
+        {
+          "id": "06fb16a813",
+          "text": "Okta uses Atlas's encryption public key; Atlas holds the corresponding private key",
+          "explanation": "Recipient key ownership allows the recipient to decrypt without sharing its private key."
+        },
+        {
+          "id": "44854df2bf",
+          "text": "Okta encrypts using Atlas's private key obtained from the browser",
+          "explanation": "The recipient's private key should remain under recipient control."
+        },
+        {
+          "id": "6b25921295",
+          "text": "Atlas decrypts using Okta's signing certificate alone",
+          "explanation": "The provider's signing public key is not Atlas's decryption private key."
+        },
+        {
+          "id": "c90f0ea479",
+          "text": "The user's password always decrypts the assertion",
+          "explanation": "XML encryption does not imply user-password-based decryption."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q05",
+      "topic": "Embedded certificates",
+      "prompt": "An untrusted incoming assertion includes a certificate in KeyInfo. How should Atlas treat it?",
+      "correctId": "bbb906138b",
+      "options": [
+        {
+          "id": "bbb906138b",
+          "text": "As message-supplied material that must not establish trust by itself",
+          "explanation": "The receiver needs an independently established trust anchor or approved key resolution policy."
+        },
+        {
+          "id": "5970a98c4a",
+          "text": "As automatic authority to authenticate any issuer",
+          "explanation": "An attacker can include a certificate in a message."
+        },
+        {
+          "id": "3888675808",
+          "text": "As proof the browser authenticated the issuer",
+          "explanation": "The browser does not make an embedded signing key trusted."
+        },
+        {
+          "id": "aa5ce75e4d",
+          "text": "As a replacement for checking the expected issuer",
+          "explanation": "Even a usable verification key must be associated with the expected trusted provider and integration."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q06",
+      "topic": "Certificate fingerprint",
+      "prompt": "An engineer compares a new signing certificate's fingerprint with a value received through an authenticated change process. Why?",
+      "correctId": "56682cc227",
+      "options": [
+        {
+          "id": "56682cc227",
+          "text": "To confirm the intended public key material before trusting it",
+          "explanation": "Fingerprint comparison is useful only when the expected value comes through an appropriate trusted channel."
+        },
+        {
+          "id": "86b5989d51",
+          "text": "To decrypt every assertion with the fingerprint",
+          "explanation": "A fingerprint is a digest identifier, not a decryption key."
+        },
+        {
+          "id": "4717e40ce8",
+          "text": "To establish that the certificate was active when the assertion was issued",
+          "explanation": "A matching fingerprint identifies material; activation timing requires separate issuance and configuration evidence."
+        },
+        {
+          "id": "6681fc0737",
+          "text": "To prove the application has refreshed all nodes",
+          "explanation": "Identity of the file and runtime adoption are separate facts."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q07",
+      "topic": "Protection scope",
+      "prompt": "Only the Assertion is signed. Which content is directly protected by that assertion signature?",
+      "correctId": "6332bc6494",
+      "options": [
+        {
+          "id": "6332bc6494",
+          "text": "The referenced assertion content within the verified signature scope",
+          "explanation": "An assertion signature does not automatically cover surrounding Response fields."
+        },
+        {
+          "id": "f22faef83c",
+          "text": "Every HTTP header on the POST",
+          "explanation": "The XML signature does not cover arbitrary transport headers."
+        },
+        {
+          "id": "438189882a",
+          "text": "Any separate RelayState form value automatically",
+          "explanation": "A separate binding field is outside the assertion signature's scope."
+        },
+        {
+          "id": "564cf90240",
+          "text": "Every sibling Assertion in the same Response",
+          "explanation": "A signature protects its actual references and scope, not every neighboring XML object."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q08",
+      "topic": "Verified versus consumed",
+      "prompt": "A receiver verifies one Assertion but builds the user session from another unsigned Assertion in the same document. What is wrong?",
+      "correctId": "e2d01832d6",
+      "options": [
+        {
+          "id": "e2d01832d6",
+          "text": "The application consumed identity data from an object it did not authenticate",
+          "explanation": "The trusted, verified object must be the one used for identity and access decisions."
+        },
+        {
+          "id": "7e00f7d992",
+          "text": "Nothing, because any signature covers every sibling element",
+          "explanation": "Signature coverage follows references and transforms, not mere proximity."
+        },
+        {
+          "id": "b39e685194",
+          "text": "Only the display font is wrong",
+          "explanation": "This is a trust-boundary error, not presentation."
+        },
+        {
+          "id": "696e5dfc48",
+          "text": "The XML must simply be Base64-encoded again",
+          "explanation": "Encoding does not repair consuming unverified content."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q09",
+      "topic": "Digest versus trust",
+      "prompt": "A message's digest matches after processing its signature references. Is that alone enough to trust the issuer?",
+      "correctId": "0483396881",
+      "options": [
+        {
+          "id": "0483396881",
+          "text": "No; the signature must also verify under the expected trusted key and allowed processing rules",
+          "explanation": "Content digest agreement is only part of signature validation and trust evaluation."
+        },
+        {
+          "id": "fc8b9feeb1",
+          "text": "Yes; any matching digest identifies the intended IdP",
+          "explanation": "A digest does not establish who is trusted to sign."
+        },
+        {
+          "id": "d0bd1e09db",
+          "text": "Yes; a matching digest means the embedded certificate is trusted",
+          "explanation": "Digest correctness does not establish independent trust in the key supplied with the message."
+        },
+        {
+          "id": "481665ece5",
+          "text": "No; SAML never uses digests",
+          "explanation": "XML signatures use digests, but those digests are not a complete trust decision."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q10",
+      "topic": "Canonicalization",
+      "prompt": "Why do XML signatures use defined canonicalization and transforms?",
+      "correctId": "cb98cceedd",
+      "options": [
+        {
+          "id": "cb98cceedd",
+          "text": "To derive the specified representation of referenced XML for signature processing",
+          "explanation": "Both sides need precise processing rules. Canonicalization is not permission to consume a different object."
+        },
+        {
+          "id": "9d57b14eb8",
+          "text": "To decide which local account matches the signed NameID",
+          "explanation": "Canonicalization concerns cryptographic XML representation, not account-resolution policy."
+        },
+        {
+          "id": "0319150bc0",
+          "text": "To encrypt all visible XML tags",
+          "explanation": "Canonicalization does not provide encryption."
+        },
+        {
+          "id": "9bc71debd0",
+          "text": "To make every modified XML document acceptable",
+          "explanation": "Unauthorized modifications can still invalidate the protected content."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q11",
+      "topic": "Algorithm policy",
+      "prompt": "A receiver can technically process an old signature algorithm that the integration's security policy disallows. What should it do?",
+      "correctId": "8b26f59450",
+      "options": [
+        {
+          "id": "8b26f59450",
+          "text": "Enforce its approved algorithm policy",
+          "explanation": "Parser or library capability does not make every available algorithm acceptable."
+        },
+        {
+          "id": "f392a594b2",
+          "text": "Accept any algorithm that decodes",
+          "explanation": "Decoding and cryptographic policy are different checks."
+        },
+        {
+          "id": "3a4145f547",
+          "text": "Let the browser choose a weaker algorithm after failure",
+          "explanation": "The browser should not override receiver policy."
+        },
+        {
+          "id": "7fb8eb45d4",
+          "text": "Ignore the signature whenever an algorithm is unfamiliar",
+          "explanation": "The correct response is controlled rejection, not skipping protection."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q12",
+      "topic": "Encrypted content authenticity",
+      "prompt": "Why is successful decryption alone insufficient to trust an assertion's issuer?",
+      "correctId": "502beacc1c",
+      "options": [
+        {
+          "id": "502beacc1c",
+          "text": "Anyone able to obtain the recipient's public encryption key may be able to encrypt content for that recipient",
+          "explanation": "Encryption to a recipient is not, by itself, authentication of the expected sender."
+        },
+        {
+          "id": "1a4e0adef1",
+          "text": "Only the genuine IdP can ever know an SP's public key",
+          "explanation": "Public-key material is intentionally distributable."
+        },
+        {
+          "id": "06d937c2b8",
+          "text": "Decryption always validates audience and replay state",
+          "explanation": "Those are separate acceptance checks."
+        },
+        {
+          "id": "95ad373ca9",
+          "text": "Encryption forces the SP account to exist",
+          "explanation": "Encryption has no such lifecycle effect."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q13",
+      "topic": "Signed envelope",
+      "prompt": "A Response signature correctly covers the Response and its nested Assertion. May the SP consume identity from an unrelated unsigned XML object elsewhere?",
+      "correctId": "99ea8097f0",
+      "options": [
+        {
+          "id": "99ea8097f0",
+          "text": "No; identity must come from the object authenticated by the verified protection scope",
+          "explanation": "A valid envelope signature is useful only when processing remains bound to the content it protects."
+        },
+        {
+          "id": "b468bfd3c2",
+          "text": "Yes, if the unrelated object has a familiar display name",
+          "explanation": "Familiar text does not authenticate an XML object."
+        },
+        {
+          "id": "24845e6ad0",
+          "text": "Yes, because the whole browser tab is signed",
+          "explanation": "XML signatures do not sign browser tabs."
+        },
+        {
+          "id": "7c7315a5ba",
+          "text": "Only if the object is indented the same way",
+          "explanation": "Indentation is not a trust relationship."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q14",
+      "topic": "Signing rollover",
+      "prompt": "Okta will begin signing with K2 instead of K1. What should happen before activation when the SP supports overlapping trusted keys?",
+      "correctId": "ff8cb79859",
+      "options": [
+        {
+          "id": "ff8cb79859",
+          "text": "Distribute and verify K2 trust across the actual validating receivers",
+          "explanation": "Preparing receiver trust before issuance switches prevents rejection of the new signatures."
+        },
+        {
+          "id": "4900e80fc6",
+          "text": "Remove K1 everywhere before distributing K2",
+          "explanation": "That can leave no usable trust during the transition."
+        },
+        {
+          "id": "bed07d79fa",
+          "text": "Send K2's private key to the SP",
+          "explanation": "Verification requires public material, not the provider's private key."
+        },
+        {
+          "id": "b6452fead0",
+          "text": "Change only the user's display name",
+          "explanation": "User profile labels do not configure signature trust."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q15",
+      "topic": "Runtime adoption",
+      "prompt": "A load-balanced SP has K2 installed on two nodes but not a third. What symptom is plausible after issuance switches to K2?",
+      "correctId": "d999528e60",
+      "options": [
+        {
+          "id": "d999528e60",
+          "text": "Intermittent signature failures depending on the validating node",
+          "explanation": "Configuration must be adopted by every active validator, not merely saved centrally."
+        },
+        {
+          "id": "07d1fc1da9",
+          "text": "All nodes necessarily succeed because the browser caches K2",
+          "explanation": "Browser caching does not update server-side trust stores."
+        },
+        {
+          "id": "856efb9b27",
+          "text": "Every user must receive a wrong password message from Okta",
+          "explanation": "The failure occurs at SP verification after issuance."
+        },
+        {
+          "id": "5404e73707",
+          "text": "Every failure must be an expired assertion",
+          "explanation": "The stated node-specific trust mismatch points to verification, not necessarily to time conditions."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q16",
+      "topic": "Key retirement",
+      "prompt": "When is retiring K1 most defensible during a planned, uncompromised signing rollover?",
+      "correctId": "861d22089a",
+      "options": [
+        {
+          "id": "861d22089a",
+          "text": "After confirming K2 adoption and the agreed overlap and outstanding-message handling",
+          "explanation": "Retirement should follow actual receiver readiness and the transition's defined acceptance window."
+        },
+        {
+          "id": "570fbf2fac",
+          "text": "Immediately when a new file is downloaded",
+          "explanation": "Downloading does not prove activation or adoption."
+        },
+        {
+          "id": "75550caa0e",
+          "text": "Never; every historical key must remain trusted forever",
+          "explanation": "Indefinite trust is not a controlled rollover policy."
+        },
+        {
+          "id": "1783acbbf8",
+          "text": "After one user reaches an app page using an old local session",
+          "explanation": "An existing session may bypass federation and therefore does not prove new-key adoption."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q17",
+      "topic": "Compromised keys",
+      "prompt": "K1 is suspected compromised during a move to K2. Why is an automatic rollback to K1 inappropriate?",
+      "correctId": "59f497b776",
+      "options": [
+        {
+          "id": "59f497b776",
+          "text": "Rollback could restore trust in material that may be controlled by an attacker",
+          "explanation": "Recovery must account for the reason the old key was removed, not just restore availability."
+        },
+        {
+          "id": "f3cfb60b73",
+          "text": "A compromised key becomes safer with age",
+          "explanation": "Time does not restore key secrecy."
+        },
+        {
+          "id": "67dbfc78ca",
+          "text": "Public keys must be kept secret forever",
+          "explanation": "The sensitive material is the private key; public-key distribution is normal."
+        },
+        {
+          "id": "9053b6242a",
+          "text": "Every rollback automatically recreates accounts",
+          "explanation": "Account creation is a different concern."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q18",
+      "topic": "Single-key receivers",
+      "prompt": "An SP can trust only one signing key at a time. What changes in the rollover plan?",
+      "correctId": "90c35cb494",
+      "options": [
+        {
+          "id": "90c35cb494",
+          "text": "The switch requires a coordinated cutover and explicit recovery plan for that limitation",
+          "explanation": "Overlap cannot be assumed when the product cannot hold two keys."
+        },
+        {
+          "id": "15345475ec",
+          "text": "The SP can still verify K1 and K2 simultaneously by renaming the certificate",
+          "explanation": "A filename does not add multi-key capability."
+        },
+        {
+          "id": "129943999d",
+          "text": "No testing is needed",
+          "explanation": "A more constrained transition particularly needs validation."
+        },
+        {
+          "id": "eb530ee298",
+          "text": "The provider should share its private key to bypass the limitation",
+          "explanation": "Private-key sharing is not a valid rollover workaround."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q19",
+      "topic": "Key purpose",
+      "prompt": "Atlas's decryption key rotates, but Okta's signing key stays unchanged. Which configuration is principally affected?",
+      "correctId": "94154996b9",
+      "options": [
+        {
+          "id": "94154996b9",
+          "text": "The public encryption key Okta uses for Atlas and Atlas's matching decryption private key",
+          "explanation": "Encryption and signing keys have different directions and owners even if managed near each other."
+        },
+        {
+          "id": "714645bace",
+          "text": "Only the user's browser bookmarks",
+          "explanation": "Bookmarks do not configure XML encryption."
+        },
+        {
+          "id": "76e48015f2",
+          "text": "Every IdP signing key necessarily changes",
+          "explanation": "Rotating recipient encryption material does not inherently rotate the sender's signing material."
+        },
+        {
+          "id": "ef593eb6ad",
+          "text": "The NameID format automatically changes",
+          "explanation": "Key rotation does not define identifier semantics."
+        }
+      ]
+    },
+    {
+      "id": "L06-Q20",
+      "topic": "Certificate trust model",
+      "prompt": "An SP pins a SAML signing certificate through authenticated metadata. What should an engineer avoid assuming?",
+      "correctId": "3c94b505b7",
+      "options": [
+        {
+          "id": "3c94b505b7",
+          "text": "That SAML key trust is automatically identical to ordinary browser HTTPS certificate validation",
+          "explanation": "Federation deployments can use metadata or explicit trust configurations rather than the browser's public Web PKI decision model."
+        },
+        {
+          "id": "f9615710f5",
+          "text": "That the public key can verify a signature",
+          "explanation": "That is its intended verification role."
+        },
+        {
+          "id": "5886289872",
+          "text": "That the issuer must be checked",
+          "explanation": "Issuer checks remain necessary."
+        },
+        {
+          "id": "ea0211b106",
+          "text": "That changes need a controlled process",
+          "explanation": "A controlled trust update is appropriate."
+        }
+      ]
+    }
+  ]
+}

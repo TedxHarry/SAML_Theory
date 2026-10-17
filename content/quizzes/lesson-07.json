@@ -1,0 +1,566 @@
+{
+  "schemaVersion": 1,
+  "lesson": 7,
+  "questions": [
+    {
+      "id": "L07-Q01",
+      "topic": "Safe XML processing",
+      "prompt": "An ACS receives XML containing an external entity that attempts to read a local server file. What should protect the receiver?",
+      "correctId": "3f9d98405b",
+      "options": [
+        {
+          "id": "3f9d98405b",
+          "text": "A hardened XML parser with external entity resolution disabled and controlled input limits",
+          "explanation": "Safe parsing is a prerequisite to processing untrusted protocol input."
+        },
+        {
+          "id": "8c0812d29b",
+          "text": "Trusting the XML because it arrived over HTTPS",
+          "explanation": "HTTPS does not make an arbitrary sender's XML safe."
+        },
+        {
+          "id": "43918bbc8c",
+          "text": "Base64-decoding twice",
+          "explanation": "Decoding does not prevent XML external entity attacks."
+        },
+        {
+          "id": "8ea6364db9",
+          "text": "Checking the user's display name first",
+          "explanation": "Identity fields cannot make unsafe parser behavior acceptable."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q02",
+      "topic": "Structure versus trust",
+      "prompt": "A Response passes schema validation. What has this established?",
+      "correctId": "968147cfa4",
+      "options": [
+        {
+          "id": "968147cfa4",
+          "text": "Its structure meets the checked schema constraints, not that the issuer is trusted",
+          "explanation": "Structural validity and authenticated origin are different requirements."
+        },
+        {
+          "id": "94de6771cb",
+          "text": "Its signature must be valid",
+          "explanation": "A schema does not perform cryptographic verification."
+        },
+        {
+          "id": "4fd4a0d366",
+          "text": "Its audience must be the correct SP",
+          "explanation": "A structurally valid audience value can still target another application."
+        },
+        {
+          "id": "1c743ebc20",
+          "text": "The local account must be active",
+          "explanation": "Schema checks do not query the local account lifecycle."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q03",
+      "topic": "Expected issuer",
+      "prompt": "Atlas trusts Okta tenant A for an integration. A response claims tenant B as issuer. What is required?",
+      "correctId": "616d1a7532",
+      "options": [
+        {
+          "id": "616d1a7532",
+          "text": "Reject or handle it through a separately configured, explicitly expected trust relationship",
+          "explanation": "The expected issuer must be tied to the actual integration and transaction."
+        },
+        {
+          "id": "2e76347ace",
+          "text": "Accept any issuer containing the word Okta",
+          "explanation": "A brand name is not a trust boundary."
+        },
+        {
+          "id": "7082278c50",
+          "text": "Replace tenant B's issuer with tenant A's string",
+          "explanation": "Editing the message does not authenticate its origin."
+        },
+        {
+          "id": "8ef492be47",
+          "text": "Accept it if another integration already trusts tenant B",
+          "explanation": "A provider trusted for one integration is not automatically the expected issuer for this transaction."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q04",
+      "topic": "Required signatures",
+      "prompt": "A response contains a signature, but it does not protect the content the receiver's profile requires. What should the SP do?",
+      "correctId": "2287cadcaa",
+      "options": [
+        {
+          "id": "2287cadcaa",
+          "text": "Reject the insufficient protection",
+          "explanation": "Signature presence is not enough; required content and trusted verification must align."
+        },
+        {
+          "id": "85921d28a6",
+          "text": "Accept because any Signature element satisfies every profile",
+          "explanation": "Coverage and verification are essential."
+        },
+        {
+          "id": "2b39d38afd",
+          "text": "Accept if the signed part contains a matching display name",
+          "explanation": "Readable matching text does not compensate for missing protection of the content actually required and consumed."
+        },
+        {
+          "id": "5ea023146d",
+          "text": "Copy the signature onto another element",
+          "explanation": "Signatures cannot be transferred to authenticate different content."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q05",
+      "topic": "Audience",
+      "prompt": "Atlas's entity ID is urn:atlas:prod. An assertion permits only urn:ledger:prod. What follows?",
+      "correctId": "e535040864",
+      "options": [
+        {
+          "id": "e535040864",
+          "text": "Atlas must reject the audience mismatch",
+          "explanation": "The assertion is restricted to a different relying party."
+        },
+        {
+          "id": "bc387f78d9",
+          "text": "Atlas should accept because both applications use Okta",
+          "explanation": "Shared IdP use does not make audiences interchangeable."
+        },
+        {
+          "id": "937b8af53a",
+          "text": "Atlas should rename itself for this sign-in",
+          "explanation": "Incoming data must not redefine the SP's trusted identity."
+        },
+        {
+          "id": "b96e7e5cf7",
+          "text": "The browser should remove AudienceRestriction",
+          "explanation": "Removing a restriction does not produce a trustworthy assertion."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q06",
+      "topic": "Recipient",
+      "prompt": "An assertion's applicable bearer confirmation names a staging ACS, while the response is being processed at the production ACS. What is the issue?",
+      "correctId": "b27c6dadb2",
+      "options": [
+        {
+          "id": "b27c6dadb2",
+          "text": "The confirmation is not addressed to the actual intended receiving endpoint",
+          "explanation": "Recipient validation ties the bearer confirmation to the appropriate receiver."
+        },
+        {
+          "id": "a3bec1a258",
+          "text": "Only the audience needs checking because it identifies the app",
+          "explanation": "Audience and bearer Recipient are distinct targeting requirements; a correct audience does not repair the endpoint mismatch."
+        },
+        {
+          "id": "9914cba017",
+          "text": "The signing key must necessarily be expired",
+          "explanation": "Target mismatch and key validity are separate checks."
+        },
+        {
+          "id": "bba4544df9",
+          "text": "The assertion must be accepted because staging and production share a company",
+          "explanation": "Environment boundaries remain meaningful within one organization."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q07",
+      "topic": "Destination",
+      "prompt": "A Response includes Destination pointing to a different endpoint from the receiving ACS. What should the receiver do?",
+      "correctId": "38c0a353cb",
+      "options": [
+        {
+          "id": "38c0a353cb",
+          "text": "Enforce the applicable Destination check and reject the mismatch",
+          "explanation": "Destination is an envelope-target check, distinct from audience and bearer Recipient."
+        },
+        {
+          "id": "943df0681e",
+          "text": "Ignore it if NameID looks correct",
+          "explanation": "Identity text does not repair an envelope target mismatch."
+        },
+        {
+          "id": "368c65c3c6",
+          "text": "Treat Destination as the subject's account ID",
+          "explanation": "It identifies a message destination."
+        },
+        {
+          "id": "76e8367a58",
+          "text": "Use it as the post-login resource without checks",
+          "explanation": "Protocol targeting and application navigation are different concerns."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q08",
+      "topic": "Combined restrictions",
+      "prompt": "An assertion has two AudienceRestriction elements. Atlas satisfies one but not the other. Is satisfying one enough?",
+      "correctId": "1533437a5a",
+      "options": [
+        {
+          "id": "1533437a5a",
+          "text": "No; separate AudienceRestriction conditions must all be satisfied",
+          "explanation": "Alternative audiences inside one restriction differ from multiple restrictions that apply together."
+        },
+        {
+          "id": "1c8252461c",
+          "text": "Yes; all AudienceRestriction elements are always alternatives",
+          "explanation": "That confuses alternatives within a condition with the combination of separate conditions."
+        },
+        {
+          "id": "d4a4c92870",
+          "text": "Yes; a signature removes audience restrictions",
+          "explanation": "Signing protects the restrictions rather than cancelling them."
+        },
+        {
+          "id": "70ab8e6ecd",
+          "text": "Yes, if Conditions has not expired",
+          "explanation": "Timing does not remove the separate requirement to satisfy the audience restrictions."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q09",
+      "topic": "Future validity",
+      "prompt": "It is 09:58 at the receiver, and an assertion has NotBefore=10:00. No clock tolerance applies. What should happen?",
+      "correctId": "0d2cebf26f",
+      "options": [
+        {
+          "id": "0d2cebf26f",
+          "text": "Do not accept it yet",
+          "explanation": "The lower bound has not been reached."
+        },
+        {
+          "id": "27a5ff9521",
+          "text": "Accept because expiry is later",
+          "explanation": "Both applicable lower and upper time limits matter."
+        },
+        {
+          "id": "2619660af3",
+          "text": "Rewrite the SP clock based on the assertion",
+          "explanation": "Untrusted input should not set the server's clock."
+        },
+        {
+          "id": "cd82f2478a",
+          "text": "Assume NotBefore is only decorative",
+          "explanation": "It expresses a validity condition."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q10",
+      "topic": "Clock tolerance",
+      "prompt": "An assertion narrowly misses a time check. What is an appropriate engineering response?",
+      "correctId": "684594829a",
+      "options": [
+        {
+          "id": "684594829a",
+          "text": "Check synchronized clocks, actual timestamps, delivery delays and the configured bounded tolerance",
+          "explanation": "Tolerance is a controlled allowance, not a substitute for understanding the timing evidence."
+        },
+        {
+          "id": "ff35f07b93",
+          "text": "Disable all expiry checks",
+          "explanation": "That would remove replay and freshness protections."
+        },
+        {
+          "id": "31f580be18",
+          "text": "Increase tolerance indefinitely until every assertion works",
+          "explanation": "An unbounded window undermines the intended restriction."
+        },
+        {
+          "id": "056882dd3a",
+          "text": "Treat the IdP's clock as authoritative and ignore the receiver's time",
+          "explanation": "Acceptance needs a trustworthy time basis; blindly adopting incoming timestamps defeats expiry checks."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q11",
+      "topic": "Bearer confirmation alternatives",
+      "prompt": "An assertion contains two bearer SubjectConfirmation alternatives. One has the right recipient but an expired deadline; the other is timely but has the wrong recipient. What should the SP do?",
+      "correctId": "fe7f136f94",
+      "options": [
+        {
+          "id": "fe7f136f94",
+          "text": "Reject because no single applicable confirmation satisfies all required checks",
+          "explanation": "Required fields must hold together within an acceptable confirmation; successful fragments cannot be mixed across alternatives."
+        },
+        {
+          "id": "3cd9bc5f62",
+          "text": "Combine the good recipient from one with the good time from the other",
+          "explanation": "That constructs a confirmation the issuer did not provide."
+        },
+        {
+          "id": "288a288b4a",
+          "text": "Accept because two confirmations are stronger than one",
+          "explanation": "Quantity does not compensate for invalid alternatives."
+        },
+        {
+          "id": "b5bfedd023",
+          "text": "Ignore both confirmations and use the display name",
+          "explanation": "Bearer acceptance requires valid subject confirmation, not a name check."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q12",
+      "topic": "Request correlation",
+      "prompt": "A signed response names an SP request that belongs to a different browser transaction. What must still be checked?",
+      "correctId": "df17ecfd46",
+      "options": [
+        {
+          "id": "df17ecfd46",
+          "text": "The response must match the protected context of the actual sign-in transaction",
+          "explanation": "A real request ID elsewhere in the store is not enough when it belongs to another context."
+        },
+        {
+          "id": "46fe3f5278",
+          "text": "Only whether the ID starts with an underscore",
+          "explanation": "Syntax does not establish transaction binding."
+        },
+        {
+          "id": "4341920409",
+          "text": "Only whether the assertion's audience names Atlas",
+          "explanation": "Audience is necessary but does not establish the correct browser transaction or pending request context."
+        },
+        {
+          "id": "3bd6b243d7",
+          "text": "Nothing once the signature is valid",
+          "explanation": "A valid signature does not settle correlation or browser context."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q13",
+      "topic": "Replay prevention",
+      "prompt": "An attacker submits the same otherwise acceptable assertion twice. What should prevent the second acceptance?",
+      "correctId": "ab3b000a0d",
+      "options": [
+        {
+          "id": "ab3b000a0d",
+          "text": "Appropriate replay detection using the relevant message or assertion identifiers and validity scope",
+          "explanation": "Signature validity persists across copies; replay state is needed to recognize reuse."
+        },
+        {
+          "id": "9ebf4c4a7c",
+          "text": "Base64 decoding",
+          "explanation": "The copied encoding remains decodable."
+        },
+        {
+          "id": "c555620ed4",
+          "text": "A new local session ID on each submission",
+          "explanation": "Creating a fresh session for every copied assertion does not detect that the authentication evidence was reused."
+        },
+        {
+          "id": "8750f8899e",
+          "text": "An email-format NameID",
+          "explanation": "Identifier format does not make an assertion single use."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q14",
+      "topic": "Distributed replay state",
+      "prompt": "Atlas runs on three nodes. Each keeps a replay cache visible only to itself. What risk remains?",
+      "correctId": "abb66b8b5e",
+      "options": [
+        {
+          "id": "abb66b8b5e",
+          "text": "The same assertion might be accepted once on each node",
+          "explanation": "Replay protection must cover the active validating service, including concurrency and shared state needs."
+        },
+        {
+          "id": "98d437f5bc",
+          "text": "No node can ever verify signatures",
+          "explanation": "Key verification and replay-cache scope are distinct."
+        },
+        {
+          "id": "da771879bb",
+          "text": "The IdP must issue three different passwords",
+          "explanation": "SAML does not deliver application passwords."
+        },
+        {
+          "id": "987dbfa866",
+          "text": "The load balancer guarantees a copied assertion reaches the original node",
+          "explanation": "Routing behavior should not be assumed to supply the required service-wide replay boundary."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q15",
+      "topic": "Concurrent replay",
+      "prompt": "Two identical responses reach different SP nodes at almost the same instant. Which design matters?",
+      "correctId": "a8529b4c83",
+      "options": [
+        {
+          "id": "a8529b4c83",
+          "text": "An atomic consume-or-reject decision across the relevant replay store",
+          "explanation": "A separate check followed later by a write can race, even when both nodes consult the same data."
+        },
+        {
+          "id": "a5aaa21cc5",
+          "text": "A shared cache with an unrestricted check-then-write sequence",
+          "explanation": "Sharing data is not enough if concurrent checks can both succeed before either records consumption."
+        },
+        {
+          "id": "8ca9cf803e",
+          "text": "Sorting assertions alphabetically",
+          "explanation": "Sorting does not prevent duplicate acceptance."
+        },
+        {
+          "id": "464280e43e",
+          "text": "Checking a cookie after granting access",
+          "explanation": "A post-acceptance check is too late to guard the acceptance decision."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q16",
+      "topic": "Authentication assurance",
+      "prompt": "Atlas requires a particular authentication context. A valid signed assertion reports a different context. What should happen?",
+      "correctId": "3e91bfeb51",
+      "options": [
+        {
+          "id": "3e91bfeb51",
+          "text": "Apply the configured comparison and assurance requirement before granting the requested access",
+          "explanation": "Trusted reporting does not mean the reported event satisfies every application's requirement."
+        },
+        {
+          "id": "3646b5ff82",
+          "text": "Assume every signed context means MFA",
+          "explanation": "The actual context and policy determine assurance."
+        },
+        {
+          "id": "130ef0df94",
+          "text": "Replace the reported context string locally",
+          "explanation": "Editing the result does not change the authentication event."
+        },
+        {
+          "id": "510c51a546",
+          "text": "Ignore the requirement because the user has an account",
+          "explanation": "Account existence and authentication assurance are separate."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q17",
+      "topic": "Unknown conditions",
+      "prompt": "A receiver encounters an assertion Condition it does not understand and cannot evaluate. What is the safe outcome?",
+      "correctId": "f18917adda",
+      "options": [
+        {
+          "id": "f18917adda",
+          "text": "Do not treat the assertion as valid by simply ignoring that condition",
+          "explanation": "A restriction cannot be assumed satisfied when the receiver cannot evaluate it."
+        },
+        {
+          "id": "bad63087f7",
+          "text": "Ignore any unfamiliar Condition",
+          "explanation": "That can remove an issuer-imposed restriction."
+        },
+        {
+          "id": "68ad2e5b31",
+          "text": "Interpret it as permission to access everything",
+          "explanation": "Unknown syntax conveys no such permission."
+        },
+        {
+          "id": "ffcb22254c",
+          "text": "Ask the browser to delete it",
+          "explanation": "Deleting the condition does not create trusted unrestricted content."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q18",
+      "topic": "Account resolution",
+      "prompt": "All SAML acceptance checks pass, but the received identifier has no matching Atlas account and JIT provisioning is disabled. What follows?",
+      "correctId": "983d10abb2",
+      "options": [
+        {
+          "id": "983d10abb2",
+          "text": "Sign-in cannot complete until the account requirement is resolved",
+          "explanation": "Protocol acceptance does not create an account when the integration does not permit that behavior."
+        },
+        {
+          "id": "76887444df",
+          "text": "Create an administrator account automatically",
+          "explanation": "That violates the stated account policy."
+        },
+        {
+          "id": "3e44b578bb",
+          "text": "Classify the signature as invalid",
+          "explanation": "The signature can be valid even when local account lookup fails."
+        },
+        {
+          "id": "d5ee3503bc",
+          "text": "Use a similar account with the same department",
+          "explanation": "A similar account is not a validated unique match for the received identifier."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q19",
+      "topic": "Resource authorization",
+      "prompt": "Atlas establishes a session for Devi, but Devi lacks the finance-report permission. What should the report request do?",
+      "correctId": "8679ef4f87",
+      "options": [
+        {
+          "id": "8679ef4f87",
+          "text": "Deny the report while preserving the distinction from authentication success",
+          "explanation": "Being signed in and being authorized for a particular resource are different outcomes."
+        },
+        {
+          "id": "66204040e6",
+          "text": "Assume SAML failed entirely",
+          "explanation": "The federation and session creation can have succeeded."
+        },
+        {
+          "id": "e98b7490d5",
+          "text": "Grant the report because Okta authenticated her",
+          "explanation": "Authentication alone does not confer every application permission."
+        },
+        {
+          "id": "fe7dcdaa36",
+          "text": "Delete every IdP signing key",
+          "explanation": "Key configuration is unrelated to the missing resource permission."
+        }
+      ]
+    },
+    {
+      "id": "L07-Q20",
+      "topic": "Acceptance reasoning",
+      "prompt": "A team says, \"The assertion is signed, so all remaining checks are unnecessary.\" Which correction is best?",
+      "correctId": "21869aee01",
+      "options": [
+        {
+          "id": "21869aee01",
+          "text": "A signature is one boundary; targeting, time, correlation, replay, assurance and local eligibility still matter",
+          "explanation": "Acceptance requires the applicable checks to hold together for the actual object consumed."
+        },
+        {
+          "id": "28cc953fe7",
+          "text": "Only Base64 decoding matters after a signature",
+          "explanation": "Decoding does not establish those acceptance properties."
+        },
+        {
+          "id": "734b895f4d",
+          "text": "Only a Success status matters",
+          "explanation": "Reported success is not the full receiver decision."
+        },
+        {
+          "id": "ade2f13ce7",
+          "text": "No signed assertion can ever be replayed",
+          "explanation": "A signed copy can be resubmitted unless replay protection detects it."
+        }
+      ]
+    }
+  ]
+}

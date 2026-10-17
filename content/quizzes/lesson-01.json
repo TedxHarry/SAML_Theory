@@ -1,0 +1,566 @@
+{
+  "schemaVersion": 1,
+  "lesson": 1,
+  "questions": [
+    {
+      "id": "L01-Q01",
+      "topic": "Authentication",
+      "prompt": "A user proves control of an approved authenticator at Okta. What decision does this primarily support?",
+      "correctId": "26eab58ebc",
+      "options": [
+        {
+          "id": "26eab58ebc",
+          "text": "Whether the claimed identity has been authenticated.",
+          "explanation": "Authentication establishes identity evidence under a policy; application permissions remain a separate decision."
+        },
+        {
+          "id": "d793e0c6d5",
+          "text": "Whether the user may administer every application.",
+          "explanation": "Administrative rights require the application's authorization decision, not just successful authentication."
+        },
+        {
+          "id": "bbd84f6332",
+          "text": "Whether all application accounts already exist.",
+          "explanation": "Authentication does not create or prove readiness of downstream accounts."
+        },
+        {
+          "id": "b1303820f7",
+          "text": "Whether every browser session must end now.",
+          "explanation": "Session termination is a different operation with its own scope and evidence."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q02",
+      "topic": "Authorization",
+      "prompt": "Atlas has accepted a user's identity but denies an administrative action under its reader role. Which result best describes this?",
+      "correctId": "42ec07e790",
+      "options": [
+        {
+          "id": "42ec07e790",
+          "text": "Successful sign-in followed by an intended authorization denial.",
+          "explanation": "An authenticated reader can be correctly denied an operation outside the reader's permissions."
+        },
+        {
+          "id": "e2369b35e0",
+          "text": "A failed Okta password check.",
+          "explanation": "The supplied facts already establish accepted identity; the denial occurs at an application operation."
+        },
+        {
+          "id": "2070e117e2",
+          "text": "Proof that SAML must send the password to Atlas.",
+          "explanation": "SAML does not need to transfer a password to make Atlas's permission decision."
+        },
+        {
+          "id": "ba10194799",
+          "text": "Proof that the signature is invalid.",
+          "explanation": "A resource denial alone does not establish a signature failure."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q03",
+      "topic": "Provider roles",
+      "prompt": "Northstar configures Okta to issue SAML authentication information that Atlas consumes. Which roles apply to this relationship?",
+      "correctId": "13f94ff091",
+      "options": [
+        {
+          "id": "13f94ff091",
+          "text": "Okta is the IdP and Atlas is the SP.",
+          "explanation": "The provider issues the identity statement; the service provider evaluates it for application access."
+        },
+        {
+          "id": "3161c0fe34",
+          "text": "Atlas is the IdP because it hosts the requested page.",
+          "explanation": "Hosting the protected application does not make it the authentication-statement issuer."
+        },
+        {
+          "id": "4f38ac43ee",
+          "text": "The browser is the IdP because it carries the response.",
+          "explanation": "Carrying a message does not confer authority to issue its statements."
+        },
+        {
+          "id": "cd7c26b74b",
+          "text": "Okta and Atlas must share one session store.",
+          "explanation": "Federation does not require a shared session store."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q04",
+      "topic": "Browser delivery",
+      "prompt": "Atlas redirects a browser toward Okta during sign-in. Who makes the resulting HTTP request to Okta?",
+      "correctId": "567cddeefa",
+      "options": [
+        {
+          "id": "567cddeefa",
+          "text": "The browser following the redirect.",
+          "explanation": "Atlas supplies direction in its response; the browser sends the next request."
+        },
+        {
+          "id": "1963b13da6",
+          "text": "Atlas sends that redirected request directly to Okta.",
+          "explanation": "A browser redirect is not itself a direct server-to-server delivery."
+        },
+        {
+          "id": "4df375c220",
+          "text": "Okta sends the browser's request to itself.",
+          "explanation": "The browser initiates the redirected HTTP request to Okta."
+        },
+        {
+          "id": "5976b74a33",
+          "text": "The user's application account sends it.",
+          "explanation": "An account record is not a network participant sending HTTP requests."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q05",
+      "topic": "Independent sessions",
+      "prompt": "After successful SSO, a browser holds separate Okta and Atlas cookies. What is the safest interpretation?",
+      "correctId": "14ffc5636b",
+      "options": [
+        {
+          "id": "14ffc5636b",
+          "text": "Each service maintains its own session relationship.",
+          "explanation": "Cookies can help each service recognize its own continuing state; they do not merge the sessions."
+        },
+        {
+          "id": "f9dc648294",
+          "text": "The cookies must contain the same SAML assertion.",
+          "explanation": "An application session cookie need not be a stored assertion or equal another service's cookie."
+        },
+        {
+          "id": "0666d42194",
+          "text": "Atlas can now read every Okta cookie.",
+          "explanation": "Cookie delivery follows scope and browser rules, not a general federation permission."
+        },
+        {
+          "id": "008e367603",
+          "text": "Deleting either cookie necessarily destroys both server sessions.",
+          "explanation": "Browser cookie removal does not establish termination at both services."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q06",
+      "topic": "SSO reuse",
+      "prompt": "A user has a usable Okta session but no Ledger session. Ledger starts a supported new SAML sign-in. What can existing Okta state help with?",
+      "correctId": "a9179bc09c",
+      "options": [
+        {
+          "id": "a9179bc09c",
+          "text": "Meeting applicable authentication requirements without necessarily prompting again.",
+          "explanation": "Reuse depends on the actual session and policies; Ledger still needs its own acceptance and session outcome."
+        },
+        {
+          "id": "a9ba264a97",
+          "text": "Skipping Ledger's validation of the response.",
+          "explanation": "Existing provider state does not waive the receiving application's checks."
+        },
+        {
+          "id": "0689ad4519",
+          "text": "Automatically copying the Atlas session into Ledger.",
+          "explanation": "Different applications own different local sessions."
+        },
+        {
+          "id": "c2b530b087",
+          "text": "Guaranteeing that no authentication prompt can occur.",
+          "explanation": "An existing provider session may not satisfy every application's requirements."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q07",
+      "topic": "Account readiness",
+      "prompt": "Okta authenticates a user assigned to Atlas. Atlas requires an existing account, but none exists and JIT is disabled. What follows?",
+      "correctId": "0b8ea37766",
+      "options": [
+        {
+          "id": "0b8ea37766",
+          "text": "Atlas can deny entry despite successful authentication.",
+          "explanation": "Assignment and authentication do not satisfy the stated existing-account requirement."
+        },
+        {
+          "id": "8791d8a112",
+          "text": "Atlas must silently create an administrator.",
+          "explanation": "Neither account creation nor administrator permission is authorized by these facts."
+        },
+        {
+          "id": "4ad04fdf57",
+          "text": "The Okta session proves an Atlas account exists.",
+          "explanation": "A provider session is not evidence of an application account."
+        },
+        {
+          "id": "20e999c91d",
+          "text": "Changing the SAML response to Success creates the missing account.",
+          "explanation": "Protocol status does not execute account provisioning."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q08",
+      "topic": "Provisioning",
+      "prompt": "An integration creates, updates and disables application accounts through a configured lifecycle mechanism. Which responsibility is this?",
+      "correctId": "e66dfcc53e",
+      "options": [
+        {
+          "id": "e66dfcc53e",
+          "text": "Provisioning and account lifecycle management.",
+          "explanation": "These operations maintain accounts and are distinct from the browser authentication exchange."
+        },
+        {
+          "id": "f6731fa3e0",
+          "text": "Transporting every SAML response through the browser.",
+          "explanation": "Message delivery is not account lifecycle management."
+        },
+        {
+          "id": "b985b30d02",
+          "text": "Proving a received signature was verified.",
+          "explanation": "Provisioning results do not establish cryptographic acceptance of a particular response."
+        },
+        {
+          "id": "097e3a9e6b",
+          "text": "Granting every authenticated user every permission.",
+          "explanation": "Account maintenance does not imply unrestricted authorization."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q09",
+      "topic": "SCIM",
+      "prompt": "A project uses SAML for sign-in and SCIM for account updates. Why can both be necessary?",
+      "correctId": "cc0341ed33",
+      "options": [
+        {
+          "id": "cc0341ed33",
+          "text": "They address different authentication and lifecycle responsibilities.",
+          "explanation": "SAML federation and SCIM resource-management operations can complement each other."
+        },
+        {
+          "id": "78eff872ea",
+          "text": "SCIM is the encryption mode of the SAML assertion.",
+          "explanation": "SCIM is not an assertion-encryption algorithm."
+        },
+        {
+          "id": "d42b253a12",
+          "text": "SAML requires the browser to make every SCIM update.",
+          "explanation": "Lifecycle operations are not inherently part of the browser SSO path."
+        },
+        {
+          "id": "be27071211",
+          "text": "SCIM makes all application authorization checks unnecessary.",
+          "explanation": "Maintaining accounts does not settle what operations those accounts may perform."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q10",
+      "topic": "Trust",
+      "prompt": "A response claims to come from Northstar's Okta integration and supplies a certificate. What must Atlas already establish?",
+      "correctId": "190e7cf6d2",
+      "options": [
+        {
+          "id": "190e7cf6d2",
+          "text": "Which issuer and verification material it is approved to trust.",
+          "explanation": "A message cannot authorize its own key merely by supplying one and claiming an issuer."
+        },
+        {
+          "id": "c7a4487dff",
+          "text": "That any certificate inside the response is automatically trusted.",
+          "explanation": "Incoming key material alone is not independent authorization for that issuer."
+        },
+        {
+          "id": "9cc662aebf",
+          "text": "That a familiar display name guarantees the key's owner.",
+          "explanation": "Human-readable labels do not establish approved federation trust."
+        },
+        {
+          "id": "545c1b5055",
+          "text": "That every public certificate includes a private key.",
+          "explanation": "A certificate supplies public-key information, not the corresponding private key."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q11",
+      "topic": "Delivery versus acceptance",
+      "prompt": "A browser successfully posts a SAML response to Atlas's ACS. What has been established by that observation alone?",
+      "correctId": "78800481b0",
+      "options": [
+        {
+          "id": "78800481b0",
+          "text": "Delivery to the receiving endpoint.",
+          "explanation": "Arrival does not establish validation, account matching, session creation or resource permission."
+        },
+        {
+          "id": "6fe9f99cfd",
+          "text": "All signature checks passed.",
+          "explanation": "A delivery observation does not show the receiver's cryptographic result."
+        },
+        {
+          "id": "11f9f47c34",
+          "text": "The user has administrative access.",
+          "explanation": "Resource authorization requires separate evidence."
+        },
+        {
+          "id": "a7f29042cf",
+          "text": "The intended account was uniquely selected.",
+          "explanation": "Account matching is a later application result not shown by delivery."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q12",
+      "topic": "Password handling",
+      "prompt": "Okta authenticates a user and issues a SAML response to Atlas. What should Atlas rely on for this federation path?",
+      "correctId": "fdc27bb59c",
+      "options": [
+        {
+          "id": "fdc27bb59c",
+          "text": "Suitable identity information after the required trust and acceptance checks.",
+          "explanation": "Atlas evaluates provider statements instead of receiving the user's password as the federation result."
+        },
+        {
+          "id": "d163eaebf1",
+          "text": "A copy of the user's Okta password inside the response.",
+          "explanation": "Password forwarding is not required by this SAML authentication arrangement."
+        },
+        {
+          "id": "152b854be9",
+          "text": "The color of the Okta sign-in screen.",
+          "explanation": "Appearance is not trustworthy authentication evidence for Atlas."
+        },
+        {
+          "id": "0de6f5460f",
+          "text": "Any unverified identity text the browser supplies.",
+          "explanation": "The browser's delivery does not make message contents trustworthy."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q13",
+      "topic": "Local access",
+      "prompt": "A browser opens Atlas using a valid existing Atlas session. No new SAML messages occur. What does this demonstrate?",
+      "correctId": "836f6aea0b",
+      "options": [
+        {
+          "id": "836f6aea0b",
+          "text": "Local application-session access for that request.",
+          "explanation": "Existing-session access can succeed without exercising a fresh federation exchange."
+        },
+        {
+          "id": "a1ed80c2a0",
+          "text": "A new Okta-to-Atlas response was accepted.",
+          "explanation": "The facts explicitly say no new SAML messages occurred."
+        },
+        {
+          "id": "9e936e8a93",
+          "text": "A recent signing-key change works for fresh SSO.",
+          "explanation": "The existing session did not test the changed federation path."
+        },
+        {
+          "id": "670206dc32",
+          "text": "Every application's session is still valid.",
+          "explanation": "Only the supplied Atlas request and its local session are observed."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q14",
+      "topic": "Information meaning",
+      "prompt": "Okta sends employee identifier E1042 and Atlas matches it to an account under an approved rule. What makes the relationship useful?",
+      "correctId": "e7925c06b6",
+      "options": [
+        {
+          "id": "e7925c06b6",
+          "text": "Agreement on identifier meaning, scope and account matching.",
+          "explanation": "The same visible string is useful only within the intended identity relationship and matching contract."
+        },
+        {
+          "id": "f8d07288fd",
+          "text": "The identifier looking like a password.",
+          "explanation": "An identifier is not a secret proving authentication by itself."
+        },
+        {
+          "id": "ebbf611cca",
+          "text": "The browser inventing a similar account name.",
+          "explanation": "Similarity does not establish account ownership or approved matching."
+        },
+        {
+          "id": "f04ea0d514",
+          "text": "Using one arbitrary value in every SAML field.",
+          "explanation": "Different fields identify participants, messages, subjects or endpoints."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q15",
+      "topic": "Entry versus resource",
+      "prompt": "Atlas creates a session for an enabled account but later denies projects access. What distinction matters?",
+      "correctId": "1b8084ce74",
+      "options": [
+        {
+          "id": "1b8084ce74",
+          "text": "Application entry and resource authorization are separate.",
+          "explanation": "A usable session does not automatically grant every protected resource."
+        },
+        {
+          "id": "af5bec5cfe",
+          "text": "Session creation guarantees projects permission.",
+          "explanation": "The application can enforce a separate resource rule after entry."
+        },
+        {
+          "id": "27c4f739cf",
+          "text": "A denied resource proves the account is disabled.",
+          "explanation": "The facts establish an enabled account; another permission boundary is involved."
+        },
+        {
+          "id": "d395bbbf3b",
+          "text": "The browser must resend the same assertion for every page.",
+          "explanation": "This session-based arrangement can serve later requests using local session state."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q16",
+      "topic": "Assignment",
+      "prompt": "A user is assigned an Atlas integration in Okta. What does this fact alone establish?",
+      "correctId": "491f7b3720",
+      "options": [
+        {
+          "id": "491f7b3720",
+          "text": "The provider-side assignment exists for that integration.",
+          "explanation": "It does not independently prove downstream provisioning, entry or resource permission."
+        },
+        {
+          "id": "1944b6f21f",
+          "text": "Atlas successfully created a local session.",
+          "explanation": "A provider assignment is not an observed application-session transition."
+        },
+        {
+          "id": "c1f0cab29f",
+          "text": "Atlas assigned the user an administrative role.",
+          "explanation": "Provider assignment and application-role enforcement are separate facts."
+        },
+        {
+          "id": "5bea29c02a",
+          "text": "The user can bypass applicable authentication policy.",
+          "explanation": "Assignment does not waive policy requirements."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q17",
+      "topic": "Two applications",
+      "prompt": "Okta authenticates a user for Atlas. Later the user opens Ledger. What remains Ledger's responsibility?",
+      "correctId": "1d08676907",
+      "options": [
+        {
+          "id": "1d08676907",
+          "text": "Evaluating its own supported sign-in and access requirements.",
+          "explanation": "Provider authentication does not transfer Atlas's account or permission decisions to Ledger."
+        },
+        {
+          "id": "4254c8e320",
+          "text": "Accepting Atlas's account record as its own without a rule.",
+          "explanation": "Each application needs its intended account relationship."
+        },
+        {
+          "id": "35e5ebc9a9",
+          "text": "Giving access because Atlas previously allowed a page.",
+          "explanation": "A decision in one application does not authorize another application's resources."
+        },
+        {
+          "id": "518419a2a4",
+          "text": "Ending every Okta session before considering sign-in.",
+          "explanation": "That is not a required consequence of opening a second application."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q18",
+      "topic": "Investigating symptoms",
+      "prompt": "A ticket says only that SSO is broken. Which observation most usefully narrows the problem first?",
+      "correctId": "b92cc1f503",
+      "options": [
+        {
+          "id": "b92cc1f503",
+          "text": "The specific user, app, attempt, starting sessions and observed stopping point.",
+          "explanation": "Context and processing evidence distinguish authentication, delivery, acceptance and access failures."
+        },
+        {
+          "id": "30a7a33421",
+          "text": "A guess that every certificate has expired.",
+          "explanation": "The symptom alone does not identify a certificate failure."
+        },
+        {
+          "id": "852fc44005",
+          "text": "A proposal to grant all users access.",
+          "explanation": "Access changes need an intended policy and established problem, not a generic symptom."
+        },
+        {
+          "id": "41bd332a43",
+          "text": "The application's logo.",
+          "explanation": "Branding does not locate a processing failure."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q19",
+      "topic": "Role of assertions",
+      "prompt": "What is an assertion in a SAML sign-in arrangement?",
+      "correctId": "0458560d25",
+      "options": [
+        {
+          "id": "0458560d25",
+          "text": "Structured statements about a subject with applicable restrictions.",
+          "explanation": "The receiver must evaluate those statements within the agreed trust and processing rules."
+        },
+        {
+          "id": "6f235c72cf",
+          "text": "An automatic command to create an application account.",
+          "explanation": "Account creation depends on supported application behavior and configuration."
+        },
+        {
+          "id": "597b3b63bc",
+          "text": "The application's permanent session cookie.",
+          "explanation": "An assertion and the resulting application-session mechanism have different roles."
+        },
+        {
+          "id": "5efdd12fba",
+          "text": "A guarantee that every requested operation is authorized.",
+          "explanation": "A statement used for sign-in does not replace local resource permissions."
+        }
+      ]
+    },
+    {
+      "id": "L01-Q20",
+      "topic": "Correct outcome",
+      "prompt": "A learner says a sign-in test passes only if every requested page returns success. What is missing?",
+      "correctId": "4c18dc067b",
+      "options": [
+        {
+          "id": "4c18dc067b",
+          "text": "An intended denial can be a correct test result.",
+          "explanation": "Testing must compare outcomes with agreed permission and rejection requirements."
+        },
+        {
+          "id": "968342405f",
+          "text": "Every denial should be fixed by removing validation.",
+          "explanation": "Removing controls can turn a correct rejection into an unsafe acceptance."
+        },
+        {
+          "id": "ff951dea15",
+          "text": "A working home page proves all other controls are enforced.",
+          "explanation": "One successful resource does not establish every relevant behavior."
+        },
+        {
+          "id": "ebeb9314a0",
+          "text": "Authentication automatically overrides all resource restrictions.",
+          "explanation": "Authentication and authorization answer different questions."
+        }
+      ]
+    }
+  ]
+}

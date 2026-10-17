@@ -63,6 +63,8 @@ Use descriptive text such as Open full diagram, Close diagram and Clear search. 
 
 Course, lesson, questions and reference links use actual paths, with previous/next lesson links. Heading anchors use github-slugger and are checked against generated HTML. Keep essential teaching content intact. A question page allows multiple native details elements to remain open.
 
+Every lesson has three sibling navigation links: Lesson, Questions and Quizzes. Quiz pages use native fieldsets, legends and radio inputs, with full-width option labels and visible keyboard focus. Each question supplies its own scenario. Shuffle options on every visit while grading by stable IDs. Feedback appears directly below that question, states correct or incorrect in words, names the correct answer and explains the selection. A disclosure explains every option. Allow answer changes without affecting other questions. The answered count measures exploration, with no pass/fail claim. Do not save attempts or send answers to a service. Native answer disclosures provide a useful no-JavaScript fallback.
+
 ### Forms and overlays
 
 Search is a labeled local search input with an explicit clear button and polite result count. No form submission is needed. The native diagram dialog handles focus containment, Escape and focus restoration; its title and close action remain visible. Search terms are restored from the URL. Rendering all static results without filtering remains useful with JavaScript disabled.

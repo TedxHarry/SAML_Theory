@@ -1,0 +1,566 @@
+{
+  "schemaVersion": 1,
+  "lesson": 2,
+  "questions": [
+    {
+      "id": "L02-Q01",
+      "topic": "Requirements",
+      "prompt": "Before configuring a custom Okta SAML integration, an engineer has only the application's marketing name. What information is most useful next?",
+      "correctId": "440bf1e871",
+      "options": [
+        {
+          "id": "440bf1e871",
+          "text": "The application's supported SAML requirements for the exact environment.",
+          "explanation": "Endpoints, identifiers, protection and identity output need an authoritative integration contract."
+        },
+        {
+          "id": "576273333f",
+          "text": "Any ACS copied from an unrelated working app.",
+          "explanation": "A working value elsewhere does not establish this application's receiving address."
+        },
+        {
+          "id": "f600bc4523",
+          "text": "An arbitrary issuer string chosen for convenience.",
+          "explanation": "The actual provider relationship determines approved issuer information."
+        },
+        {
+          "id": "c00876d4d9",
+          "text": "A private signing key requested from the application vendor.",
+          "explanation": "Collecting another party's private signing key is not the normal metadata exchange."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q02",
+      "topic": "ACS",
+      "prompt": "An approved Atlas ACS is https://atlas.example/saml/acs. What job does this value identify?",
+      "correctId": "d51c8dbca8",
+      "options": [
+        {
+          "id": "d51c8dbca8",
+          "text": "The application's receiving location for the selected SAML sign-in response.",
+          "explanation": "The ACS is a receiving endpoint, distinct from the SP's identity and resource pages."
+        },
+        {
+          "id": "f30195f548",
+          "text": "The user's employee identifier.",
+          "explanation": "A subject identifier does not name the response endpoint."
+        },
+        {
+          "id": "d60513cba1",
+          "text": "The signing certificate fingerprint.",
+          "explanation": "A key fingerprint does not identify a message-delivery address."
+        },
+        {
+          "id": "246fb3546f",
+          "text": "A guarantee of successful application access.",
+          "explanation": "Delivery to the ACS still requires acceptance and application decisions."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q03",
+      "topic": "Audience",
+      "prompt": "Atlas's entity ID is https://atlas.example/saml and its ACS ends in /saml/acs. Which should represent Atlas as the intended assertion audience in this agreement?",
+      "correctId": "9272adc148",
+      "options": [
+        {
+          "id": "9272adc148",
+          "text": "The approved SP entity ID.",
+          "explanation": "Audience identifies the relying party; it is not selected merely by resembling an endpoint."
+        },
+        {
+          "id": "d3896b4641",
+          "text": "Any URL beginning with the same hostname.",
+          "explanation": "A shared host does not make different identifier values interchangeable."
+        },
+        {
+          "id": "de56b223a7",
+          "text": "The browser's current page URL automatically.",
+          "explanation": "Resource navigation and the agreed audience have different purposes."
+        },
+        {
+          "id": "a2580c5747",
+          "text": "The user's email address.",
+          "explanation": "The subject's identifier does not identify the intended SP audience."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q04",
+      "topic": "Entity identifiers",
+      "prompt": "An SP entity ID resembles an HTTPS address. What must be true for its identity role?",
+      "correctId": "b7826f4077",
+      "options": [
+        {
+          "id": "b7826f4077",
+          "text": "Its exact value must agree with the integration's expected participant identity.",
+          "explanation": "An entity identifier is not necessarily an address a browser must retrieve successfully."
+        },
+        {
+          "id": "8101d29607",
+          "text": "Opening it must always display the sign-in page.",
+          "explanation": "Participant identity does not require that exact value to host a sign-in page."
+        },
+        {
+          "id": "1e552e3d02",
+          "text": "It must equal the ACS in every application.",
+          "explanation": "Participant identity and message delivery can have different values."
+        },
+        {
+          "id": "1deed553f7",
+          "text": "It must contain the employee's name.",
+          "explanation": "An SP identity is not a user identifier."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q05",
+      "topic": "Environments",
+      "prompt": "Atlas test has a different ACS and entity ID from production. What is the sound configuration approach?",
+      "correctId": "f221541e2d",
+      "options": [
+        {
+          "id": "f221541e2d",
+          "text": "Use the approved test values and the intended test trust relationship.",
+          "explanation": "Environment boundaries should remain explicit even when applications look similar."
+        },
+        {
+          "id": "69cb7b8302",
+          "text": "Copy production endpoints because the software is the same.",
+          "explanation": "Identical software does not merge test and production identity or routing."
+        },
+        {
+          "id": "5a909b4307",
+          "text": "Change only the visible integration label.",
+          "explanation": "A label change does not change actual targets, issuer or trust."
+        },
+        {
+          "id": "9056476c1a",
+          "text": "Accept responses intended for either environment without distinction.",
+          "explanation": "That would discard the supplied target separation."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q06",
+      "topic": "Metadata roles",
+      "prompt": "A metadata document contains SPSSODescriptor. What does that element describe?",
+      "correctId": "93e076ee2f",
+      "options": [
+        {
+          "id": "93e076ee2f",
+          "text": "The entity's service-provider SSO role and its advertised configuration.",
+          "explanation": "The role descriptor carries SP-related declarations; it is not a user's authentication result."
+        },
+        {
+          "id": "64c8fbbe78",
+          "text": "A specific user passing authentication.",
+          "explanation": "Metadata describes participants and capabilities, not a completed user attempt."
+        },
+        {
+          "id": "faa93ed68f",
+          "text": "An Okta session cookie.",
+          "explanation": "A role descriptor is XML configuration information, not browser session state."
+        },
+        {
+          "id": "9dec9f05ae",
+          "text": "The application's authorization decision for a page.",
+          "explanation": "Resource decisions require application processing evidence."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q07",
+      "topic": "Binding and endpoint",
+      "prompt": "Metadata advertises an endpoint with a Location and a Binding URI. Why should they be read together?",
+      "correctId": "976458f7a5",
+      "options": [
+        {
+          "id": "976458f7a5",
+          "text": "The address and delivery mechanism jointly describe the advertised endpoint.",
+          "explanation": "An endpoint's address alone does not identify how a message must be carried."
+        },
+        {
+          "id": "79dc31d5d0",
+          "text": "The binding replaces the need for an address.",
+          "explanation": "A delivery mechanism still needs an appropriate destination."
+        },
+        {
+          "id": "307e98ea04",
+          "text": "The Location determines every permitted signing algorithm.",
+          "explanation": "Endpoint location does not by itself define the full algorithm policy."
+        },
+        {
+          "id": "bf3d5e8e7e",
+          "text": "The browser may ignore either value whenever authentication succeeds.",
+          "explanation": "Authentication does not authorize arbitrary delivery behavior."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q08",
+      "topic": "Public material",
+      "prompt": "An application receives the provider's public signing certificate. What is its intended use?",
+      "correctId": "0acda35203",
+      "options": [
+        {
+          "id": "0acda35203",
+          "text": "Verification under the application's approved issuer/key trust rules.",
+          "explanation": "Public verification material helps check signatures but needs an authorized trust relationship."
+        },
+        {
+          "id": "4a61be5656",
+          "text": "Producing signatures as the provider without another key.",
+          "explanation": "Signing requires the corresponding private-key capability."
+        },
+        {
+          "id": "85e7c82a53",
+          "text": "Decrypting every assertion encrypted to the application.",
+          "explanation": "Recipient decryption uses the application's corresponding private capability, not the provider's public signing certificate."
+        },
+        {
+          "id": "43b8c0ccb1",
+          "text": "Proving the user has the administrator role.",
+          "explanation": "Key material alone does not establish resource authorization."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q09",
+      "topic": "Authenticated metadata",
+      "prompt": "A downloaded XML metadata file is well formed. What is still needed before adopting its keys?",
+      "correctId": "703ba546a3",
+      "options": [
+        {
+          "id": "703ba546a3",
+          "text": "An approved basis for authenticating and trusting the metadata source.",
+          "explanation": "Readable XML is not proof that its configuration is authorized for this integration."
+        },
+        {
+          "id": "b451ca853a",
+          "text": "Nothing, because XML syntax establishes trust.",
+          "explanation": "Syntax validation and source authenticity are separate questions."
+        },
+        {
+          "id": "8ab8d74a93",
+          "text": "A matching fingerprint copied from that same unverified download.",
+          "explanation": "Self-consistency is not independent authentication of the source."
+        },
+        {
+          "id": "fa7e3a5d53",
+          "text": "Permission to trust any later replacement from any location.",
+          "explanation": "Trust adoption must remain scoped to the approved process."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q10",
+      "topic": "Signing declarations",
+      "prompt": "An SP advertises WantAssertionsSigned=true. What does that declaration establish by itself?",
+      "correctId": "52d63bac32",
+      "options": [
+        {
+          "id": "52d63bac32",
+          "text": "The advertised expectation that assertions be signed.",
+          "explanation": "The declaration still needs supported sender configuration and actual receiver enforcement."
+        },
+        {
+          "id": "72027c1597",
+          "text": "That every received assertion signature has already verified.",
+          "explanation": "Metadata is not a verification result for a particular message."
+        },
+        {
+          "id": "57e8ae5533",
+          "text": "That the SP signs its outgoing AuthnRequests.",
+          "explanation": "Outgoing request signing is a different responsibility."
+        },
+        {
+          "id": "cb9fc003bc",
+          "text": "That assertion encryption is mandatory.",
+          "explanation": "Signing expectations do not automatically require encryption."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q11",
+      "topic": "Request signing",
+      "prompt": "An SP advertises AuthnRequestsSigned=true. Which responsibility does this concern?",
+      "correctId": "e9a4dac55b",
+      "options": [
+        {
+          "id": "e9a4dac55b",
+          "text": "The SP's authentication requests being signed.",
+          "explanation": "It describes outgoing request behavior, distinct from the IdP's response protection."
+        },
+        {
+          "id": "eaf3da7915",
+          "text": "The IdP encrypting every response.",
+          "explanation": "Encryption is a different mechanism and direction."
+        },
+        {
+          "id": "ac145fd9ca",
+          "text": "The application checking projects permission.",
+          "explanation": "Resource authorization is not a request-signing declaration."
+        },
+        {
+          "id": "02b44f22cc",
+          "text": "The browser creating an approved provider signature.",
+          "explanation": "A browser carrying a request does not become the provider's signer."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q12",
+      "topic": "Identifier formats",
+      "prompt": "Metadata advertises a NameID format, but an integration has no agreed source for the actual value. What is missing?",
+      "correctId": "9735404cfa",
+      "options": [
+        {
+          "id": "9735404cfa",
+          "text": "The identity source and application matching agreement.",
+          "explanation": "A format declaration does not select the emitted value or establish the account relationship."
+        },
+        {
+          "id": "3190b3507c",
+          "text": "Only the color of the login button.",
+          "explanation": "Appearance cannot resolve identity output."
+        },
+        {
+          "id": "af994b7e64",
+          "text": "A rule that NameID must always be email.",
+          "explanation": "NameID value and semantics depend on the agreed integration."
+        },
+        {
+          "id": "34b810462b",
+          "text": "A guarantee that the attribute is a private key.",
+          "explanation": "An identity format does not make the subject value cryptographic secret material."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q13",
+      "topic": "Requested attributes",
+      "prompt": "SP metadata requests department. What proves department was actually supplied in a sign-in?",
+      "correctId": "fd4d622de6",
+      "options": [
+        {
+          "id": "fd4d622de6",
+          "text": "Inspection of the relevant emitted assertion and application interpretation.",
+          "explanation": "A requested claim and its observed release are different evidence."
+        },
+        {
+          "id": "c8e6177d3b",
+          "text": "The request declaration alone.",
+          "explanation": "An advertised request does not establish the provider's actual output."
+        },
+        {
+          "id": "13d6bec780",
+          "text": "A successful browser redirect to the IdP.",
+          "explanation": "Redirect delivery says nothing about released department values."
+        },
+        {
+          "id": "36dde361c9",
+          "text": "The application containing a department column.",
+          "explanation": "Local storage capability does not prove the assertion included the claim."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q14",
+      "topic": "Metadata expiry",
+      "prompt": "Metadata has validUntil=12:00 UTC. At exactly 12:00, what does this deadline mean?",
+      "correctId": "b2c7a32c58",
+      "options": [
+        {
+          "id": "b2c7a32c58",
+          "text": "The metadata has reached its validity limit.",
+          "explanation": "validUntil is an expiry boundary; reaching it is not merely a refresh suggestion."
+        },
+        {
+          "id": "c5e89e8c65",
+          "text": "It starts a new application session automatically.",
+          "explanation": "Metadata expiry does not create application state."
+        },
+        {
+          "id": "1f25aa2f6f",
+          "text": "It remains valid indefinitely if a prior signature verified.",
+          "explanation": "A valid signature does not remove the metadata validity bound."
+        },
+        {
+          "id": "3285191981",
+          "text": "It expires only when the user closes the browser.",
+          "explanation": "This deadline concerns configuration metadata, not a browser lifetime."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q15",
+      "topic": "Cache duration",
+      "prompt": "A metadata cacheDuration has elapsed, with no validUntil expiry or other invalidity established. What follows from cache age alone?",
+      "correctId": "62bd1b6ef5",
+      "options": [
+        {
+          "id": "62bd1b6ef5",
+          "text": "A refresh-related threshold has been reached, not automatic metadata invalidity.",
+          "explanation": "Caching and strict validity are separate; actual use still follows applicable implementation and deployment policy."
+        },
+        {
+          "id": "ee1b75128f",
+          "text": "Every established app session must end immediately.",
+          "explanation": "Metadata cache age does not define every application session lifetime."
+        },
+        {
+          "id": "273c85c1b5",
+          "text": "The cached metadata must be trusted without source checks.",
+          "explanation": "Source authentication remains necessary regardless of cache age."
+        },
+        {
+          "id": "6bf80fc327",
+          "text": "The metadata's signature must have become mathematically invalid.",
+          "explanation": "Cache age does not alter the signed XML's mathematical verification by itself."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q16",
+      "topic": "Inherited limits",
+      "prompt": "A metadata parent expires at 16:00 and a child at 15:00. What is the child's effective maximum validity from those bounds?",
+      "correctId": "f5e3bf35c4",
+      "options": [
+        {
+          "id": "f5e3bf35c4",
+          "text": "15:00 UTC.",
+          "explanation": "A child can impose a shorter limit; it cannot extend the applicable parent limit."
+        },
+        {
+          "id": "ad8d41fb74",
+          "text": "16:00 because the longer time always wins.",
+          "explanation": "The shorter applicable expiry constrains the child."
+        },
+        {
+          "id": "350379743d",
+          "text": "17:00 after adding the two deadlines.",
+          "explanation": "Expiry instants are not additive durations."
+        },
+        {
+          "id": "45dad4f8c2",
+          "text": "No expiry because two values cancel each other.",
+          "explanation": "Multiple applicable limits do not erase each other."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q17",
+      "topic": "Root metadata",
+      "prompt": "A standalone root EntityDescriptor omits both validUntil and cacheDuration. A generic schema parser accepts it. Which conclusion is sound?",
+      "correctId": "a27ad216be",
+      "options": [
+        {
+          "id": "a27ad216be",
+          "text": "Schema success alone does not establish the metadata root rule was met.",
+          "explanation": "The metadata specification requires at least one root freshness attribute despite their individual schema optionality."
+        },
+        {
+          "id": "e3af5b21f1",
+          "text": "Schema success proves complete protocol conformance.",
+          "explanation": "A schema does not encode every specification or deployment requirement."
+        },
+        {
+          "id": "1729178470",
+          "text": "The root automatically inherits an expiry from an absent parent.",
+          "explanation": "A standalone root has no supplied parent limit to inherit."
+        },
+        {
+          "id": "d90891db8d",
+          "text": "The omitted attributes are application passwords.",
+          "explanation": "They concern metadata freshness and validity, not credentials."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q18",
+      "topic": "Runtime adoption",
+      "prompt": "Okta publishes a new signing certificate in metadata. What establishes that Atlas can use it?",
+      "correctId": "45190ea1a7",
+      "options": [
+        {
+          "id": "45190ea1a7",
+          "text": "Approved effective receiver trust and verification evidence for the intended new key.",
+          "explanation": "Publication is not the same operation as receiver adoption and runtime verification."
+        },
+        {
+          "id": "face2344ca",
+          "text": "The new certificate merely appearing on a setup page.",
+          "explanation": "Availability does not establish the receiver's effective configuration."
+        },
+        {
+          "id": "fc3e9ebd7a",
+          "text": "A successful old-key attempt on an unrelated receiver.",
+          "explanation": "That observation does not test new-key adoption at Atlas."
+        },
+        {
+          "id": "3254b63764",
+          "text": "Changing the integration's display name.",
+          "explanation": "A label change does not install verification material."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q19",
+      "topic": "Integration selection",
+      "prompt": "A catalog integration exists for an app, but a project requires a specific supported feature. What should determine suitability?",
+      "correctId": "96562e5677",
+      "options": [
+        {
+          "id": "96562e5677",
+          "text": "The exact integration's documented capabilities and requirements.",
+          "explanation": "Catalog presence is a starting point, not proof that every desired feature is supported."
+        },
+        {
+          "id": "482e2842d1",
+          "text": "The icon looking identical to a production icon.",
+          "explanation": "Branding is not a capability contract."
+        },
+        {
+          "id": "508d039a06",
+          "text": "An assumption that custom always means more secure.",
+          "explanation": "Security depends on the supported configuration and controls, not that label alone."
+        },
+        {
+          "id": "8b7b63daac",
+          "text": "An assumption that all SAML capabilities are included.",
+          "explanation": "A protocol-defined option is not automatically a product feature."
+        }
+      ]
+    },
+    {
+      "id": "L02-Q20",
+      "topic": "Ownership",
+      "prompt": "Which handover best supports maintaining an Okta-to-Atlas integration?",
+      "correctId": "601818481f",
+      "options": [
+        {
+          "id": "601818481f",
+          "text": "A record of authoritative values, owners, trust sources and refresh/change behavior.",
+          "explanation": "Another engineer needs both current agreement and responsibility for keeping it effective."
+        },
+        {
+          "id": "3632e730fd",
+          "text": "Only a screenshot saying login worked.",
+          "explanation": "A screenshot omits configuration provenance, limits and ownership."
+        },
+        {
+          "id": "eb72e0b666",
+          "text": "A copy of every user's password.",
+          "explanation": "Passwords are not required handover material for this federation relationship."
+        },
+        {
+          "id": "986a761bce",
+          "text": "Only the public product names.",
+          "explanation": "Names alone do not identify the specific environment or effective configuration."
+        }
+      ]
+    }
+  ]
+}

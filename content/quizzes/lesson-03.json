@@ -1,0 +1,566 @@
+{
+  "schemaVersion": 1,
+  "lesson": 3,
+  "questions": [
+    {
+      "id": "L03-Q01",
+      "topic": "Request ownership",
+      "prompt": "Atlas creates an AuthnRequest with ID _r81 and sends it toward Okta through a browser. Which system should retain the pending request context for validating the eventual response?",
+      "correctId": "625941cbca",
+      "options": [
+        {
+          "id": "625941cbca",
+          "text": "Atlas",
+          "explanation": "The requester needs its own pending context to correlate the reply and recover the original sign-in transaction."
+        },
+        {
+          "id": "909c7467f7",
+          "text": "The browser alone",
+          "explanation": "Browser-carried values are not a substitute for the SP's protected request context."
+        },
+        {
+          "id": "a4845aac98",
+          "text": "Any unrelated application",
+          "explanation": "Correlation belongs to the SP that originated this transaction."
+        },
+        {
+          "id": "89888669e1",
+          "text": "Okta alone, with no requester-side context needed",
+          "explanation": "The IdP can issue a reply, but Atlas still needs protected context for its own correlation and navigation decisions."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q02",
+      "topic": "Browser delivery",
+      "prompt": "A browser receives a redirect from Atlas to Okta containing SAMLRequest. What does the browser do in this exchange?",
+      "correctId": "62c974b44c",
+      "options": [
+        {
+          "id": "62c974b44c",
+          "text": "Carries the encoded request to the IdP endpoint",
+          "explanation": "The browser follows the redirect and transports the request between the participants."
+        },
+        {
+          "id": "96f015cadf",
+          "text": "Verifies that the assertion grants access",
+          "explanation": "Assertion acceptance is the receiving SP's responsibility."
+        },
+        {
+          "id": "127a7cf92e",
+          "text": "Creates Okta's signing key",
+          "explanation": "Signing keys belong to the provider's managed configuration."
+        },
+        {
+          "id": "ee94185363",
+          "text": "Chooses the trusted issuer independently",
+          "explanation": "The application establishes trusted providers through configuration, not browser choice."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q03",
+      "topic": "Correlation",
+      "prompt": "Atlas has a pending request _r81. An otherwise valid response has InResponseTo=\"_r99\". What should Atlas do on its request-correlated path?",
+      "correctId": "b01aa7d467",
+      "options": [
+        {
+          "id": "b01aa7d467",
+          "text": "Reject the correlation mismatch",
+          "explanation": "The response must match the actual pending transaction, not merely contain a plausible request ID."
+        },
+        {
+          "id": "0a7e845c9e",
+          "text": "Accept because the response is signed",
+          "explanation": "A valid signature does not fix a reply to the wrong request."
+        },
+        {
+          "id": "d8595ed57c",
+          "text": "Rename the pending request to _r99",
+          "explanation": "Changing stored context to match incoming data defeats correlation."
+        },
+        {
+          "id": "d43da5eab6",
+          "text": "Treat InResponseTo as the user's account ID",
+          "explanation": "It identifies a request, not a person."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q04",
+      "topic": "RelayState",
+      "prompt": "Atlas stores an opaque RelayState value that resolves to a pending transaction and the original resource. Which statement is correct?",
+      "correctId": "c9f80558ef",
+      "options": [
+        {
+          "id": "c9f80558ef",
+          "text": "It can restore navigation context but does not replace SAML correlation checks",
+          "explanation": "RelayState and InResponseTo serve different purposes. A returned navigation token does not prove the response matches a pending request."
+        },
+        {
+          "id": "d201a72002",
+          "text": "It is the assertion's signature",
+          "explanation": "RelayState is a binding parameter, not the XML signature."
+        },
+        {
+          "id": "5acd1a88b0",
+          "text": "It is always a URL that may be followed without checks",
+          "explanation": "Opaque handles are valid, and any restored destination needs safe handling."
+        },
+        {
+          "id": "22c82f323c",
+          "text": "It is a replacement for the Response ID in replay detection",
+          "explanation": "RelayState tracks exchange or navigation context; it does not replace message identifiers and replay controls."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q05",
+      "topic": "Existing IdP session",
+      "prompt": "Devi starts a new Atlas sign-in while an acceptable Okta browser session already exists. No stronger authentication is required. What can happen?",
+      "correctId": "42f6d72adf",
+      "options": [
+        {
+          "id": "42f6d72adf",
+          "text": "Okta can issue a response without another credential prompt",
+          "explanation": "An existing session may satisfy the provider's policy for this new exchange."
+        },
+        {
+          "id": "1704c99e9d",
+          "text": "Atlas automatically receives the Okta session cookie",
+          "explanation": "Cookies remain scoped to their own sites; SAML carries the provider's statement."
+        },
+        {
+          "id": "109afbc5b4",
+          "text": "Atlas skips response validation",
+          "explanation": "Session reuse at the IdP does not remove SP validation requirements."
+        },
+        {
+          "id": "b5c639d606",
+          "text": "The browser must invent a new assertion",
+          "explanation": "The IdP issues the assertion; the browser transports it."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q06",
+      "topic": "ForceAuthn",
+      "prompt": "An SP requests ForceAuthn=\"true\" and the IdP supports the request. What does the request mean?",
+      "correctId": "f5a85bf835",
+      "options": [
+        {
+          "id": "f5a85bf835",
+          "text": "Authenticate the presenter freshly rather than rely on the existing security context",
+          "explanation": "ForceAuthn requests fresh authentication. It does not prescribe a particular credential or factor by itself."
+        },
+        {
+          "id": "fd35a2890a",
+          "text": "Always ask for a password specifically",
+          "explanation": "Fresh authentication can use supported methods other than a password."
+        },
+        {
+          "id": "268b2a4d41",
+          "text": "Ignore the SP's own existing session automatically",
+          "explanation": "Whether the SP initiates a new exchange is a separate application decision."
+        },
+        {
+          "id": "a453dcee7b",
+          "text": "Extend the assertion's validity window",
+          "explanation": "Fresh authentication and assertion acceptance lifetime are separate requirements."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q07",
+      "topic": "Passive requests",
+      "prompt": "A request uses IsPassive=\"true\". The IdP cannot satisfy it without interacting with the user. What is the appropriate outcome?",
+      "correctId": "8fbbcf4fd5",
+      "options": [
+        {
+          "id": "8fbbcf4fd5",
+          "text": "Return an applicable error instead of presenting an interactive sign-in",
+          "explanation": "Passive processing must avoid visible interaction; inability to meet that constraint is a failure outcome."
+        },
+        {
+          "id": "45e9d16a95",
+          "text": "Show any prompt needed and call it passive",
+          "explanation": "A prompt violates the passive requirement."
+        },
+        {
+          "id": "df10f444ce",
+          "text": "Accept an unauthenticated user",
+          "explanation": "Passive processing does not waive authentication."
+        },
+        {
+          "id": "ebe77bc715",
+          "text": "Disable application authorization",
+          "explanation": "Authorization remains the application's responsibility."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q08",
+      "topic": "Requested context",
+      "prompt": "Atlas requests an authentication context that the IdP cannot satisfy. What should the engineer expect?",
+      "correctId": "b60eb47bec",
+      "options": [
+        {
+          "id": "b60eb47bec",
+          "text": "A failure rather than an invented claim that the context was satisfied",
+          "explanation": "Requesting a context expresses a requirement; it does not create evidence of its fulfillment."
+        },
+        {
+          "id": "57fcbc3b88",
+          "text": "Any signed response proves the requested method happened",
+          "explanation": "A signature authenticates protected content, not an unsupported assumption about its meaning."
+        },
+        {
+          "id": "b11a59b0c9",
+          "text": "The browser can upgrade the authentication method",
+          "explanation": "The browser cannot turn a weaker event into the requested authentication context."
+        },
+        {
+          "id": "ea9d68eb2e",
+          "text": "The SP should silently replace the requirement after receipt",
+          "explanation": "Changing the requirement to fit an incoming result undermines the intended assurance check."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q09",
+      "topic": "NameIDPolicy",
+      "prompt": "An AuthnRequest contains a NameIDPolicy asking for a particular identifier format. What does this communicate?",
+      "correctId": "9c98426a08",
+      "options": [
+        {
+          "id": "9c98426a08",
+          "text": "The identifier format the requester wants the IdP to use",
+          "explanation": "The policy concerns the identifier issued in the response and must fit provider capabilities and the integration agreement."
+        },
+        {
+          "id": "2f91b0e7d6",
+          "text": "The application's password policy",
+          "explanation": "NameIDPolicy does not configure passwords."
+        },
+        {
+          "id": "29315a47d6",
+          "text": "The exact database row the application must create",
+          "explanation": "Identifier policy is separate from account provisioning and local lookup."
+        },
+        {
+          "id": "aca589f2d0",
+          "text": "The exact subject identifier that must be returned",
+          "explanation": "NameIDPolicy requests format and related policy constraints; it does not supply the actual issued NameID value."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q10",
+      "topic": "AllowCreate",
+      "prompt": "An SP sets AllowCreate=\"true\" in NameIDPolicy. What does that permission concern?",
+      "correctId": "4922925e80",
+      "options": [
+        {
+          "id": "4922925e80",
+          "text": "Creation of a new identifier by the IdP, if needed to satisfy the identifier policy",
+          "explanation": "AllowCreate concerns identifier establishment at the IdP. It is not an instruction to provision an application account."
+        },
+        {
+          "id": "68ac9b9449",
+          "text": "Mandatory just-in-time account creation at the SP",
+          "explanation": "The SP's provisioning policy is a separate agreement."
+        },
+        {
+          "id": "8182b29cdf",
+          "text": "Permission to bypass signature verification",
+          "explanation": "Identifier creation does not relax trust checks."
+        },
+        {
+          "id": "be0439296a",
+          "text": "Permission for any user to access any resource",
+          "explanation": "Resource authorization remains separate."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q11",
+      "topic": "Endpoint selection",
+      "prompt": "An incoming AuthnRequest names an ACS URL that is not approved for that SP. What should the IdP do?",
+      "correctId": "e87d049a10",
+      "options": [
+        {
+          "id": "e87d049a10",
+          "text": "Enforce its trusted endpoint rules instead of sending an assertion to an arbitrary destination",
+          "explanation": "Endpoint selection must stay within the trusted integration configuration to prevent delivery to an attacker-controlled endpoint."
+        },
+        {
+          "id": "1748f43c27",
+          "text": "Use the URL because it is inside XML",
+          "explanation": "An XML field is not automatically trustworthy."
+        },
+        {
+          "id": "e89eadf606",
+          "text": "Ask the browser to decide whether the URL is safe",
+          "explanation": "The browser is not the authority for the provider's trust configuration."
+        },
+        {
+          "id": "7fb51a7bbe",
+          "text": "Send the same assertion to every possible ACS",
+          "explanation": "Broadcast delivery would disclose sensitive material and ignore the agreed recipient."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q12",
+      "topic": "Request signatures",
+      "prompt": "An integration requires signed AuthnRequests, but Atlas sends an unsigned request. What is the correct expectation?",
+      "correctId": "25246770e9",
+      "options": [
+        {
+          "id": "25246770e9",
+          "text": "The IdP should enforce the configured request-signing requirement",
+          "explanation": "The applicable trust agreement determines whether this request is acceptable."
+        },
+        {
+          "id": "c3ec5cd8fa",
+          "text": "The future signed response repairs the missing request signature",
+          "explanation": "Response protection cannot retroactively authenticate an unsigned request."
+        },
+        {
+          "id": "05c38c408f",
+          "text": "HTTPS always satisfies a SAML request-signature requirement",
+          "explanation": "Transport protection and a protocol signature are different protections."
+        },
+        {
+          "id": "d920ca2261",
+          "text": "Signing is needed only after a user logs out",
+          "explanation": "Request-signing requirements apply when those requests are processed."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q13",
+      "topic": "Redirect signing",
+      "prompt": "An AuthnRequest is signed using the SAML HTTP-Redirect binding. Where is the binding signature carried?",
+      "correctId": "9865031c3c",
+      "options": [
+        {
+          "id": "9865031c3c",
+          "text": "In URL query parameters using Signature and SigAlg",
+          "explanation": "Redirect binding signing protects the specified encoded query-string data and is distinct from an embedded XML signature."
+        },
+        {
+          "id": "dfbc73197c",
+          "text": "Only in the application session cookie",
+          "explanation": "The session cookie is not the Redirect binding signature container."
+        },
+        {
+          "id": "f3f6e7da98",
+          "text": "Always inside an encrypted Assertion",
+          "explanation": "The request has no requirement to carry an assertion, encrypted or otherwise."
+        },
+        {
+          "id": "41082592d9",
+          "text": "In the human-readable page title",
+          "explanation": "A title is not protocol signature material."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q14",
+      "topic": "Authentication time",
+      "prompt": "An assertion is issued at 10:30 but reports AuthnInstant 09:00 after reuse of an existing session. Which interpretation is sound?",
+      "correctId": "fc6526a0d7",
+      "options": [
+        {
+          "id": "fc6526a0d7",
+          "text": "The authentication event preceded the issuance of this assertion",
+          "explanation": "AuthnInstant describes the authentication event; IssueInstant describes message issuance. They need not be identical."
+        },
+        {
+          "id": "9ddc4c77ab",
+          "text": "The user necessarily typed credentials at 10:30",
+          "explanation": "Issuance time does not establish a fresh credential event."
+        },
+        {
+          "id": "6fa7f7e376",
+          "text": "The assertion is necessarily malformed",
+          "explanation": "Different event and issuance times can be legitimate."
+        },
+        {
+          "id": "ba04540655",
+          "text": "The assertion's acceptance deadline",
+          "explanation": "AuthnInstant records an authentication event, while acceptance deadlines are expressed through validity fields."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q15",
+      "topic": "Provider association",
+      "prompt": "Atlas has pending requests for two different IdPs. A response references a real pending ID but comes from the wrong trusted provider. What is required?",
+      "correctId": "04bc4368ab",
+      "options": [
+        {
+          "id": "04bc4368ab",
+          "text": "Check the expected provider associated with that pending transaction",
+          "explanation": "Being trusted somewhere in the application does not make a provider the expected responder to every request."
+        },
+        {
+          "id": "a68184f658",
+          "text": "Accept any provider with any trusted key",
+          "explanation": "Provider trust must be tied to the intended exchange, not pooled without context."
+        },
+        {
+          "id": "4e6e298da9",
+          "text": "Ignore issuer checks when an ID matches",
+          "explanation": "Correlation and issuer checks address different requirements."
+        },
+        {
+          "id": "ee01f53810",
+          "text": "Change the transaction's provider after receiving the response",
+          "explanation": "That would let incoming data redefine the expected trust relationship."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q16",
+      "topic": "Request lifetime",
+      "prompt": "A signed response matches a request that Atlas expired and removed from its pending store. What should the correlated path do?",
+      "correctId": "8de09eaf54",
+      "options": [
+        {
+          "id": "8de09eaf54",
+          "text": "Reject it as having no acceptable pending transaction",
+          "explanation": "A once-valid request ID does not remain usable indefinitely. Request context has a controlled lifetime."
+        },
+        {
+          "id": "8835700a77",
+          "text": "Restore the request from the response itself",
+          "explanation": "The response is not a replacement for the SP's original protected context."
+        },
+        {
+          "id": "cc75ad5295",
+          "text": "Accept if the assertion has any future expiry",
+          "explanation": "Assertion validity alone does not restore expired request correlation."
+        },
+        {
+          "id": "e665ed7eab",
+          "text": "Use the user's display name as a replacement request ID",
+          "explanation": "A name is not transaction correlation evidence."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q17",
+      "topic": "Concurrent tabs",
+      "prompt": "Two browser tabs start separate Atlas sign-ins. What design best supports reliable correlation?",
+      "correctId": "ad516ed87b",
+      "options": [
+        {
+          "id": "ad516ed87b",
+          "text": "Keep distinct pending request IDs and context for each transaction",
+          "explanation": "Separate contexts avoid one tab accidentally overwriting the other tab's sign-in state."
+        },
+        {
+          "id": "86317d00a5",
+          "text": "Use one shared constant request ID for all users",
+          "explanation": "A constant cannot distinguish concurrent transactions."
+        },
+        {
+          "id": "3c3eb015b1",
+          "text": "Correlate both tabs using only the user's account name",
+          "explanation": "One account can have concurrent transactions; the account name does not distinguish their request context."
+        },
+        {
+          "id": "2e33e9c549",
+          "text": "Match replies by arrival order alone",
+          "explanation": "Network ordering is not a trustworthy transaction identifier."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q18",
+      "topic": "Local session reuse",
+      "prompt": "Devi opens Atlas while her existing Atlas session is still acceptable. Must Atlas initiate SAML every time she opens a page?",
+      "correctId": "0da4e61ee2",
+      "options": [
+        {
+          "id": "0da4e61ee2",
+          "text": "No; Atlas may serve the request using its own acceptable session",
+          "explanation": "The SP controls when its local session is sufficient and when a new federation exchange is needed."
+        },
+        {
+          "id": "97d8b48334",
+          "text": "Yes; every page requires a new assertion",
+          "explanation": "A local session commonly supports subsequent application requests."
+        },
+        {
+          "id": "8b7e675206",
+          "text": "No; Okta's cookie is sent directly to Atlas instead",
+          "explanation": "The local session can be reused without sharing the provider's cookie."
+        },
+        {
+          "id": "5c73855d45",
+          "text": "Yes; otherwise the assertion becomes an application password",
+          "explanation": "Assertions and passwords have different roles regardless of page navigation."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q19",
+      "topic": "Safe return targets",
+      "prompt": "A returned RelayState value resolves to https://untrusted.example. What should Atlas do before redirecting the browser?",
+      "correctId": "c7d15fb9e0",
+      "options": [
+        {
+          "id": "c7d15fb9e0",
+          "text": "Apply its allowed-return-target rules",
+          "explanation": "Restored navigation must be constrained. A returned value is not permission for an arbitrary redirect."
+        },
+        {
+          "id": "883aac6ecd",
+          "text": "Redirect immediately because a response was signed",
+          "explanation": "A signed SAML message does not automatically authenticate or approve every external navigation parameter."
+        },
+        {
+          "id": "865259cd6e",
+          "text": "Treat the URL as the SAML audience",
+          "explanation": "Audience identifies the intended relying party, not the post-login page."
+        },
+        {
+          "id": "fc34c46d71",
+          "text": "Assume the URL is safe because the user is authenticated",
+          "explanation": "Authentication does not approve an arbitrary external return destination."
+        }
+      ]
+    },
+    {
+      "id": "L03-Q20",
+      "topic": "Successful completion",
+      "prompt": "Okta posts a response to Atlas's ACS endpoint. When should Atlas establish an authenticated application session?",
+      "correctId": "d50c308944",
+      "options": [
+        {
+          "id": "d50c308944",
+          "text": "After response acceptance and the required account and access checks succeed",
+          "explanation": "Arrival at the ACS is only delivery. The receiver still validates the exchange and resolves an eligible local identity."
+        },
+        {
+          "id": "2ea3784db9",
+          "text": "Immediately on any POST to the ACS",
+          "explanation": "An HTTP request alone is not authentication evidence."
+        },
+        {
+          "id": "64fe46a67e",
+          "text": "As soon as Base64 decoding succeeds",
+          "explanation": "Decoding establishes readability, not trust or access."
+        },
+        {
+          "id": "463c513fab",
+          "text": "When the browser displays an Okta logo",
+          "explanation": "Branding does not establish protocol acceptance."
+        }
+      ]
+    }
+  ]
+}
