@@ -262,6 +262,41 @@
       "quizzes": 20
     },
     {
+      "source": "reference/mixed-review.md",
+      "route": "reference/mixed-review/",
+      "title": "Mixed review",
+      "description": "Connect concepts across three cumulative checkpoints.",
+      "kind": "Reference"
+    },
+    {
+      "source": "reference/annotated-saml-messages.md",
+      "route": "reference/annotated-saml-messages/",
+      "title": "Annotated SAML messages",
+      "description": "Read request and response XML with field-level explanations.",
+      "kind": "Reference"
+    },
+    {
+      "source": "reference/troubleshooting-comparisons.md",
+      "route": "reference/troubleshooting-comparisons/",
+      "title": "Troubleshooting comparisons",
+      "description": "Distinguish similar symptoms using evidence and unknowns.",
+      "kind": "Reference"
+    },
+    {
+      "source": "reference/okta-settings-to-saml.md",
+      "route": "reference/okta-settings-to-saml/",
+      "title": "Okta settings and SAML",
+      "description": "Connect settings to emitted fields and application requirements.",
+      "kind": "Reference"
+    },
+    {
+      "source": "reference/final-engineering-case.md",
+      "route": "reference/final-engineering-case/",
+      "title": "Final engineering case",
+      "description": "Defend a correction and verification plan from several attempts.",
+      "kind": "Reference"
+    },
+    {
       "source": "reference/glossary.md",
       "route": "reference/glossary/",
       "title": "Glossary",

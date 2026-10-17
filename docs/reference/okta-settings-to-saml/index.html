@@ -1,0 +1,64 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Connect settings to emitted fields and application requirements."><meta name="color-scheme" content="light"><title>Okta settings and SAML | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/reference/okta-settings-to-saml/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css?v=cf7b539460f9"><link rel="stylesheet" href="/SAML_Theory/assets/style.css?v=cf7b539460f9"><script src="/SAML_Theory/assets/app.js?v=cf7b539460f9" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/" aria-current="page">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary title="Expand or collapse lessons"><span class="menu-icon" aria-hidden="true">☰</span><span class="menu-label">Browse lessons</span></summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><div class="eyebrow">Reference library</div><article class="prose reference-page"><h1 id="connect-okta-settings-to-the-saml-message">Connect Okta settings to the SAML message</h1>
+<p>An integration setting has two jobs to understand: what it changes in the outgoing exchange, and what the application expects to receive. Keep the application's approved requirements beside the actual message. A saved setting or a preview is useful evidence, but neither proves that a particular live sign-in was accepted.</p>
+<p>The following fictional Atlas test agreement makes the comparison concrete. Its ACS is <code>https://atlas-test.northstar.example/saml/acs</code>, its entity ID is <code>urn:northstar:atlas:test</code>, and its account lookup uses an employee identifier. Devi's approved value is <code>E1042</code>. Atlas also requires a <code>department</code> attribute.</p>
+<h2 id="follow-a-setting-to-its-observable-result">Follow a setting to its observable result</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Okta setting or integration information</th>
+<th>Look for in the exchange</th>
+<th>What Atlas needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single sign-on URL</td>
+<td>The browser's POST target; normally also the configured Response <code>Destination</code> and bearer confirmation <code>Recipient</code></td>
+<td>The approved ACS for this environment</td>
+</tr>
+<tr>
+<td>Audience URI (SP Entity ID)</td>
+<td>Assertion <code>Conditions/AudienceRestriction/Audience</code></td>
+<td>Exact agreed relying-party identifier, here <code>urn:northstar:atlas:test</code></td>
+</tr>
+<tr>
+<td>Application username configuration and effective app-user value</td>
+<td>Subject <code>NameID</code> in the emitted assertion</td>
+<td>The value expected by its lookup rule, here <code>E1042</code></td>
+</tr>
+<tr>
+<td>Name ID format</td>
+<td><code>NameID/@Format</code></td>
+<td>The agreed interpretation; a format does not select the account by itself</td>
+</tr>
+<tr>
+<td>Attribute statements or custom claims</td>
+<td>Named <code>Attribute</code> elements and their <code>AttributeValue</code> children</td>
+<td>Required names, values and cardinality, including <code>department</code></td>
+</tr>
+<tr>
+<td>Response / Assertion Signature</td>
+<td>The relevant XML <code>Signature</code> and its references</td>
+<td>Required protection of the exact content consumed, verified under independently approved issuer/key trust</td>
+</tr>
+<tr>
+<td>IdP issuer and signing certificate from the integration's setup information</td>
+<td>Issuer values and the actual verification result</td>
+<td>The expected provider and effective trusted public key at every validating runtime</td>
+</tr>
+</tbody>
+</table></div>
+<p>The Single sign-on URL is the default ACS. Okta's default checkbox shares it with Recipient and Destination; supported advanced settings can separate them or select other endpoints. Do not infer endpoint behavior from the label alone. These settings are documented in the <a href="https://help.okta.com/oie/en-us/content/topics/apps/aiw-saml-reference.htm">Okta SAML field reference</a>.</p>
+<h2 id="follow-one-identity-value-all-the-way-through">Follow one identity value all the way through</h2>
+<p>For this example, trace <code>E1042</code> from the authoritative employee source to the effective app username, then to the captured <code>NameID</code>, then to Atlas's unique enabled account. Inspect each boundary instead of assuming that a profile update propagated everywhere. Update timing, integration behavior and supported overrides can affect the emitted value.</p>
+<p>Suppose the source contains <code>E1042</code>, but the app-user record and actual NameID contain <code>devi@northstar.example</code>. Atlas logs <code>account_match=none</code> under its employee-ID rule. The output disagrees with the contract. Compare the username configuration, effective app-user value and update behavior before changing Atlas's matching rule. The evidence does not yet explain why the configured value became email.</p>
+<details><summary>Check your reasoning</summary>
+<p>Changing Name ID format to emailAddress would not make an employee-ID lookup find the intended account. Changing the audience would not repair the emitted subject value either. Resolve the identity contract at its source and verify a fresh sign-in selects exactly Devi's intended account.</p>
+</details>
+<h2 id="find-claims-without-depending-on-an-old-screenshot">Find claims without depending on an old screenshot</h2>
+<p>Current Okta documentation places custom claims on the app's <strong>Sign On</strong> tab and distinguishes the newer claims interface from legacy configuration. The expression languages differ; do not copy a legacy expression into the newer interface without checking its syntax. An empty expression result can omit a claim. See <a href="https://help.okta.com/oie/en-us/content/topics/apps/federated-claims-overview.htm">Okta custom claims</a>.</p>
+<p>For <code>department</code>, compare the intended source, configured expression, actual output name and emitted value. If the assertion contains <code>Department</code> but Atlas requires <code>department</code> with exact matching, a populated source profile does not resolve that name mismatch. If the assertion contains no department attribute, investigate issuance before debugging Atlas's role mapping.</p>
+<h2 id="keep-the-two-sso-addresses-distinct">Keep the two SSO addresses distinct</h2>
+<p>The <strong>app's ACS</strong> receives the response from the browser. The <strong>Okta IdP SSO endpoint</strong> receives the authentication request from the browser. They belong to opposite sides of the exchange. Audience identifies the relying party; it is neither of those destinations merely because it resembles a URL.</p>
+<p>Continue with <a href="/SAML_Theory/reference/annotated-saml-messages/">annotated messages</a> to find these values inside XML, or use <a href="/SAML_Theory/reference/troubleshooting-comparisons/">troubleshooting comparisons</a> to distinguish similar failures.</p>
+</article></section></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

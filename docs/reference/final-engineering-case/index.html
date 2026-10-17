@@ -1,0 +1,133 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Defend a correction and verification plan from several attempts."><meta name="color-scheme" content="light"><title>Final engineering case | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/reference/final-engineering-case/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css?v=cf7b539460f9"><link rel="stylesheet" href="/SAML_Theory/assets/style.css?v=cf7b539460f9"><script src="/SAML_Theory/assets/app.js?v=cf7b539460f9" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/" aria-current="page">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary title="Expand or collapse lessons"><span class="menu-icon" aria-hidden="true">☰</span><span class="menu-label">Browse lessons</span></summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><div class="eyebrow">Reference library</div><article class="prose reference-page"><h1 id="final-engineering-case-restore-atlas-test-access">Final engineering case: restore Atlas test access</h1>
+<p>Northstar's app owner asks you to assess Atlas test after an integration change. Several users report “Unable to sign in,” while one reader reports an administrative denial. Prepare a reasoned engineering recommendation using the evidence below. This is a fictional investigation with normalized records, not an export of actual Okta event names.</p>
+<h2 id="establish-the-required-behavior">Establish the required behavior</h2>
+<p>Atlas test's entity ID is <code>urn:northstar:atlas:test</code>, and its ACS is <code>https://atlas-test.northstar.example/saml/acs</code>. It expects the approved provider issuer <code>urn:northstar:okta:test</code>, its required signed assertion protection, request correlation, target/time checks and service-wide replay prevention. Actual tenant issuer values must come from approved integration information.</p>
+<p>Devi should match employee ID <code>E1042</code>; Noor should match <code>E2087</code>. Both test accounts are unique, enabled readers. JIT provisioning is disabled. A required <code>department</code> claim must be released. Readers may open projects and must be denied administrative changes.</p>
+<p>Approved K2 replaces uncompromised K1 under a planned overlap. Every active validator must adopt K2 before the sender switches. Recovery must preserve trust checks and intended account permissions. No supported cross-app logout mechanism is part of this change.</p>
+<h2 id="compare-selected-settings-with-requirements">Compare selected settings with requirements</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Recorded value or state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single sign-on URL</td>
+<td>The agreed Atlas test ACS</td>
+</tr>
+<tr>
+<td>Audience URI</td>
+<td><code>urn:northstar:atlas:test</code></td>
+</tr>
+<tr>
+<td>Name ID format</td>
+<td>Unspecified, interpreted by the agreed employee-ID mapping</td>
+</tr>
+<tr>
+<td>Devi's authoritative source / effective app username</td>
+<td><code>E1042</code> / <code>devi@northstar.example</code></td>
+</tr>
+<tr>
+<td>Noor's authoritative source / effective app username</td>
+<td><code>E2087</code> / <code>E2087</code></td>
+</tr>
+<tr>
+<td>Claim configuration and observed release</td>
+<td><code>department</code> is required; the displayed issued message contains <code>Research</code></td>
+</tr>
+<tr>
+<td>Sender signing key after the change</td>
+<td>Approved K2</td>
+</tr>
+<tr>
+<td>Effective node trust</td>
+<td>A trusts K1/K2; B trusts only K1</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="inspect-the-message-evidence">Inspect the message evidence</h2>
+<p>This excerpt is a sanitized, incomplete copy of Devi's first attempt at node A. The signature and unrelated fields are omitted. Its displayed values do not prove cryptographic validity; the separate receiver record reports the validation result for the preserved original. Do not attempt to validate the modified excerpt as though it were that original.</p>
+<pre tabindex="0" role="region" aria-label="xml code example"><code class="language-xml">&lt;samlp:Response xmlns:samlp=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;
+  xmlns:saml=&quot;urn:oasis:names:tc:SAML:2.0:assertion&quot;
+  ID=&quot;_resp_D03_01&quot; InResponseTo=&quot;_req_D03_01&quot;
+  Destination=&quot;https://atlas-test.northstar.example/saml/acs&quot;&gt;
+  &lt;saml:Issuer&gt;urn:northstar:okta:test&lt;/saml:Issuer&gt;
+  &lt;!-- Status is Success; signature and other required fields omitted. --&gt;
+  &lt;saml:Assertion ID=&quot;_assert_D03_01&quot;&gt;
+    &lt;saml:Issuer&gt;urn:northstar:okta:test&lt;/saml:Issuer&gt;
+    &lt;saml:Subject&gt;
+      &lt;saml:NameID&gt;devi@northstar.example&lt;/saml:NameID&gt;
+    &lt;/saml:Subject&gt;
+    &lt;saml:Conditions NotBefore=&quot;2026-10-17T14:01:00Z&quot;
+      NotOnOrAfter=&quot;2026-10-17T14:06:00Z&quot;&gt;
+      &lt;saml:AudienceRestriction&gt;
+        &lt;saml:Audience&gt;urn:northstar:atlas:test&lt;/saml:Audience&gt;
+      &lt;/saml:AudienceRestriction&gt;
+    &lt;/saml:Conditions&gt;
+    &lt;saml:AttributeStatement&gt;
+      &lt;saml:Attribute Name=&quot;department&quot;&gt;
+        &lt;saml:AttributeValue&gt;Research&lt;/saml:AttributeValue&gt;
+      &lt;/saml:Attribute&gt;
+    &lt;/saml:AttributeStatement&gt;
+  &lt;/saml:Assertion&gt;
+&lt;/samlp:Response&gt;
+</code></pre>
+<p>Compare the reported audience, destination and subject with the contract. Record what each comparison establishes and what requires separate receiver evidence. For field-by-field interpretation, consult <a href="/SAML_Theory/reference/annotated-saml-messages/">annotated messages</a>.</p>
+<h2 id="correlate-several-independent-attempts">Correlate several independent attempts</h2>
+<p>All timestamps are UTC. Every sign-in starts without a usable Atlas session and uses a fresh request, response and assertion. Required Okta assignment and authentication policy succeed for these recorded attempts. These facts do not imply every unrelated attempt succeeds.</p>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Attempt</th>
+<th>Time and evidence</th>
+<th>Observed result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1: Devi at A</td>
+<td>14:01:10, request <code>_req_D03_01</code>, response <code>_resp_D03_01</code>, assertion <code>_assert_D03_01</code>; preserved original uses K2; required receiver checks pass, including bearer confirmation, browser/request context and replay state</td>
+<td>NameID is email; employee-ID lookup returns no match; no Atlas session</td>
+</tr>
+<tr>
+<td>B1: Devi at B</td>
+<td>14:02:10, request <code>_req_EC_B1</code>, response <code>_resp_EC_B1</code>, assertion <code>_assert_EC_B1</code>; K2 response reaches correct ACS; node reports no approved verification key for that sender key</td>
+<td>Verification fails; account mapping not reached; no Atlas session</td>
+</tr>
+<tr>
+<td>A2: Noor at A</td>
+<td>14:03:10, request <code>_req_EC_A2</code>, response <code>_resp_EC_A2</code>, assertion <code>_assert_EC_A2</code>; required checks pass; NameID <code>E2087</code>, department <code>Research</code></td>
+<td>Intended enabled account selected; new session; projects succeeds</td>
+</tr>
+<tr>
+<td>A2 resource request</td>
+<td>14:03:30, Noor's same new session requests an administrative action</td>
+<td>Denied under reader role</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="write-your-recommendation-before-opening-the-analysis">Write your recommendation before opening the analysis</h2>
+<ol>
+<li>Explain the intended browser journey from requesting projects through session creation and the final resource check.</li>
+<li>Identify the last success and first failure for A1 and B1. Explain why the A2 administrative denial differs.</li>
+<li>Separate confirmed mismatches from unknown underlying causes.</li>
+<li>Propose the smallest authorized corrections. Would a key rollback alone resolve all supplied failures?</li>
+<li>Give positive and rejection tests that demonstrate recovery without weakening a boundary.</li>
+</ol>
+<details><summary>Reveal the engineering analysis</summary>
+<p><strong>A1 stops at account resolution.</strong> Node A accepted the actual protected SAML message, but its consumed subject value disagrees with the employee-ID lookup contract. Trace Devi's username configuration, effective app-user value and update behavior to the approved source. Resolve that mismatch through the controlled identity change process. Do not substitute a permissive email lookup just to suppress the error.</p>
+<p><strong>B1 stops at verification trust.</strong> Its effective K2 trust is absent. Reconcile approved K2 adoption at B and verify all active validators. Do not trust an arbitrary embedded certificate or disable verification. Since K1 is stated uncompromised, a coordinated temporary rollback may be a supported recovery option, but it does not fix Devi's account mapping and requires its own criteria and verification.</p>
+<p><strong>A2 establishes useful success and intended denial.</strong> Noor reaches the intended account and projects. The reader's administrative denial is required behavior, not an SSO defect. Do not grant administrator rights as a repair.</p>
+<p>The packet does not explain why B missed adoption or why Devi's app username became email. It also does not establish readiness of any unnamed node. Preserve those uncertainties in the handover.</p>
+<p>Retest fresh Devi and Noor exchanges at each validator, recording new request and message IDs, actual signing key, time/target/correlation/replay outcomes, consumed NameID, unique account and resource result. Verify that a copied assertion, wrong audience and incorrect correlation are rejected through an approved test environment or supported test harness. A new successful sign-in must not make those rejection tests pass incorrectly. Keep the reader administrative denial.</p>
+</details>
+<h2 id="trace-the-intended-complete-exchange">Trace the intended complete exchange</h2>
+<p>The diagram below shows a successful path after correction, starting without usable Atlas or Okta sessions. It reuses the same request identifier as A1 for orientation; a real retest must create a new request and assertion. The observed failures above stop before the intended session steps. Separate tests should also cover reuse of an acceptable Okta session.</p>
+<p><strong>Figure RF-EC1: Intended complete sign-in after correction.</strong> Browser delivery and local decisions are distinct.</p>
+<figure class="diagram"><img src="/SAML_Theory/assets/diagrams/L03-S1.svg" alt="RF-EC1: Intended complete sign-in after correction" width="1173" height="1115" loading="lazy"><figcaption><span>RF-EC1</span><a href="/SAML_Theory/assets/diagrams/L03-S1.svg" data-diagram="RF-EC1: Intended complete sign-in after correction">Open full diagram</a></figcaption></figure><p>At step 1, the browser asks Atlas for projects. Steps 2a through 3 create protected pending context and carry the request to Okta. Step 4 groups provider request processing, authentication and policy interactions. Steps 5 and 6 carry the response through the browser to the ACS. At 7a, the receiver evaluates trust and the applicable acceptance checks; at 7b it resolves the intended account. Compare each supplied attempt with these boundaries. Only successful processing reaches session creation at 7c and the browser's cookie-backed resource request and authorization outcome at step 8.</p>
+<p>The cross-participant arrows show message movement; self-arrows show local processing. A trust configuration is a prerequisite to verification, not another browser message. The changed session state begins only after the receiver and account checks succeed.</p>
+<h2 id="check-your-own-confidence">Check your own confidence</h2>
+<p>You are ready to defend the recommendation when you can explain the two distinct failure boundaries, preserve the expected denial, name missing evidence, and describe how a fresh test proves the intended repair. If one of those is unclear, use <a href="/SAML_Theory/reference/troubleshooting-comparisons/">troubleshooting comparisons</a> or the <a href="/SAML_Theory/reference/okta-settings-to-saml/">Okta settings bridge</a>, then attempt the recommendation again.</p>
+</article></section></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

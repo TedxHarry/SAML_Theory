@@ -109,8 +109,8 @@
         },
         {
           "id": "c90f0ea479",
-          "text": "The user's password always decrypts the assertion",
-          "explanation": "XML encryption does not imply user-password-based decryption."
+          "text": "Atlas decrypts using its public encryption certificate alone",
+          "explanation": "Public recipient material allows encryption to the recipient; decryption requires the corresponding private-key capability."
         }
       ]
     },
@@ -216,8 +216,8 @@
         },
         {
           "id": "b39e685194",
-          "text": "Only the display font is wrong",
-          "explanation": "This is a trust-boundary error, not presentation."
+          "text": "The unsigned assertion is acceptable if it names the same issuer",
+          "explanation": "A claimed issuer string does not authenticate the second object or bind consumption to the verified assertion."
         },
         {
           "id": "696e5dfc48",
@@ -361,8 +361,8 @@
         },
         {
           "id": "7c7315a5ba",
-          "text": "Only if the object is indented the same way",
-          "explanation": "Indentation is not a trust relationship."
+          "text": "Yes, if both objects contain the same subject identifier text",
+          "explanation": "Matching text does not extend a signature's coverage to an unrelated unsigned object."
         }
       ]
     },
@@ -412,8 +412,8 @@
         },
         {
           "id": "856efb9b27",
-          "text": "Every user must receive a wrong password message from Okta",
-          "explanation": "The failure occurs at SP verification after issuance."
+          "text": "The provider's successful issuance guarantees every node can verify",
+          "explanation": "Issuance and effective verification trust at each receiving runtime are separate requirements."
         },
         {
           "id": "5404e73707",
@@ -452,86 +452,103 @@
     },
     {
       "id": "L06-Q17",
-      "topic": "Compromised keys",
-      "prompt": "K1 is suspected compromised during a move to K2. Why is an automatic rollback to K1 inappropriate?",
+      "topic": "Verified object evidence",
+      "prompt": "The signature result and consumed identity refer to different assertions. What is the first defect to address?",
       "correctId": "59f497b776",
       "options": [
         {
           "id": "59f497b776",
-          "text": "Rollback could restore trust in material that may be controlled by an attacker",
-          "explanation": "Recovery must account for the reason the old key was removed, not just restore availability."
+          "text": "The receiver consumed an identity object it did not authenticate",
+          "explanation": "Validation must remain bound to the exact object used for the identity decision."
         },
         {
           "id": "f3cfb60b73",
-          "text": "A compromised key becomes safer with age",
-          "explanation": "Time does not restore key secrecy."
+          "text": "The audience check alone should be removed",
+          "explanation": "That would weaken a separate acceptance boundary."
         },
         {
           "id": "67dbfc78ca",
-          "text": "Public keys must be kept secret forever",
-          "explanation": "The sensitive material is the private key; public-key distribution is normal."
+          "text": "The unsigned assertion should inherit trust from its sibling",
+          "explanation": "Proximity in XML does not establish signature coverage."
         },
         {
           "id": "9053b6242a",
-          "text": "Every rollback automatically recreates accounts",
-          "explanation": "Account creation is a different concern."
+          "text": "The browser should Base64-encode both assertions together",
+          "explanation": "Transport encoding does not authenticate the consumed object."
         }
-      ]
+      ],
+      "evidence": [
+        "Verified signature references Assertion _A",
+        "Consumed NameID comes from unsigned Assertion _B",
+        "Assertion _B reports the expected audience"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L06-Q18",
-      "topic": "Single-key receivers",
-      "prompt": "An SP can trust only one signing key at a time. What changes in the rollover plan?",
+      "topic": "Decryption evidence limits",
+      "prompt": "Atlas successfully decrypts the packet, but has no issuer verification result. What remains unknown?",
       "correctId": "90c35cb494",
       "options": [
         {
           "id": "90c35cb494",
-          "text": "The switch requires a coordinated cutover and explicit recovery plan for that limitation",
-          "explanation": "Overlap cannot be assumed when the product cannot hold two keys."
+          "text": "Whether the content is authenticated under the expected issuer trust",
+          "explanation": "Recipient confidentiality and sender authenticity are different properties."
         },
         {
           "id": "15345475ec",
-          "text": "The SP can still verify K1 and K2 simultaneously by renaming the certificate",
-          "explanation": "A filename does not add multi-key capability."
+          "text": "Whether Atlas obtained readable XML",
+          "explanation": "Successful decryption establishes that stated result."
         },
         {
           "id": "129943999d",
-          "text": "No testing is needed",
-          "explanation": "A more constrained transition particularly needs validation."
+          "text": "Whether the private decryption key was usable for this packet",
+          "explanation": "The recorded operation establishes its use for this decryption."
         },
         {
           "id": "eb530ee298",
-          "text": "The provider should share its private key to bypass the limitation",
-          "explanation": "Private-key sharing is not a valid rollover workaround."
+          "text": "Whether encryption automatically validates audience",
+          "explanation": "It does not; audience remains a separate check rather than a decryption result."
         }
-      ]
+      ],
+      "evidence": [
+        "EncryptedAssertion decryption: succeeded",
+        "Expected-issuer signature verification: not supplied",
+        "Audience and account result: not supplied"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L06-Q19",
-      "topic": "Key purpose",
-      "prompt": "Atlas's decryption key rotates, but Okta's signing key stays unchanged. Which configuration is principally affected?",
+      "topic": "Rollover runtime evidence",
+      "prompt": "The observations below follow K2 activation. What best explains the supplied intermittent signature failures?",
       "correctId": "94154996b9",
       "options": [
         {
           "id": "94154996b9",
-          "text": "The public encryption key Okta uses for Atlas and Atlas's matching decryption private key",
-          "explanation": "Encryption and signing keys have different directions and owners even if managed near each other."
+          "text": "One active validator has not adopted K2",
+          "explanation": "The effective node inventory and node-specific results identify a trust-adoption mismatch."
         },
         {
           "id": "714645bace",
-          "text": "Only the user's browser bookmarks",
-          "explanation": "Bookmarks do not configure XML encryption."
+          "text": "The audience is necessarily wrong on every node",
+          "explanation": "The packet supplies matching audiences and successful acceptance at A."
         },
         {
           "id": "76e48015f2",
-          "text": "Every IdP signing key necessarily changes",
-          "explanation": "Rotating recipient encryption material does not inherently rotate the sender's signing material."
+          "text": "The user's password changes between nodes",
+          "explanation": "The supplied failure is signature verification after issuance."
         },
         {
           "id": "ef593eb6ad",
-          "text": "The NameID format automatically changes",
-          "explanation": "Key rotation does not define identifier semantics."
+          "text": "K2 is necessarily invalid everywhere",
+          "explanation": "Successful verification at A contradicts that universal conclusion."
         }
+      ],
+      "evidence": [
+        "Issuer switched from approved K1 to K2",
+        "Node A trusts K2 and verifies; node B trusts only K1 and fails",
+        "Audience and ACS match the test contract"
       ]
     },
     {

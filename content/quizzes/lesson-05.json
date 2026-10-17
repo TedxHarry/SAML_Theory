@@ -277,8 +277,8 @@
         },
         {
           "id": "205e6ce497",
-          "text": "A request ID is the user's password",
-          "explanation": "Request correlation values and passwords have different roles."
+          "text": "An IdP signature always establishes the initiating browser context",
+          "explanation": "A signed assertion can authenticate content without supplying the same requester-established browser transaction context."
         }
       ]
     },
@@ -452,86 +452,103 @@
     },
     {
       "id": "L05-Q17",
-      "topic": "Broker identity linking",
-      "prompt": "Two upstream users have similar email addresses. What must a federation broker avoid?",
+      "topic": "Binding evidence",
+      "prompt": "The packet shows a Redirect request and a POST response. What is correct?",
       "correctId": "63d1c7d033",
       "options": [
         {
           "id": "63d1c7d033",
-          "text": "Linking them to the same local identity without the agreed unique matching and lifecycle rules",
-          "explanation": "Identity linking is a security-sensitive decision, not a consequence of similar-looking strings."
+          "text": "The request and response use different supported bindings",
+          "explanation": "Response binding can differ from request binding; inspect each leg's actual mechanism."
         },
         {
           "id": "efb1ad96f8",
-          "text": "Maintaining separate trust relationships",
-          "explanation": "Separate trust relationships are necessary."
+          "text": "The flow is invalid because both legs must use Redirect",
+          "explanation": "SAML does not impose that symmetry."
         },
         {
           "id": "bd11fe6ebe",
-          "text": "Recording the actual upstream issuer",
-          "explanation": "Issuer context helps interpret identity correctly."
+          "text": "The POST field is confidential because it is Base64",
+          "explanation": "Encoding does not provide confidentiality."
         },
         {
           "id": "9b39e5fff9",
-          "text": "Applying configured account eligibility checks",
-          "explanation": "Eligibility checks remain important when a broker is involved."
+          "text": "RelayState replaces the signed assertion",
+          "explanation": "The binding context parameter is separate from the identity statements."
         }
-      ]
+      ],
+      "evidence": [
+        "Request: HTTP-Redirect with SAMLRequest query parameter",
+        "Response: HTTP-POST with Base64 SAMLResponse form field",
+        "Both mechanisms are supported by this integration"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L05-Q18",
-      "topic": "IdP discovery",
-      "prompt": "A sign-in page routes users to an IdP based on an email domain. What has this routing decision established?",
+      "topic": "Artifact evidence limits",
+      "prompt": "The server resolved an artifact and retrieved XML. What is still unknown?",
       "correctId": "48885728d6",
       "options": [
         {
           "id": "48885728d6",
-          "text": "Where to attempt authentication, not permission to enter the application",
-          "explanation": "Discovery chooses an authentication path. Authentication, matching and authorization still follow."
+          "text": "Whether the retrieved message satisfies acceptance and local account requirements",
+          "explanation": "Resolution establishes retrieval, not every subsequent validation and access result."
         },
         {
           "id": "8202b8fdaf",
-          "text": "That the user owns any mailbox with that domain",
-          "explanation": "A typed domain is not ownership evidence."
+          "text": "Whether the full message was retrieved",
+          "explanation": "That is the supplied resolution observation."
         },
         {
           "id": "541aeedf48",
-          "text": "That every routed user has an application account",
-          "explanation": "Account readiness is separate from discovery."
+          "text": "Whether there was a resolution exchange",
+          "explanation": "The supplied packet explicitly records the resolution exchange, so its existence is already established."
         },
         {
           "id": "f408b439d6",
-          "text": "That the typed email domain is already a verified identity",
-          "explanation": "Discovery input chooses a route; it is not the completed authentication result."
+          "text": "Whether the artifact itself must be the permanent employee ID",
+          "explanation": "An artifact is an exchange reference, not a durable subject identifier."
         }
-      ]
+      ],
+      "evidence": [
+        "Browser delivered artifact reference",
+        "Resolution exchange: succeeded; XML retrieved",
+        "Acceptance, account and session results: not supplied"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L05-Q19",
-      "topic": "Binding compatibility",
-      "prompt": "An SP offers only a POST ACS endpoint. A proposed design requires an Artifact ACS endpoint instead. What is needed?",
+      "topic": "Unsolicited fallback evidence",
+      "prompt": "A response claims a request ID that Atlas does not recognize. Which behavior preserves the correlated path's protection?",
       "correctId": "59a5c11d6b",
       "options": [
         {
           "id": "59a5c11d6b",
-          "text": "Confirm supported endpoints and bindings on both sides before adopting the design",
-          "explanation": "A protocol option is usable only when the participating products and configuration support it."
+          "text": "Reject the failed correlated reply rather than silently reclassifying it",
+          "explanation": "An unknown InResponseTo must not automatically gain acceptance through an unsolicited fallback."
         },
         {
           "id": "1ef40ec2de",
-          "text": "Rename the POST endpoint to Artifact in a spreadsheet",
-          "explanation": "A label cannot add protocol support."
+          "text": "Accept it as unsolicited because that mode is enabled",
+          "explanation": "Enabling a second flow does not repair a failed correlated transaction."
         },
         {
           "id": "30c020a6ac",
-          "text": "Assume every SAML product implements every binding",
-          "explanation": "SAML defines options that products need not all expose."
+          "text": "Create pending context using the incoming request ID",
+          "explanation": "A fabricated pending record is not the original transaction context."
         },
         {
           "id": "5ba8e09859",
-          "text": "Ask the browser to convert any message automatically",
-          "explanation": "The browser does not implement missing SP protocol capabilities."
+          "text": "Accept it when RelayState contains an internal path",
+          "explanation": "Safe navigation does not supply missing request correlation."
         }
+      ],
+      "evidence": [
+        "Correlated path: InResponseTo _unknown",
+        "Pending context: no matching acceptable request",
+        "Unsolicited support exists as a separately configured path"
       ]
     },
     {

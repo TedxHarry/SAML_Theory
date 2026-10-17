@@ -323,8 +323,8 @@
         },
         {
           "id": "3190b3507c",
-          "text": "Only the color of the login button.",
-          "explanation": "Appearance cannot resolve identity output."
+          "text": "Only the provider's advertised NameID format",
+          "explanation": "Advertising a format does not select the source value or define which local account it must match."
         },
         {
           "id": "af994b7e64",
@@ -452,86 +452,103 @@
     },
     {
       "id": "L02-Q17",
-      "topic": "Root metadata",
-      "prompt": "A standalone root EntityDescriptor omits both validUntil and cacheDuration. A generic schema parser accepts it. Which conclusion is sound?",
+      "topic": "Endpoint evidence",
+      "prompt": "Compare the integration contract and observed response in the packet. What needs correction first?",
       "correctId": "a27ad216be",
       "options": [
         {
           "id": "a27ad216be",
-          "text": "Schema success alone does not establish the metadata root rule was met.",
-          "explanation": "The metadata specification requires at least one root freshness attribute despite their individual schema optionality."
+          "text": "The assertion audience disagrees with the intended SP identity",
+          "explanation": "Correct delivery to an ACS does not make a different application's audience acceptable."
         },
         {
           "id": "e3af5b21f1",
-          "text": "Schema success proves complete protocol conformance.",
-          "explanation": "A schema does not encode every specification or deployment requirement."
+          "text": "The ACS must be changed to the issued audience string",
+          "explanation": "An audience identifier is not automatically a receiving endpoint."
         },
         {
           "id": "1729178470",
-          "text": "The root automatically inherits an expiry from an absent parent.",
-          "explanation": "A standalone root has no supplied parent limit to inherit."
+          "text": "The user's NameID must equal the audience",
+          "explanation": "Subject and relying-party identifiers have different roles."
         },
         {
           "id": "d90891db8d",
-          "text": "The omitted attributes are application passwords.",
-          "explanation": "They concern metadata freshness and validity, not credentials."
+          "text": "Nothing needs correction because the response reached the ACS",
+          "explanation": "Delivery alone does not establish targeting acceptance."
         }
-      ]
+      ],
+      "evidence": [
+        "Approved ACS: https://atlas.example/saml/acs",
+        "Approved audience: urn:atlas:test",
+        "Observed POST target: approved ACS; assertion Audience: urn:ledger:test"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L02-Q18",
-      "topic": "Runtime adoption",
-      "prompt": "Okta publishes a new signing certificate in metadata. What establishes that Atlas can use it?",
+      "topic": "Adoption evidence",
+      "prompt": "New signing material appears in metadata, but no runtime inventory or new-key acceptance test is supplied. What remains unknown?",
       "correctId": "45190ea1a7",
       "options": [
         {
           "id": "45190ea1a7",
-          "text": "Approved effective receiver trust and verification evidence for the intended new key.",
-          "explanation": "Publication is not the same operation as receiver adoption and runtime verification."
+          "text": "Whether the active SP validators have adopted the approved new key",
+          "explanation": "Publication and effective receiver trust are separate facts."
         },
         {
           "id": "face2344ca",
-          "text": "The new certificate merely appearing on a setup page.",
-          "explanation": "Availability does not establish the receiver's effective configuration."
+          "text": "Whether the metadata currently advertises K2",
+          "explanation": "The supplied metadata snapshot establishes publication."
         },
         {
           "id": "fc3e9ebd7a",
-          "text": "A successful old-key attempt on an unrelated receiver.",
-          "explanation": "That observation does not test new-key adoption at Atlas."
+          "text": "Whether the public material can be viewed",
+          "explanation": "That availability is already observed."
         },
         {
           "id": "3254b63764",
-          "text": "Changing the integration's display name.",
-          "explanation": "A label change does not install verification material."
+          "text": "Whether metadata can describe signing keys",
+          "explanation": "The packet already shows that role; adoption is the missing evidence."
         }
-      ]
+      ],
+      "evidence": [
+        "Approved publication: metadata now advertises K2",
+        "Validator inventory: not supplied",
+        "Fresh K2 verification result: not supplied"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L02-Q19",
-      "topic": "Integration selection",
-      "prompt": "A catalog integration exists for an app, but a project requires a specific supported feature. What should determine suitability?",
+      "topic": "Identity configuration evidence",
+      "prompt": "The app requires employee IDs, but the effective app username and live NameID contain email. What is the smallest justified next investigation?",
       "correctId": "96562e5677",
       "options": [
         {
           "id": "96562e5677",
-          "text": "The exact integration's documented capabilities and requirements.",
-          "explanation": "Catalog presence is a starting point, not proof that every desired feature is supported."
+          "text": "Trace the username source, effective value and SP matching contract",
+          "explanation": "The observed output disagrees with the account key; its configuration path needs inspection."
         },
         {
           "id": "482e2842d1",
-          "text": "The icon looking identical to a production icon.",
-          "explanation": "Branding is not a capability contract."
+          "text": "Change the audience to the email address",
+          "explanation": "Audience does not define the subject account key."
         },
         {
           "id": "508d039a06",
-          "text": "An assumption that custom always means more secure.",
-          "explanation": "Security depends on the supported configuration and controls, not that label alone."
+          "text": "Change only Name ID format to emailAddress",
+          "explanation": "A format label would not repair an employee-ID lookup mismatch."
         },
         {
           "id": "8b7b63daac",
-          "text": "An assumption that all SAML capabilities are included.",
-          "explanation": "A protocol-defined option is not automatically a product feature."
+          "text": "Disable signature verification until an account matches",
+          "explanation": "Signature checks and the mapping mismatch are separate boundaries."
         }
+      ],
+      "evidence": [
+        "Agreed account key: employee ID E1042",
+        "Effective app username: devi@northstar.example",
+        "Live NameID: devi@northstar.example; SP lookup: no match"
       ]
     },
     {
@@ -552,8 +569,8 @@
         },
         {
           "id": "eb72e0b666",
-          "text": "A copy of every user's password.",
-          "explanation": "Passwords are not required handover material for this federation relationship."
+          "text": "Only the currently active certificate's filename",
+          "explanation": "A filename does not document approved trust provenance, runtime adoption, rotation ownership or recovery behavior."
         },
         {
           "id": "986a761bce",

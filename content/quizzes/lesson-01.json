@@ -328,8 +328,8 @@
         },
         {
           "id": "152b854be9",
-          "text": "The color of the Okta sign-in screen.",
-          "explanation": "Appearance is not trustworthy authentication evidence for Atlas."
+          "text": "An app assignment alone, without checking the issued response",
+          "explanation": "Assignment is provider-side eligibility, not an authenticated message or a completed receiver acceptance result."
         },
         {
           "id": "0de6f5460f",
@@ -379,8 +379,8 @@
         },
         {
           "id": "f8d07288fd",
-          "text": "The identifier looking like a password.",
-          "explanation": "An identifier is not a secret proving authentication by itself."
+          "text": "The identifier being nonempty, regardless of issuer scope",
+          "explanation": "A nonempty string is not enough to establish the intended trusted identity relationship and local account match."
         },
         {
           "id": "ebbf611cca",
@@ -452,86 +452,103 @@
     },
     {
       "id": "L01-Q17",
-      "topic": "Two applications",
-      "prompt": "Okta authenticates a user for Atlas. Later the user opens Ledger. What remains Ledger's responsibility?",
+      "topic": "Observed boundaries",
+      "prompt": "The observations below concern one Atlas sign-in. What can you conclude from them?",
       "correctId": "1d08676907",
       "options": [
         {
           "id": "1d08676907",
-          "text": "Evaluating its own supported sign-in and access requirements.",
-          "explanation": "Provider authentication does not transfer Atlas's account or permission decisions to Ledger."
+          "text": "Authentication succeeded, but local account readiness stopped entry",
+          "explanation": "The receiver accepted identity information; the application still required a usable account."
         },
         {
           "id": "4254c8e320",
-          "text": "Accepting Atlas's account record as its own without a rule.",
-          "explanation": "Each application needs its intended account relationship."
+          "text": "Okta necessarily rejected the user's credentials",
+          "explanation": "That contradicts the recorded successful authentication."
         },
         {
           "id": "35e5ebc9a9",
-          "text": "Giving access because Atlas previously allowed a page.",
-          "explanation": "A decision in one application does not authorize another application's resources."
+          "text": "The browser failed to deliver the response",
+          "explanation": "The receiver's acceptance record establishes delivery and processing."
         },
         {
           "id": "518419a2a4",
-          "text": "Ending every Okta session before considering sign-in.",
-          "explanation": "That is not a required consequence of opening a second application."
+          "text": "Assignment guarantees Atlas must create an account",
+          "explanation": "Assignment does not override the stated disabled JIT provisioning."
         }
-      ]
+      ],
+      "evidence": [
+        "Okta authentication: success",
+        "Atlas SAML acceptance: success",
+        "Atlas account lookup: no match; JIT disabled"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L01-Q18",
-      "topic": "Investigating symptoms",
-      "prompt": "A ticket says only that SSO is broken. Which observation most usefully narrows the problem first?",
+      "topic": "Limits of sign-in evidence",
+      "prompt": "A user reaches an application home page using an existing local session. What is still unknown from this visit?",
       "correctId": "b92cc1f503",
       "options": [
         {
           "id": "b92cc1f503",
-          "text": "The specific user, app, attempt, starting sessions and observed stopping point.",
-          "explanation": "Context and processing evidence distinguish authentication, delivery, acceptance and access failures."
+          "text": "Whether a new federation exchange would succeed",
+          "explanation": "An existing session can serve a request without exercising new SAML issuance or acceptance."
         },
         {
           "id": "30a7a33421",
-          "text": "A guess that every certificate has expired.",
-          "explanation": "The symptom alone does not identify a certificate failure."
+          "text": "Whether this request used an application session",
+          "explanation": "The packet explicitly records that session use."
         },
         {
           "id": "852fc44005",
-          "text": "A proposal to grant all users access.",
-          "explanation": "Access changes need an intended policy and established problem, not a generic symptom."
+          "text": "Whether the home page was returned",
+          "explanation": "That result is observed in the packet."
         },
         {
           "id": "41bd332a43",
-          "text": "The application's logo.",
-          "explanation": "Branding does not locate a processing failure."
+          "text": "Whether every page visit always requires SAML",
+          "explanation": "The observed visit itself shows a page can use local session state."
         }
-      ]
+      ],
+      "evidence": [
+        "Atlas session S1: usable",
+        "GET /home: 200 using S1",
+        "New SAML messages during visit: none"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L01-Q19",
-      "topic": "Role of assertions",
-      "prompt": "What is an assertion in a SAML sign-in arrangement?",
+      "topic": "Expected permission outcome",
+      "prompt": "The packet records an enabled reader reaching projects and being denied an administrative action. Which interpretation fits?",
       "correctId": "0458560d25",
       "options": [
         {
           "id": "0458560d25",
-          "text": "Structured statements about a subject with applicable restrictions.",
-          "explanation": "The receiver must evaluate those statements within the agreed trust and processing rules."
+          "text": "The application enforced the stated authorization boundary",
+          "explanation": "A reader's sign-in and intended resource denial can both be correct outcomes."
         },
         {
           "id": "6f235c72cf",
-          "text": "An automatic command to create an application account.",
-          "explanation": "Account creation depends on supported application behavior and configuration."
+          "text": "The administrative denial proves failed authentication",
+          "explanation": "The same accepted session reached projects successfully."
         },
         {
           "id": "597b3b63bc",
-          "text": "The application's permanent session cookie.",
-          "explanation": "An assertion and the resulting application-session mechanism have different roles."
+          "text": "The reader role should be changed to administrator to repair SSO",
+          "explanation": "That would violate the stated permission requirement."
         },
         {
           "id": "5efdd12fba",
-          "text": "A guarantee that every requested operation is authorized.",
-          "explanation": "A statement used for sign-in does not replace local resource permissions."
+          "text": "The IdP's account must have been disabled between the two requests",
+          "explanation": "No supplied evidence establishes an IdP lifecycle change."
         }
+      ],
+      "evidence": [
+        "Local account: enabled, reader",
+        "Projects request: allowed using session S2",
+        "Administrative action: denied using S2; reader policy forbids it"
       ]
     },
     {

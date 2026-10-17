@@ -384,8 +384,8 @@
         },
         {
           "id": "da771879bb",
-          "text": "The IdP must issue three different passwords",
-          "explanation": "SAML does not deliver application passwords."
+          "text": "A new session ID on each node prevents assertion reuse",
+          "explanation": "Fresh local session IDs do not detect reuse of the same authentication evidence across validators."
         },
         {
           "id": "987dbfa866",
@@ -412,8 +412,8 @@
         },
         {
           "id": "8ca9cf803e",
-          "text": "Sorting assertions alphabetically",
-          "explanation": "Sorting does not prevent duplicate acceptance."
+          "text": "Recording the replay key after granting the session is enough",
+          "explanation": "Post-acceptance recording can allow both concurrent requests to cross the acceptance boundary before reuse is detected."
         },
         {
           "id": "464280e43e",
@@ -452,86 +452,103 @@
     },
     {
       "id": "L07-Q17",
-      "topic": "Unknown conditions",
-      "prompt": "A receiver encounters an assertion Condition it does not understand and cannot evaluate. What is the safe outcome?",
+      "topic": "Acceptance evidence limits",
+      "prompt": "A signature verifies and targets match. No request, replay or account evidence is supplied. What can be concluded?",
       "correctId": "f18917adda",
       "options": [
         {
           "id": "f18917adda",
-          "text": "Do not treat the assertion as valid by simply ignoring that condition",
-          "explanation": "A restriction cannot be assumed satisfied when the receiver cannot evaluate it."
+          "text": "Those supplied checks passed, but full sign-in success is not established",
+          "explanation": "A partial acceptance record must not be promoted into a complete session and access result."
         },
         {
           "id": "bad63087f7",
-          "text": "Ignore any unfamiliar Condition",
-          "explanation": "That can remove an issuer-imposed restriction."
+          "text": "Every acceptance check passed",
+          "explanation": "Several required boundaries have no supplied result."
         },
         {
           "id": "68ad2e5b31",
-          "text": "Interpret it as permission to access everything",
-          "explanation": "Unknown syntax conveys no such permission."
+          "text": "A local application session must exist",
+          "explanation": "No session-creation evidence is provided."
         },
         {
           "id": "ffcb22254c",
-          "text": "Ask the browser to delete it",
-          "explanation": "Deleting the condition does not create trusted unrestricted content."
+          "text": "Replay detection is unnecessary for this signed message",
+          "explanation": "A copied signed message can still be resubmitted."
         }
-      ]
+      ],
+      "evidence": [
+        "Expected-issuer signature: verified",
+        "Audience and Recipient: match",
+        "Correlation, replay state and local account result: not supplied"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L07-Q18",
-      "topic": "Account resolution",
-      "prompt": "All SAML acceptance checks pass, but the received identifier has no matching Atlas account and JIT provisioning is disabled. What follows?",
+      "topic": "Replay concurrency evidence",
+      "prompt": "Two nodes both observe a replay key as absent before either writes it. What must the design address?",
       "correctId": "983d10abb2",
       "options": [
         {
           "id": "983d10abb2",
-          "text": "Sign-in cannot complete until the account requirement is resolved",
-          "explanation": "Protocol acceptance does not create an account when the integration does not permit that behavior."
+          "text": "An atomic service-wide consume-or-reject operation",
+          "explanation": "A shared store alone does not prevent a check-then-write race."
         },
         {
           "id": "76887444df",
-          "text": "Create an administrator account automatically",
-          "explanation": "That violates the stated account policy."
+          "text": "Only a longer assertion lifetime",
+          "explanation": "That does not make concurrent replay handling atomic."
         },
         {
           "id": "3e44b578bb",
-          "text": "Classify the signature as invalid",
-          "explanation": "The signature can be valid even when local account lookup fails."
+          "text": "Only keeping the same browser on one node",
+          "explanation": "Routing affinity does not establish the required service-wide replay guarantee."
         },
         {
           "id": "d5ee3503bc",
-          "text": "Use a similar account with the same department",
-          "explanation": "A similar account is not a validated unique match for the received identifier."
+          "text": "Only verifying the signature twice",
+          "explanation": "A copied message can have a valid signature on both nodes."
         }
-      ]
+      ],
+      "evidence": [
+        "Node A: replay key absent at t1",
+        "Node B: same key absent at t1",
+        "Each node writes consumption separately at t2"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L07-Q19",
-      "topic": "Resource authorization",
-      "prompt": "Atlas establishes a session for Devi, but Devi lacks the finance-report permission. What should the report request do?",
+      "topic": "Account versus resource evidence",
+      "prompt": "The receiver accepts SAML and establishes the intended reader session, then denies an administrative request. What is still unknown from that denial alone?",
       "correctId": "8679ef4f87",
       "options": [
         {
           "id": "8679ef4f87",
-          "text": "Deny the report while preserving the distinction from authentication success",
-          "explanation": "Being signed in and being authorized for a particular resource are different outcomes."
+          "text": "Whether any resource permissions beyond the supplied reader boundary are misconfigured",
+          "explanation": "The administrative denial is expected; it does not establish unrelated permission outcomes."
         },
         {
           "id": "66204040e6",
-          "text": "Assume SAML failed entirely",
-          "explanation": "The federation and session creation can have succeeded."
+          "text": "Whether authentication necessarily failed",
+          "explanation": "The packet explicitly establishes acceptance and session creation."
         },
         {
           "id": "e98b7490d5",
-          "text": "Grant the report because Okta authenticated her",
-          "explanation": "Authentication alone does not confer every application permission."
+          "text": "Whether the administrative action was denied",
+          "explanation": "That result is directly supplied."
         },
         {
           "id": "fe7dcdaa36",
-          "text": "Delete every IdP signing key",
-          "explanation": "Key configuration is unrelated to the missing resource permission."
+          "text": "Whether the stated reader rule was enforced for this action",
+          "explanation": "The observed denial matches that stated rule."
         }
+      ],
+      "evidence": [
+        "SAML acceptance: passed; intended reader session: created",
+        "Reader permission: projects allowed, administration denied",
+        "Observed administrative request: denied"
       ]
     },
     {

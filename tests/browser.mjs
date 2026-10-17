@@ -237,6 +237,87 @@ try {
   assert.deepEqual([...orderBefore].sort(), [...orderAfter].sort());
   await randomPage.close();
   await lowPage.close();
+  const quizData = JSON.parse(await page.locator("#quiz-data").textContent());
+  const correctCard = page.locator(`#${quizData.questions[0].id}`);
+  await correctCard
+    .locator(`input[value="${quizData.questions[0].correctId}"]`)
+    .check();
+  const correctFeedback = await correctCard.locator(".quiz-result").innerText();
+  const retried = quizData.questions.slice(1, 3);
+  const previousOrders = [];
+  for (const q of retried) {
+    const card = page.locator(`#${q.id}`);
+    previousOrders.push(
+      await card
+        .locator("input")
+        .evaluateAll((nodes) => nodes.map((n) => n.value)),
+    );
+    await card
+      .locator(
+        `input[value="${q.options.find((o) => o.id !== q.correctId).id}"]`,
+      )
+      .check();
+  }
+  await page
+    .getByRole("button", { name: "Retry missed questions (2)", exact: true })
+    .click();
+  assert.equal(
+    await page.locator("#quiz-progress").innerText(),
+    "1 of 20 answered",
+  );
+  assert.equal(
+    await correctCard.locator(".quiz-result").innerText(),
+    correctFeedback,
+  );
+  assert.equal(await correctCard.locator("input:checked").count(), 1);
+  for (const [i, q] of retried.entries()) {
+    const card = page.locator(`#${q.id}`);
+    assert.equal(await card.locator("input:checked").count(), 0);
+    assert.equal(await card.locator(".quiz-feedback").isVisible(), false);
+    assert.notDeepEqual(
+      await card
+        .locator("input")
+        .evaluateAll((nodes) => nodes.map((n) => n.value)),
+      previousOrders[i],
+    );
+    await card.locator(`input[value="${q.correctId}"]`).check();
+    assert.equal(await card.locator(".quiz-verdict").innerText(), "Correct.");
+    await card.getByText("Understand every option", { exact: true }).click();
+    const optionTexts = await card
+      .locator(".quiz-option")
+      .evaluateAll((nodes) => nodes.map((n) => n.lastElementChild.textContent));
+    const explanations = await card
+      .locator(".quiz-rationales strong")
+      .allTextContents();
+    optionTexts.forEach((text, index) =>
+      assert(explanations[index].endsWith(text)),
+    );
+  }
+  const packet = page.locator("#L01-Q17");
+  assert.equal(await packet.locator(".quiz-evidence").isVisible(), true);
+  assert.equal(await packet.locator(".quiz-reasoning").isVisible(), true);
+  assert.equal(
+    await page
+      .getByRole("button", { name: /Retry missed questions/ })
+      .isVisible(),
+    false,
+  );
+  await audit(page, "quiz-retry-and-evidence");
+  for (const slug of [
+    "mixed-review",
+    "annotated-saml-messages",
+    "troubleshooting-comparisons",
+    "okta-settings-to-saml",
+    "final-engineering-case",
+  ]) {
+    await page.goto(base + `reference/${slug}/`);
+    for (const disclosure of await page.locator("article details").all())
+      await disclosure.locator("summary").click();
+    await audit(page, `practice-${slug}`);
+  }
+  results.push(
+    "Missed-only retry preserves correct answers, resets and reshuffles missed choices, and keeps rationale order aligned. Five new practice guides and evidence/reasoning prompts pass accessibility checks.",
+  );
   results.push(
     "All 10 quiz banks: correct/incorrect feedback, answer changes, four explanations, independent state, keyboard selection, shuffled positions and fresh-visit reset pass.",
   );
@@ -269,6 +350,8 @@ try {
     ["questions", "questions/lesson-01/"],
     ["quizzes", "quizzes/lesson-01/"],
     ["reference", "reference/"],
+    ["annotated-messages", "reference/annotated-saml-messages/"],
+    ["engineering-case", "reference/final-engineering-case/"],
   ]) {
     await page.goto(base + route);
     assert.equal(

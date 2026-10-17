@@ -104,8 +104,8 @@
         },
         {
           "id": "80a82c4a17",
-          "text": "The assertion's XML indentation limit",
-          "explanation": "XML formatting is unrelated to session clocks."
+          "text": "The current page activity necessarily refreshes the absolute maximum",
+          "explanation": "An idle refresh does not inherently extend an absolute maximum session lifetime."
         },
         {
           "id": "f7f89a021f",
@@ -277,8 +277,8 @@
         },
         {
           "id": "dbacfdc3b0",
-          "text": "The response is necessarily an application password",
-          "explanation": "Logout responses report protocol outcome, not credentials."
+          "text": "The SP should accept only an empty browser response",
+          "explanation": "The documented SLO return is a protocol response that must be handled under its configured agreement."
         }
       ]
     },
@@ -452,86 +452,103 @@
     },
     {
       "id": "L08-Q17",
-      "topic": "Deactivation",
-      "prompt": "An administrator deactivates a user in Okta. What should the engineer avoid assuming about Atlas?",
+      "topic": "Replacement session evidence",
+      "prompt": "After local logout, the packet records a new exchange and a different Atlas session. What is justified?",
       "correctId": "c479a6b0c8",
       "options": [
         {
           "id": "c479a6b0c8",
-          "text": "That every existing Atlas session is immediately terminated without an applicable revocation mechanism",
-          "explanation": "Identity lifecycle changes and downstream session termination require explicit supported behavior."
+          "text": "Later access used replacement state rather than proving the old session survived",
+          "explanation": "Independent provider state can support a new SSO transaction after local logout."
         },
         {
           "id": "93dcbc3b6f",
-          "text": "That deactivation and local logout have the same implementation in every app",
-          "explanation": "Products have different lifecycle and session mechanisms; their actual supported outcomes need confirmation."
+          "text": "The old Atlas session necessarily survived",
+          "explanation": "The packet records its invalidation and a distinct new session."
         },
         {
           "id": "9084afcecf",
-          "text": "That session-revocation support should be checked",
-          "explanation": "Checking supported lifecycle and logout behavior is appropriate."
+          "text": "Local logout automatically ended every Ledger session",
+          "explanation": "No Ledger termination is supplied."
         },
         {
           "id": "1a5b92ee2a",
-          "text": "That evidence is needed from Atlas",
-          "explanation": "Application evidence is useful for confirming local session state."
+          "text": "The assertion must have been replayed",
+          "explanation": "The packet states that the new exchange used fresh messages."
         }
-      ]
+      ],
+      "evidence": [
+        "Old Atlas session S1: invalidated",
+        "New sign-in: fresh request/response; acceptable Okta session reused",
+        "New Atlas session S2: created; projects allowed"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L08-Q18",
-      "topic": "Assignment removal",
-      "prompt": "Devi's Atlas assignment is removed in Okta while she has an existing Atlas session. Which question matters for immediate access?",
+      "topic": "Logout completion limits",
+      "prompt": "Atlas confirms local termination and Ledger times out without a confirmed result. What remains unknown?",
       "correctId": "5aa69d6a4c",
       "options": [
         {
           "id": "5aa69d6a4c",
-          "text": "Whether Atlas or a supported revocation path terminates or re-evaluates that existing session",
-          "explanation": "Blocking new federation access does not by itself establish the fate of every current app session."
+          "text": "Whether Ledger actually ended the targeted session",
+          "explanation": "An absent completion response establishes uncertainty, not positive evidence either way."
         },
         {
           "id": "aac9079990",
-          "text": "Whether Atlas's logo is still visible",
-          "explanation": "Branding does not establish session status."
+          "text": "Whether Atlas's local termination was confirmed",
+          "explanation": "That confirmation is supplied directly."
         },
         {
           "id": "e44c12f8eb",
-          "text": "Whether a new login would be blocked after the old session expires",
-          "explanation": "That tests future federation access, but does not establish immediate termination of the already active local session."
+          "text": "Whether the request to Ledger timed out",
+          "explanation": "The timeout itself is an observed fact; the missing result leaves the participant session outcome unconfirmed."
         },
         {
           "id": "4cbee295ad",
-          "text": "Whether the browser supports Base64",
-          "explanation": "Encoding support is unrelated to revocation of a current session."
+          "text": "Whether a timeout proves Ledger kept the session",
+          "explanation": "It does not; processing might occur even when a result is lost."
         }
-      ]
+      ],
+      "evidence": [
+        "Atlas local termination: confirmed",
+        "Ledger logout request: timed out",
+        "Ledger completion or subsequent session evidence: not supplied"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L08-Q19",
-      "topic": "Universal Logout",
-      "prompt": "A team wants to use Okta Universal Logout for a target application. What is needed before promising session termination?",
+      "topic": "Assignment and sessions",
+      "prompt": "Assignment removal blocks new federation access, but no app-session revocation is configured. What is the key distinction?",
       "correctId": "c5687b94c3",
       "options": [
         {
           "id": "c5687b94c3",
-          "text": "Verify that the target integration and configured mechanism support the required logout scope",
-          "explanation": "A named product capability is not a guarantee that every application participates."
+          "text": "Future sign-in eligibility does not establish immediate termination of an existing app session",
+          "explanation": "Check the application's actual session and supported revocation behavior."
         },
         {
           "id": "e6922ba11d",
-          "text": "Assume all SAML apps are covered automatically",
-          "explanation": "Support and configuration vary by integration and mechanism."
+          "text": "Every existing app session necessarily ended at assignment removal",
+          "explanation": "The packet supplies no mechanism or evidence for that claim."
         },
         {
           "id": "73ef401541",
-          "text": "Only extend assertion validity",
-          "explanation": "Longer acceptance windows do not implement revocation."
+          "text": "Every existing app session necessarily lasts forever",
+          "explanation": "Absence of immediate revocation does not remove other session expiry policies."
         },
         {
           "id": "c45b0d9c72",
-          "text": "Only ensure that each app uses the same NameID value",
-          "explanation": "Shared identity text does not implement the target application's supported session-termination mechanism."
+          "text": "The user's NameID must change immediately",
+          "explanation": "Assignment and identifier value are separate concerns."
         }
+      ],
+      "evidence": [
+        "Okta assignment: removed; new app sign-in: blocked",
+        "Existing Atlas session: present before removal",
+        "Immediate downstream revocation mechanism: not configured"
       ]
     },
     {

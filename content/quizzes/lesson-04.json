@@ -25,8 +25,8 @@
         },
         {
           "id": "0965168be6",
-          "text": "An Assertion is always a password",
-          "explanation": "An assertion conveys statements rather than the user's password."
+          "text": "The Assertion is the outer transport envelope",
+          "explanation": "That reverses the relationship: the Response is the protocol envelope containing assertion statements."
         }
       ]
     },
@@ -99,8 +99,8 @@
         },
         {
           "id": "493ff95bee",
-          "text": "An account with the same screen color",
-          "explanation": "UI preferences have no identity-mapping role."
+          "text": "The first account whose email resembles the identifier",
+          "explanation": "The agreed rule matches employee IDs; resemblance in another field is not a unique authorized identity match."
         },
         {
           "id": "9c89a023b3",
@@ -267,8 +267,8 @@
         },
         {
           "id": "a739e58f49",
-          "text": "Only the user's password age",
-          "explanation": "Password age does not fix an attribute-name mismatch."
+          "text": "Only whether the source profile contains a nonempty employee value",
+          "explanation": "A populated source does not repair a disagreement in the actual released attribute name and receiving mapping."
         },
         {
           "id": "a58b2206be",
@@ -452,86 +452,103 @@
     },
     {
       "id": "L04-Q17",
-      "topic": "Session bounds",
-      "prompt": "An AuthnStatement includes SessionNotOnOrAfter. What should an SP avoid assuming?",
+      "topic": "Identifier resolution evidence",
+      "prompt": "The received identifier is trusted, but two eligible accounts match. What follows?",
       "correctId": "201bc44f67",
       "options": [
         {
           "id": "201bc44f67",
-          "text": "That the assertion's short acceptance window alone defines every derived session lifetime",
-          "explanation": "Authentication-session bounds and applicable profile rules must be considered separately from assertion acceptance conditions."
+          "text": "Stop and resolve the ambiguous identity mapping",
+          "explanation": "Authentication cannot safely select between two accounts using an arbitrary tie-breaker."
         },
         {
           "id": "269b3d3e52",
-          "text": "That the field is always an attribute name",
-          "explanation": "It is an AuthnStatement attribute with session-related meaning."
+          "text": "Choose the account with the higher role",
+          "explanation": "Privileges are not identity evidence."
         },
         {
           "id": "5b4cfe21f1",
-          "text": "That it can be ignored whenever Conditions is still valid",
-          "explanation": "The Conditions window and the authentication-session bound have different roles; one does not automatically cancel the other."
+          "text": "Choose the most recently active account",
+          "explanation": "Recent activity does not establish which account the subject owns."
         },
         {
           "id": "43660bacde",
-          "text": "That the field identifies the ACS endpoint",
-          "explanation": "Endpoints and session bounds are different concepts."
+          "text": "Create a third account using JIT",
+          "explanation": "Creating another account does not resolve the ambiguity."
         }
-      ]
+      ],
+      "evidence": [
+        "Consumed NameID: E1042; required SAML checks: passed",
+        "Eligible local matches: atlas-1042 and atlas-7731",
+        "No disambiguation rule approved"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L04-Q18",
-      "topic": "Encrypted assertions",
-      "prompt": "Atlas decrypts an EncryptedAssertion successfully. What must happen next?",
+      "topic": "Claim release evidence",
+      "prompt": "The source contains a department value, but the captured assertion omits it. What is still unknown?",
       "correctId": "3fe22fb3c1",
       "options": [
         {
           "id": "3fe22fb3c1",
-          "text": "Perform the required trust, signature, targeting, timing and application checks",
-          "explanation": "Readable content is not automatically acceptable content."
+          "text": "Why the live claim was omitted",
+          "explanation": "The gap is established, but the packet does not identify the expression or source-selection cause."
         },
         {
           "id": "959dfde65e",
-          "text": "Grant access because only Atlas could read it",
-          "explanation": "Confidentiality does not establish all acceptance requirements."
+          "text": "Whether the source has a department value",
+          "explanation": "That fact is explicitly supplied."
         },
         {
           "id": "fc54962ece",
-          "text": "Use the XML ID as the user's password",
-          "explanation": "Message IDs are not credentials for local password authentication."
+          "text": "Whether the captured assertion has the attribute",
+          "explanation": "The packet explicitly records its absence."
         },
         {
           "id": "1902f5829b",
-          "text": "Skip issuer checking because encryption succeeded",
-          "explanation": "Successful decryption alone does not establish the expected issuer."
+          "text": "Whether an existing local role can prove the missing claim was issued",
+          "explanation": "A local role cannot establish a value that is absent from the captured message."
         }
-      ]
+      ],
+      "evidence": [
+        "Source department: Research",
+        "Captured AttributeStatement: department absent",
+        "Claim expression and evaluation result: not supplied"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L04-Q19",
-      "topic": "Ambiguous account matches",
-      "prompt": "An accepted identifier matches two local Atlas accounts. What is the appropriate response?",
+      "topic": "Two validity windows",
+      "prompt": "At the stated processing time, which time conclusion is justified?",
       "correctId": "7245b6f222",
       "options": [
         {
           "id": "7245b6f222",
-          "text": "Stop account resolution and investigate the ambiguous mapping",
-          "explanation": "Choosing arbitrarily risks signing the user into the wrong account."
+          "text": "The sole applicable bearer confirmation is expired",
+          "explanation": "The later Conditions bound does not extend the bearer confirmation deadline."
         },
         {
           "id": "66e4c94e20",
-          "text": "Select the account with more permissions",
-          "explanation": "Privilege is not a safe disambiguation rule."
+          "text": "The later of the two timestamps always wins",
+          "explanation": "Relevant restrictions apply together rather than choosing the most permissive deadline."
         },
         {
           "id": "0916d9f4c0",
-          "text": "Select the account that was most recently active",
-          "explanation": "Recent activity is not a safe disambiguation rule for a federated identifier."
+          "text": "The session must have ended when the bearer deadline passed",
+          "explanation": "The packet concerns new message acceptance, not an established session lifetime."
         },
         {
           "id": "41c6941d2e",
-          "text": "Merge both accounts during authentication automatically",
-          "explanation": "Account merging requires a controlled process, not an ambiguous sign-in event."
+          "text": "The signature must have become mathematically invalid",
+          "explanation": "Expiry changes acceptability, not the signature calculation itself."
         }
+      ],
+      "evidence": [
+        "Receiver processing: 11:04 UTC; tolerance: none",
+        "Conditions NotOnOrAfter: 11:10 UTC",
+        "Sole applicable bearer confirmation NotOnOrAfter: 11:03 UTC"
       ]
     },
     {

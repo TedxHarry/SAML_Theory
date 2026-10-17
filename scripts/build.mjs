@@ -80,6 +80,31 @@ const config = {
   ],
   references: [
     [
+      "mixed-review",
+      "Mixed review",
+      "Connect concepts across three cumulative checkpoints.",
+    ],
+    [
+      "annotated-saml-messages",
+      "Annotated SAML messages",
+      "Read request and response XML with field-level explanations.",
+    ],
+    [
+      "troubleshooting-comparisons",
+      "Troubleshooting comparisons",
+      "Distinguish similar symptoms using evidence and unknowns.",
+    ],
+    [
+      "okta-settings-to-saml",
+      "Okta settings and SAML",
+      "Connect settings to emitted fields and application requirements.",
+    ],
+    [
+      "final-engineering-case",
+      "Final engineering case",
+      "Defend a correction and verification plan from several attempts.",
+    ],
+    [
       "glossary",
       "Glossary",
       "Look up a term and the distinction that matters.",
@@ -253,7 +278,11 @@ function render(d) {
   const fence = md.renderer.rules.fence;
   md.renderer.rules.fence = (ts, i, opts, env, self) => {
     const t = ts[i];
-    if (t.info.trim() !== "mermaid") return fence(ts, i, opts, env, self);
+    if (t.info.trim() !== "mermaid")
+      return fence(ts, i, opts, env, self).replace(
+        "<pre>",
+        `<pre tabindex="0" role="region" aria-label="${escape(t.info.trim() ? t.info.trim() + " code example" : "Code example")}">`,
+      );
     const entry = manifest[hash(t.content)];
     if (!entry)
       throw new Error(
@@ -301,12 +330,15 @@ for (const d of documents) {
   const prevNext = n
     ? `<nav class="page-navigation" aria-label="Lesson sequence">${n > 1 ? `<a href="${base + lessonDocs[n - 2].route}"><small>← Previous lesson</small>${escape(lessonDocs[n - 2].title)}</a>` : "<span></span>"}${n < 10 ? `<a href="${base + lessonDocs[n].route}"><small>Next lesson →</small>${escape(lessonDocs[n].title)}</a>` : `<a href="${base}reference/"><small>Keep nearby →</small>Reference library</a>`}</nav>`
     : "";
+  const learningLinks = n
+    ? `<aside class="learning-links" aria-label="Practice and field guides"><strong>Connect and apply</strong><a href="${base}reference/mixed-review/#checkpoint-${n <= 3 ? "1-authentication-configuration-and-the-browser" : n <= 6 ? "2-identity-message-delivery-and-protection" : "3-validation-sessions-and-engineering-evidence"}">Mixed review</a><a href="${base}reference/annotated-saml-messages/">Annotated messages</a><a href="${base}reference/okta-settings-to-saml/">Okta settings</a><a href="${base}reference/troubleshooting-comparisons/">Compare failures</a><a href="${base}reference/final-engineering-case/">Final engineering case</a></aside>`
+    : "";
   write(
     d.route,
     shell(
       d.title,
       d.route,
-      `<div class="reading-layout"><section>${modes}<article class="prose ${d.kind === "Quizzes" ? "quiz-page" : d.kind.toLowerCase() + "-page"}">${html}</article>${prevNext}</section></div>${d.kind === "Quizzes" ? `<script type="module" src="${base}assets/quiz.js?v=${uiVersion}"></script>` : ""}`,
+      `<div class="reading-layout"><section>${modes}<article class="prose ${d.kind === "Quizzes" ? "quiz-page" : d.kind.toLowerCase() + "-page"}">${html}</article>${learningLinks}${prevNext}</section></div>${d.kind === "Quizzes" ? `<script type="module" src="${base}assets/quiz.js?v=${uiVersion}"></script>` : ""}`,
       d,
     ),
   );
@@ -323,7 +355,7 @@ write(
   shell(
     "Learn SAML with Okta",
     "",
-    `<div class="home"><section class="hero"><div><div class="eyebrow">SAML with Okta · Theory course</div><h1>Understand the exchange.<br>Think like an engineer.</h1><p class="intro">Follow Devi from her browser to Okta and into Atlas. Learn what each message means, why an application accepts it, and how to investigate when the journey stops.</p><a class="primary-link" href="${base + lessonDocs[0].route}">Start with Lesson 1 <span aria-hidden="true">→</span></a></div><div class="connection" aria-label="Three recurring participants"><div>Browser<small>The visible journey</small></div><div>Okta<small>Identity provider</small></div><div>Application<small>Trust and access</small></div></div></section><section aria-labelledby="course-outline"><div class="section-heading"><h2 id="course-outline">Your learning path</h2><small>10 lessons · 200 interactive quiz questions</small></div><div class="course-list">${rows}</div></section><section class="reference-link"><strong>Need a field, flow or troubleshooting reminder?</strong><p>Use the reference library for message anatomy, trust, sessions, test planning and official sources.</p><a href="${base}reference/">Open the reference library →</a></section></div>`,
+    `<div class="home"><section class="hero"><div><div class="eyebrow">SAML with Okta · Theory course</div><h1>Understand the exchange.<br>Think like an engineer.</h1><p class="intro">Follow Devi from her browser to Okta and into Atlas. Learn what each message means, why an application accepts it, and how to investigate when the journey stops.</p><a class="primary-link" href="${base + lessonDocs[0].route}">Start with Lesson 1 <span aria-hidden="true">→</span></a></div><div class="connection" aria-label="Three recurring participants"><div>Browser<small>The visible journey</small></div><div>Okta<small>Identity provider</small></div><div>Application<small>Trust and access</small></div></div></section><section aria-labelledby="course-outline"><div class="section-heading"><h2 id="course-outline">Your learning path</h2><small>10 lessons · 200 interactive quiz questions</small></div><div class="course-list">${rows}</div></section><section class="reference-link"><strong>Ready to connect the concepts?</strong><p><a href="${base}reference/mixed-review/">Try mixed review</a> · <a href="${base}reference/final-engineering-case/">Work the final engineering case</a></p><strong>Need a field, flow or troubleshooting reminder?</strong><p>Use the reference library for message anatomy, trust, sessions, test planning and official sources.</p><a href="${base}reference/">Open the reference library →</a></section></div>`,
   ),
 );
 write(

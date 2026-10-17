@@ -361,8 +361,8 @@
         },
         {
           "id": "41082592d9",
-          "text": "In the human-readable page title",
-          "explanation": "A title is not protocol signature material."
+          "text": "Only in an embedded XML Signature inside the deflated request",
+          "explanation": "The Redirect binding's query-string signature uses binding-specific parameters rather than requiring an embedded XML signature."
         }
       ]
     },
@@ -452,86 +452,103 @@
     },
     {
       "id": "L03-Q17",
-      "topic": "Concurrent tabs",
-      "prompt": "Two browser tabs start separate Atlas sign-ins. What design best supports reliable correlation?",
+      "topic": "Pending request packet",
+      "prompt": "The receiver evaluates the request context shown below. What can it conclude about the reply on its correlated path?",
       "correctId": "ad516ed87b",
       "options": [
         {
           "id": "ad516ed87b",
-          "text": "Keep distinct pending request IDs and context for each transaction",
-          "explanation": "Separate contexts avoid one tab accidentally overwriting the other tab's sign-in state."
+          "text": "The reply does not match the pending request",
+          "explanation": "InResponseTo must fit the actual retained transaction, not merely be syntactically valid."
         },
         {
           "id": "86317d00a5",
-          "text": "Use one shared constant request ID for all users",
-          "explanation": "A constant cannot distinguish concurrent transactions."
+          "text": "The response can be accepted because RelayState restores projects",
+          "explanation": "Navigation context does not replace request correlation."
         },
         {
           "id": "3c3eb015b1",
-          "text": "Correlate both tabs using only the user's account name",
-          "explanation": "One account can have concurrent transactions; the account name does not distinguish their request context."
+          "text": "The pending request should be renamed to the received ID",
+          "explanation": "Incoming data must not redefine the original trusted context."
         },
         {
           "id": "2e33e9c549",
-          "text": "Match replies by arrival order alone",
-          "explanation": "Network ordering is not a trustworthy transaction identifier."
+          "text": "The correct ACS makes request IDs irrelevant",
+          "explanation": "Endpoint targeting and transaction correlation are separate checks."
         }
-      ]
+      ],
+      "evidence": [
+        "Pending request: _r81 in current browser context",
+        "Response InResponseTo: _r99",
+        "Recipient: expected ACS; RelayState: resolves to projects"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L03-Q18",
-      "topic": "Local session reuse",
-      "prompt": "Devi opens Atlas while her existing Atlas session is still acceptable. Must Atlas initiate SAML every time she opens a page?",
+      "topic": "Authentication freshness evidence",
+      "prompt": "The packet contains assertion issuance and authentication times. What has not been established?",
       "correctId": "0da4e61ee2",
       "options": [
         {
           "id": "0da4e61ee2",
-          "text": "No; Atlas may serve the request using its own acceptable session",
-          "explanation": "The SP controls when its local session is sufficient and when a new federation exchange is needed."
+          "text": "Fresh authentication at the assertion's issuance time",
+          "explanation": "AuthnInstant reports an earlier event; issuance time does not prove a new credential event."
         },
         {
           "id": "97d8b48334",
-          "text": "Yes; every page requires a new assertion",
-          "explanation": "A local session commonly supports subsequent application requests."
+          "text": "That the assertion was issued at 10:10",
+          "explanation": "That timestamp is supplied directly."
         },
         {
           "id": "8b7e675206",
-          "text": "No; Okta's cookie is sent directly to Atlas instead",
-          "explanation": "The local session can be reused without sharing the provider's cookie."
+          "text": "That an authentication event was reported at 09:00",
+          "explanation": "That is the stated AuthnInstant."
         },
         {
           "id": "5c73855d45",
-          "text": "Yes; otherwise the assertion becomes an application password",
-          "explanation": "Assertions and passwords have different roles regardless of page navigation."
+          "text": "That the response reached Atlas at 10:10:01",
+          "explanation": "Receipt time is a supplied observation."
         }
-      ]
+      ],
+      "evidence": [
+        "IssueInstant: 10:10:00 UTC",
+        "AuthnInstant: 09:00:00 UTC",
+        "Atlas receipt: 10:10:01 UTC"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L03-Q19",
-      "topic": "Safe return targets",
-      "prompt": "A returned RelayState value resolves to https://untrusted.example. What should Atlas do before redirecting the browser?",
+      "topic": "Provider context evidence",
+      "prompt": "The incoming response uses a trusted provider, but not the one expected for this pending transaction. Which decision is sound?",
       "correctId": "c7d15fb9e0",
       "options": [
         {
           "id": "c7d15fb9e0",
-          "text": "Apply its allowed-return-target rules",
-          "explanation": "Restored navigation must be constrained. A returned value is not permission for an arbitrary redirect."
+          "text": "Reject the provider-to-transaction mismatch",
+          "explanation": "Trust is scoped to the expected relationship for the actual pending exchange."
         },
         {
           "id": "883aac6ecd",
-          "text": "Redirect immediately because a response was signed",
-          "explanation": "A signed SAML message does not automatically authenticate or approve every external navigation parameter."
+          "text": "Accept because either provider is trusted somewhere",
+          "explanation": "Trust in another integration does not make the provider expected here."
         },
         {
           "id": "865259cd6e",
-          "text": "Treat the URL as the SAML audience",
-          "explanation": "Audience identifies the intended relying party, not the post-login page."
+          "text": "Accept because the subject text matches",
+          "explanation": "Subject text does not repair the wrong responder context."
         },
         {
           "id": "fc34c46d71",
-          "text": "Assume the URL is safe because the user is authenticated",
-          "explanation": "Authentication does not approve an arbitrary external return destination."
+          "text": "Use the latest responding provider as the new expectation",
+          "explanation": "That lets incoming data redefine the intended relationship."
         }
+      ],
+      "evidence": [
+        "Pending request _rA: expects provider A",
+        "Response InResponseTo: _rA; actual verified provider: B",
+        "Provider B is trusted only in a different integration"
       ]
     },
     {
@@ -557,8 +574,8 @@
         },
         {
           "id": "463c513fab",
-          "text": "When the browser displays an Okta logo",
-          "explanation": "Branding does not establish protocol acceptance."
+          "text": "As soon as the provider reports successful authentication",
+          "explanation": "Issuer-side authentication does not establish SP acceptance, unique account resolution or local eligibility."
         }
       ]
     }

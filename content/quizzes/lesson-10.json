@@ -25,8 +25,8 @@
         },
         {
           "id": "98578ac07f",
-          "text": "Ask for the user's password",
-          "explanation": "Passwords are not needed for ordinary protocol evidence review."
+          "text": "Assume every affected user has the same failure boundary",
+          "explanation": "A shared symptom can hide distinct issuer, receiver, identity and session problems; establish each attempt's evidence."
         }
       ]
     },
@@ -300,8 +300,8 @@
         },
         {
           "id": "a74c25f57c",
-          "text": "Only a screenshot of a successful login from last month",
-          "explanation": "Historical success does not measure current timing."
+          "text": "Only the most recent successful sign-in, without its session state",
+          "explanation": "A success that reused an old session may not exercise the timing boundary of a new assertion at all."
         },
         {
           "id": "e917418e4f",
@@ -323,8 +323,8 @@
         },
         {
           "id": "90a1fb8683",
-          "text": "Every user's password changed randomly",
-          "explanation": "The evidence points to receiver trust, not credential changes."
+          "text": "A successful issuance record means every downstream validator is ready",
+          "explanation": "The node-specific effective trust and rejection result show that downstream readiness still differs."
         },
         {
           "id": "eaf9352cd3",
@@ -351,8 +351,8 @@
         },
         {
           "id": "e481fc1637",
-          "text": "Only the original AuthnRequest's XML indentation",
-          "explanation": "That does not explain losing a newly created session."
+          "text": "Only the original AuthnRequest's audience-related configuration",
+          "explanation": "Required SAML acceptance already passed; investigate the next observed boundary, use of the newly created session."
         },
         {
           "id": "0f635414c0",
@@ -445,93 +445,110 @@
         },
         {
           "id": "9a84f351ef",
-          "text": "Only the browser's bookmark folder",
-          "explanation": "That does not explain the stated rejection."
+          "text": "Only the upstream provider's signing certificate",
+          "explanation": "The supplied failure is the downstream audience check, so replacing upstream trust does not address that mismatch."
         }
       ]
     },
     {
       "id": "L10-Q17",
-      "topic": "Logout evidence",
-      "prompt": "Atlas confirms local logout. Ledger never responds to its logout request. What is the accurate status?",
+      "topic": "Combined evidence diagnosis",
+      "prompt": "Which conclusion best fits the two independent receiver failures below?",
       "correctId": "ce5ba48bc9",
       "options": [
         {
           "id": "ce5ba48bc9",
-          "text": "Atlas logout is confirmed; Ledger termination is unconfirmed",
-          "explanation": "Report each participant according to actual evidence rather than inferring universal completion."
+          "text": "There are distinct trust-adoption and identity-resolution problems",
+          "explanation": "Each failure is evidenced at a different processing boundary and needs its own controlled retest."
         },
         {
           "id": "1b8734f389",
-          "text": "Every session everywhere is definitely ended",
-          "explanation": "That exceeds the confirmation available."
+          "text": "The audience explains both failures",
+          "explanation": "The supplied targets match and A reports acceptance before account resolution fails."
         },
         {
           "id": "58b09847e8",
-          "text": "Atlas logout necessarily failed",
-          "explanation": "Another participant's missing confirmation does not erase Atlas's confirmed local result."
+          "text": "The user's password explains both failures",
+          "explanation": "The packet records issuer-side authentication success and downstream failures."
         },
         {
           "id": "e1ab709da7",
-          "text": "Ledger termination is confirmed because the initiating app logged out",
-          "explanation": "A confirmed initiating-app outcome does not prove completion by an unresponsive participant."
+          "text": "One successful attempt by another user proves full recovery",
+          "explanation": "That does not resolve the failed node or subject mapping."
         }
-      ]
+      ],
+      "evidence": [
+        "Okta authentication: success for both fresh attempts",
+        "A: K2 trusted; SAML accepted; employee lookup finds no email NameID match",
+        "B: K2 absent from trust; signature verification fails"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L10-Q18",
-      "topic": "Evidence handling",
-      "prompt": "A support case needs a SAML trace containing identifiers, personal attributes and session-related values. How should it be shared?",
+      "topic": "Causal uncertainty",
+      "prompt": "The packet establishes a missing K2 trust entry at node B. What remains unknown?",
       "correctId": "c91c33b8a9",
       "options": [
         {
           "id": "c91c33b8a9",
-          "text": "Use the approved secure process, minimize sensitive data and preserve an original when integrity analysis requires it",
-          "explanation": "Sanitized copies can support discussion, but modifying signed XML prevents using that altered copy to prove original signature validity."
+          "text": "Why node B missed the approved update",
+          "explanation": "Observed effective state identifies a mismatch, but not its operational root cause."
         },
         {
           "id": "4381fcc5f5",
-          "text": "Paste all session cookies into a public issue",
-          "explanation": "That exposes credentials or sensitive session data."
+          "text": "Whether node B currently lists K2",
+          "explanation": "The supplied inventory explicitly says it does not."
         },
         {
           "id": "4fea583b5e",
-          "text": "Delete arbitrary XML nodes and claim the edited copy proves the original signature",
-          "explanation": "Editing protected content changes the evidence needed for verification."
+          "text": "Whether the incoming message used K2",
+          "explanation": "That key association is supplied."
         },
         {
           "id": "c8383a8c56",
-          "text": "Share the provider's private key with every reviewer",
-          "explanation": "Reviewers ordinarily need evidence and public trust material, not private signing keys."
+          "text": "Whether node B reported a verification failure",
+          "explanation": "The receiver result states that outcome."
         }
-      ]
+      ],
+      "evidence": [
+        "Approved plan: B should adopt K2 before activation",
+        "Effective inventory: B trusts K1 only",
+        "Incoming sender key: K2; B result: no trusted verification key"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L10-Q19",
-      "topic": "Controlled retest",
-      "prompt": "An engineer changes the ACS mapping to address a confirmed recipient mismatch. What makes the retest useful?",
+      "topic": "Session continuity packet",
+      "prompt": "The receiver accepted SAML and created a session, but the next request supplied no session cookie. What is the best next step?",
       "correctId": "1775b5e223",
       "options": [
         {
           "id": "1775b5e223",
-          "text": "Repeat a controlled new sign-in, correlate its evidence and confirm both acceptance and intended account access",
-          "explanation": "A successful retest must exercise the change and verify the resulting identity and access outcome."
+          "text": "Inspect supported cookie delivery, browser behavior and session continuity",
+          "explanation": "The first confirmed gap is between creation and use of the application session."
         },
         {
           "id": "8efbb6978a",
-          "text": "Refresh an unrelated public page",
-          "explanation": "That does not test the federation path."
+          "text": "Replace the IdP signing certificate first",
+          "explanation": "The signature and other required SAML checks already passed."
         },
         {
           "id": "57524dfdea",
-          "text": "Stop when the settings page saves",
-          "explanation": "Saving proves configuration persistence, not end-to-end behavior."
+          "text": "Change the audience to the requested page URL",
+          "explanation": "That is unrelated to the observed missing session reference."
         },
         {
           "id": "5f7f92a472",
-          "text": "Disable every other validation check for the test",
-          "explanation": "That would prevent the test from confirming real acceptance behavior."
+          "text": "Conclude the exact cookie attribute at fault without inspection",
+          "explanation": "The packet establishes missing delivery, not its specific underlying cause."
         }
+      ],
+      "evidence": [
+        "Required SAML checks: passed",
+        "Intended account matched; new local session: created",
+        "Next resource request: expected session cookie absent"
       ]
     },
     {

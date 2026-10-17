@@ -15,8 +15,8 @@
         },
         {
           "id": "47554941dd",
-          "text": "Only the application's logo dimensions",
-          "explanation": "Branding does not define federation behavior."
+          "text": "Only the desired display name and a previously successful login",
+          "explanation": "Those facts do not establish the new integration's targets, identity contract, trust requirements or lifecycle behavior."
         },
         {
           "id": "c06f6dca09",
@@ -188,8 +188,8 @@
         },
         {
           "id": "fa2d67ef4b",
-          "text": "Only change the page theme",
-          "explanation": "Theme changes do not create a controlled authentication baseline."
+          "text": "Only repeat the same test without recording session state",
+          "explanation": "That can repeat the same session-reuse path without establishing a fresh exchange through the changed configuration."
         },
         {
           "id": "d180626a4c",
@@ -379,8 +379,8 @@
         },
         {
           "id": "239b9f57bf",
-          "text": "Only the text of the logout button",
-          "explanation": "Button text cannot establish cross-system session termination."
+          "text": "Only whether a logout endpoint appears in metadata",
+          "explanation": "An advertised endpoint does not define every required participant, device, termination scope or confirmation outcome."
         },
         {
           "id": "10c8a79a8c",
@@ -452,86 +452,103 @@
     },
     {
       "id": "L09-Q17",
-      "topic": "Handover quality",
-      "prompt": "Which handover entry is most useful to the next engineer?",
+      "topic": "Release evidence limits",
+      "prompt": "A rollout has a successful test on node A, but no test or effective key inventory for node B. What is not established?",
       "correctId": "dd66f78ef8",
       "options": [
         {
           "id": "dd66f78ef8",
-          "text": "The exact environment, expected values, owners, test evidence, known limitations and recovery procedure",
-          "explanation": "A handover should support investigation and safe change without reconstructing the project from memory."
+          "text": "Readiness across every active validator",
+          "explanation": "One runtime's positive evidence cannot be generalized to an unverified runtime."
         },
         {
           "id": "97a8f0d2f0",
-          "text": "\"SSO works\" with no date or test context",
-          "explanation": "That statement does not establish what was tested or where."
+          "text": "Whether the recorded A attempt succeeded",
+          "explanation": "The packet explicitly supplies a successful controlled attempt at A; its result does not establish B readiness."
         },
         {
           "id": "9d63d0e545",
-          "text": "A collection of private keys",
-          "explanation": "Secrets do not belong in routine handover documentation."
+          "text": "Whether K2 is planned for the rollout",
+          "explanation": "The approved plan states that fact."
         },
         {
           "id": "9c3cae2660",
-          "text": "An unlabeled assertion copied from an unknown tenant",
-          "explanation": "Unknown provenance makes evidence difficult to use safely."
+          "text": "Whether a valid old-key result proves new-key adoption",
+          "explanation": "It does not; actual new-key behavior needs verification."
         }
-      ]
+      ],
+      "evidence": [
+        "Approved change: activate K2 after all validators are ready",
+        "Node A: controlled K2 sign-in succeeded",
+        "Node B: effective inventory and verification test not supplied"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L09-Q18",
-      "topic": "Release criteria",
-      "prompt": "A required replay-rejection test has not run, but one positive sign-in passed. What should the release status say?",
+      "topic": "Recovery scope evidence",
+      "prompt": "A key rollback is proposed for the two supplied failures. What is the limitation?",
       "correctId": "b2ce4ae3f1",
       "options": [
         {
           "id": "b2ce4ae3f1",
-          "text": "The defined acceptance evidence is incomplete",
-          "explanation": "A missing required test cannot be converted into a pass by success elsewhere."
+          "text": "It cannot by itself correct the separate emitted-identifier mismatch",
+          "explanation": "Key trust and local identity resolution require distinct corrective evidence."
         },
         {
           "id": "ab9e5aff49",
-          "text": "All requirements are proved because one user signed in",
-          "explanation": "A positive baseline does not establish that a replayed response is rejected for the intended reason."
+          "text": "It automatically changes email NameID into employee ID",
+          "explanation": "A signing-key switch does not alter the configured subject mapping."
         },
         {
           "id": "4dcd95b886",
-          "text": "Replay protection is unnecessary for signed messages",
-          "explanation": "Signed assertions can be replayed unless reuse is detected."
+          "text": "It proves the application is fully recovered as soon as it saves",
+          "explanation": "A saved setting is not a fresh end-to-end verification."
         },
         {
           "id": "21dc65bb06",
-          "text": "The failed evidence should be removed from the plan",
-          "explanation": "Removing a requirement after the fact hides the gap."
+          "text": "It authorizes disabling all account checks temporarily",
+          "explanation": "The supplied recovery proposal does not justify removing account eligibility."
         }
-      ]
+      ],
+      "evidence": [
+        "Node B: no approved K2 key",
+        "Node A: K2 accepted; NameID is email instead of required employee ID",
+        "Proposal: return sender to uncompromised K1"
+      ],
+      "reasoning": "Before choosing, explain which observation supports your conclusion and which outcome this packet does not establish."
     },
     {
       "id": "L09-Q19",
-      "topic": "Identifier changes",
-      "prompt": "An organization plans to change the value used as NameID from email to employee ID. What needs assessment?",
+      "topic": "Negative test interpretation",
+      "prompt": "A valid baseline succeeds and a controlled wrong-audience response is rejected. What should the team record?",
       "correctId": "26f96f6cb4",
       "options": [
         {
           "id": "26f96f6cb4",
-          "text": "Both issuance and the SP's mapping, account-linking, uniqueness and migration behavior",
-          "explanation": "Changing the identifier can change which account is resolved, not merely the appearance of XML."
+          "text": "The audience rejection behaved as required for that test",
+          "explanation": "Expected rejection is successful boundary evidence, not a generic outage."
         },
         {
           "id": "42f2615aad",
-          "text": "Only whether employee IDs contain digits",
-          "explanation": "Syntax alone does not cover identity continuity."
+          "text": "The release must remove audience checking",
+          "explanation": "That would defeat the tested requirement."
         },
         {
           "id": "e7efbe9b83",
-          "text": "Only the signing algorithm",
-          "explanation": "Signing preserves the new value but does not migrate local account associations."
+          "text": "Every SAML rejection means the positive baseline failed",
+          "explanation": "Independent positive and negative attempts have different expected outcomes."
         },
         {
           "id": "5e059bdb86",
-          "text": "Nothing if both values identify the same human informally",
-          "explanation": "The receiver uses configured matching rules rather than human intuition."
+          "text": "This test proves all logout paths work",
+          "explanation": "The packet establishes no logout outcome."
         }
+      ],
+      "evidence": [
+        "Fresh valid baseline: accepted; intended account reached",
+        "Separate controlled response: wrong audience",
+        "Receiver: rejects for audience mismatch"
       ]
     },
     {

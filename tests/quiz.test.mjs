@@ -1,7 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { loadQuiz, renderQuiz } from "../scripts/quizzes.mjs";
-import { shuffleOptions, evaluateChoice } from "../site/quiz.js";
+import {
+  shuffleOptions,
+  reshuffleOptions,
+  evaluateChoice,
+} from "../site/quiz.js";
 
 const banks = Array.from({ length: 10 }, (_, i) =>
   loadQuiz(
@@ -14,10 +18,32 @@ test("200 independent questions have four unique options, stable IDs and substan
   assert.equal(banks.flatMap((bank) => bank.questions).length, 200);
   const prompts = banks.flatMap((bank) => bank.questions.map((q) => q.prompt));
   assert.equal(new Set(prompts).size, prompts.length);
+  const questions = banks.flatMap((bank) => bank.questions);
+  assert.equal(questions.filter((q) => q.evidence).length, 30);
+  assert.equal(questions.filter((q) => q.reasoning).length, 20);
   for (const bank of banks) {
     assert.equal(new Set(bank.questions.map((q) => q.topic)).size, 20);
     assert.equal(bank.questions.length, 20);
   }
+});
+
+test("retry changes option order even when the random draw repeats the same order", () => {
+  for (const bank of banks)
+    for (const q of bank.questions) {
+      const next = reshuffleOptions(q.options, () => 0.999);
+      assert.notDeepEqual(
+        next.map((o) => o.id),
+        q.options.map((o) => o.id),
+      );
+      assert.equal(
+        evaluateChoice({ ...q, options: next }, q.correctId).isCorrect,
+        true,
+      );
+      assert.deepEqual(
+        [...next].map((o) => o.id).sort(),
+        q.options.map((o) => o.id).sort(),
+      );
+    }
 });
 
 test("grading follows immutable option IDs in every order for all 800 choices", () => {
@@ -63,6 +89,9 @@ test("generated quizzes include per-question no-script explanations and escape s
   const data = structuredClone(banks[0]);
   data.questions[0].prompt += " </script><img src=x>";
   const html = renderQuiz(data, "Test quiz");
+  assert(html.includes('class="quiz-evidence"'));
+  assert(html.includes('aria-describedby="L01-Q17-evidence"'));
+  assert(html.includes('class="quiz-reasoning"'));
   assert.equal((html.match(/Show answer and explanations/g) || []).length, 20);
   assert.equal((html.match(/class="quiz-feedback"/g) || []).length, 20);
   assert(html.includes("&lt;/script&gt;"));

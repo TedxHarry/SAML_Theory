@@ -948,6 +948,54 @@ dialog::backdrop {
 .quiz-list {
   margin-top: 2rem;
 }
+.quiz-page .quiz-evidence {
+  background: var(--primary-soft);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.86rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 0 0 1rem;
+  padding: 1rem;
+}
+.quiz-page .quiz-reasoning {
+  color: var(--practice);
+  background: var(--practice-soft);
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  border-radius: var(--radius-sm);
+  margin: 0 0 1rem;
+}
+.quiz-tools {
+  margin: 1rem 0;
+}
+.quiz-tools button {
+  color: var(--practice);
+  border-color: var(--practice);
+  background: var(--practice-soft);
+}
+.quiz-tools button:hover {
+  background: var(--surface);
+}
+#retry-note {
+  font-size: 1rem;
+}
+.learning-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.2rem;
+  align-items: baseline;
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 1.2rem;
+  margin-top: 2.5rem;
+  font-size: 0.85rem;
+}
+.learning-links strong {
+  width: 100%;
+  color: var(--accent);
+}
 .quiz-announcement {
   position: absolute;
   width: 1px;

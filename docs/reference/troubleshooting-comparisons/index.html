@@ -1,0 +1,98 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Distinguish similar symptoms using evidence and unknowns."><meta name="color-scheme" content="light"><title>Troubleshooting comparisons | SAML Theory</title><link rel="canonical" href="https://tedxharry.github.io/SAML_Theory/reference/troubleshooting-comparisons/"><link rel="icon" href="/SAML_Theory/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/SAML_Theory/assets/tokens.css?v=cf7b539460f9"><link rel="stylesheet" href="/SAML_Theory/assets/style.css?v=cf7b539460f9"><script src="/SAML_Theory/assets/app.js?v=cf7b539460f9" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="topbar"><a class="brand" href="/SAML_Theory/"><span class="brand-mark" aria-hidden="true"></span>SAML Theory</a><nav class="toplinks" aria-label="Primary"><a href="/SAML_Theory/">Course</a><a href="/SAML_Theory/reference/" aria-current="page">Reference</a><a href="/SAML_Theory/search/">Search</a><a class="repo-link" href="https://github.com/TedxHarry/SAML_Theory">GitHub ↗</a></nav></header><div class="shell"><aside class="sidebar"><details class="course-menu" open><summary title="Expand or collapse lessons"><span class="menu-icon" aria-hidden="true">☰</span><span class="menu-label">Browse lessons</span></summary><p class="nav-label">SAML with Okta</p><nav aria-label="Lessons"><ol class="lesson-nav"><li><a href="/SAML_Theory/lessons/lesson-01-why-saml-exists/"><span class="lesson-number">01</span><span>Why SAML exists</span></a></li><li><a href="/SAML_Theory/lessons/lesson-02-planning-and-metadata/"><span class="lesson-number">02</span><span>Planning and metadata</span></a></li><li><a href="/SAML_Theory/lessons/lesson-03-sp-initiated-sso/"><span class="lesson-number">03</span><span>SP-initiated sign-in</span></a></li><li><a href="/SAML_Theory/lessons/lesson-04-responses-assertions-and-identity/"><span class="lesson-number">04</span><span>Responses and identity</span></a></li><li><a href="/SAML_Theory/lessons/lesson-05-bindings-relaystate-and-alternative-paths/"><span class="lesson-number">05</span><span>Bindings and alternative paths</span></a></li><li><a href="/SAML_Theory/lessons/lesson-06-trust-signatures-and-encryption/"><span class="lesson-number">06</span><span>Trust and protection</span></a></li><li><a href="/SAML_Theory/lessons/lesson-07-response-acceptance-and-access/"><span class="lesson-number">07</span><span>Response acceptance</span></a></li><li><a href="/SAML_Theory/lessons/lesson-08-sessions-reauthentication-and-logout/"><span class="lesson-number">08</span><span>Sessions and logout</span></a></li><li><a href="/SAML_Theory/lessons/lesson-09-integration-design-and-change-planning/"><span class="lesson-number">09</span><span>Integration design and changes</span></a></li><li><a href="/SAML_Theory/lessons/lesson-10-troubleshooting-and-engineering-casework/"><span class="lesson-number">10</span><span>Troubleshooting and casework</span></a></li></ol></nav><a class="side-ref" href="/SAML_Theory/reference/">Reference library →</a><p class="sidebar-note">Read the explanation.<br>Trace the exchange.<br>Explain the decision.</p></details></aside><main id="main" class="main"><div class="reading-layout"><section><div class="eyebrow">Reference library</div><article class="prose reference-page"><h1 id="similar-symptoms-different-causes">Similar symptoms, different causes</h1>
+<p>Begin with the last confirmed success and the first confirmed failure. A user-visible message often hides several possible boundaries. The comparisons below use independent fictional attempts; do not carry one row's account or session state into another.</p>
+<h2 id="unable-to-sign-in-after-returning-from-okta">“Unable to sign in” after returning from Okta</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Evidence packet</th>
+<th>Supported conclusion</th>
+<th>Still unknown</th>
+<th>Next useful check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Correct ACS receives a response. Receiver reports <code>audience_mismatch</code>: expected <code>urn:atlas:test</code>, received <code>urn:ledger:test</code></td>
+<td>Targeting fails at Atlas</td>
+<td>Why the wrong integration or value was selected</td>
+<td>Compare the actual issued audience with the approved app/environment agreement</td>
+</tr>
+<tr>
+<td>Correct audience arrives. Receiver reports <code>no_trusted_key</code>; effective node inventory lacks the approved K2 used for this attempt</td>
+<td>Verification trust is incomplete at that node</td>
+<td>Why K2 adoption was missed</td>
+<td>Verify controlled K2 adoption on each active validator</td>
+</tr>
+<tr>
+<td>Required SAML checks pass. NameID is email; Atlas's contract requires employee ID and logs no match</td>
+<td>Account resolution fails after protocol acceptance</td>
+<td>Why issuance selected email</td>
+<td>Trace source, effective app username, emitted NameID and the SP lookup</td>
+</tr>
+</tbody>
+</table></div>
+<details><summary>Explain why one fix cannot repair all three</summary>
+<p>Adding K2 does not change the audience or the emitted subject. Correcting an audience does not establish a unique account match. Do not disable several checks simply because all three attempts show the same page. Each supplied receiver result identifies a different first failure.</p>
+</details>
+<h2 id="the-attribute-is-missing">“The attribute is missing”</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Observation</th>
+<th>What it establishes</th>
+<th>What to investigate next</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source profile has department; live assertion has no department attribute</td>
+<td>Source availability is not proof of release</td>
+<td>Actual claim expression, source selection, empty results and emitted output</td>
+</tr>
+<tr>
+<td>Live assertion has <code>Department</code>; receiver requires exact name <code>department</code></td>
+<td>The contract and emitted name disagree</td>
+<td>Correct the agreed output or supported receiving mapping through the approved change process</td>
+</tr>
+<tr>
+<td>Live assertion has the correct name and value; receiver does not consume it</td>
+<td>Issuance is established, consumption is not</td>
+<td>Actual SP mapping and the protected XML object consumed</td>
+</tr>
+</tbody>
+</table></div>
+<p>An assertion preview can help inspect configuration. It cannot replace the actual message and receiver result for the controlled attempt. Okta documents both current and legacy claim interfaces and empty-result omission in its <a href="https://help.okta.com/oie/en-us/content/topics/apps/federated-claims-overview.htm">custom claims guide</a>.</p>
+<h2 id="it-keeps-sending-me-back-to-sign-in">“It keeps sending me back to sign in”</h2>
+<p>In attempt A, every ACS return is rejected for stale pending context. No session is created. Investigate the pending transaction's expiry and association, using request IDs and the actual processing timeline.</p>
+<p>In attempt B, response acceptance and session creation succeed. The next resource request does not present the expected session cookie. Investigate supported cookie delivery and browser behavior. A missing cookie does not by itself identify which cookie attribute or browser rule caused the problem.</p>
+<p>In attempt C, the cookie returns, but another runtime cannot recognize its server-side session. Investigate the application's session storage and routing design. The browser's successful cookie delivery does not establish shared session state.</p>
+<details><summary>Check the boundary before choosing a repair</summary>
+<p>Attempt A stops before session creation. Attempt B stops at continuity between the created session and the next request. Attempt C reaches a receiver that cannot use the supplied session reference. Replacing a signing certificate does not address the established failure in B or C, and changing cookie settings is not yet justified in A.</p>
+</details>
+<h2 id="i-logged-out-but-i-am-back-in">“I logged out, but I am back in”</h2>
+<div class="table-scroll" role="region" aria-label="Comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Atlas invalidated its session. A later new SAML exchange reused an acceptable Okta session and created a new Atlas session</td>
+<td>Local logout worked; the later sign-in created replacement state</td>
+</tr>
+<tr>
+<td>The same old Atlas session identifier still authorizes requests after confirmed local invalidation was supposed to occur</td>
+<td>Investigate actual application invalidation and session validation; the claimed termination and observed use disagree</td>
+</tr>
+<tr>
+<td>A participating app was notified, but no completion evidence or subsequent session test is available</td>
+<td>Its termination is unconfirmed; neither survival nor completion has been established</td>
+</tr>
+</tbody>
+</table></div>
+<p>A logout requirement must name the participating systems, sessions and supported mechanisms. For the distinctions between basic SLO and conditional front-channel participation, consult <a href="/SAML_Theory/reference/sessions-reauthentication-and-logout/">sessions and logout</a>.</p>
+<h2 id="make-your-conclusion-testable">Make your conclusion testable</h2>
+<p>Use this sentence pattern: “For attempt ___, source ___ establishes ___; processing first fails at ___. We have not established ___. Next, verify ___.” Then name a controlled positive test and an expected rejection. Practice this across concepts in <a href="/SAML_Theory/reference/mixed-review/">mixed review</a>, then investigate the <a href="/SAML_Theory/reference/final-engineering-case/">final engineering case</a>.</p>
+</article></section></div><footer class="page-footer">SAML with Okta · <a href="/SAML_Theory/reference/sources-and-further-reading/">Official sources</a> · <a href="https://github.com/TedxHarry/SAML_Theory">Course source</a></footer></main></div><dialog id="diagram-dialog" aria-labelledby="diagram-title"><div class="dialog-head"><h2 id="diagram-title">Full diagram</h2><form method="dialog" novalidate><button type="submit" id="close-diagram">Close diagram</button></form></div><div class="diagram-scroll"><img id="full-diagram" alt=""></div></dialog></body></html>

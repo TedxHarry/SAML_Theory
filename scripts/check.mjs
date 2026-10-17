@@ -5,7 +5,7 @@ const root = path.resolve("docs");
 const manifest = JSON.parse(
   fs.readFileSync(path.join(root, "build-manifest.json"), "utf8"),
 );
-assert.equal(manifest.documents.length, 41);
+assert.equal(manifest.documents.length, 46);
 assert.equal(manifest.documents.filter((d) => d.kind === "Quizzes").length, 10);
 assert.equal(
   manifest.documents.reduce((n, d) => n + (d.quizzes || 0), 0),
@@ -24,7 +24,7 @@ function walk(dir) {
   }
 }
 walk(root);
-assert.equal(pages.length, 45);
+assert.equal(pages.length, 50);
 let links = 0;
 let diagrams = 0;
 let answers = 0;
@@ -72,14 +72,14 @@ for (const file of pages) {
     links++;
   }
 }
-assert.equal(diagrams, 66);
+assert.equal(diagrams, 67);
 assert.equal(answers, 155);
 assert.equal(quizCards, 200);
 console.log(
   JSON.stringify(
     {
       generatedPages: pages.length,
-      courseFiles: 41,
+      courseFiles: 46,
       questions: 155,
       interactiveQuizQuestions: quizCards,
       diagrams,

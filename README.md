@@ -8,9 +8,9 @@ A theory course for beginners developing practical SAML engineering judgment. Fo
 
 - **10 lessons:** foundations, metadata, SP-initiated SSO, identity, bindings, trust, acceptance, sessions, integration planning and troubleshooting.
 - **155 independent questions:** each with its own expandable teaching explanation.
-- **200 interactive quiz questions:** 20 per lesson, with shuffled options, immediate feedback and explanations for every choice.
-- **11 reference and appendix files:** fields, bindings, protection, acceptance, sessions, misconceptions, evidence, planning, glossary, sources and specialized recognition.
-- **66 diagram placements:** progressive sequences, decision flows, timelines, message structure and trust relationships.
+- **200 interactive quiz questions:** 20 per lesson, including 30 evidence packets and 20 reasoning prompts, with shuffled options, immediate explanations and an optional retry of currently missed questions.
+- **16 reference and practice files:** includes 12 cumulative review cases, annotated request/response XML, an Okta settings bridge, troubleshooting comparisons and a final engineering case.
+- **67 diagram placements:** progressive sequences, decision flows, timelines, message structure and trust relationships, including a reused complete exchange in the final case.
 
 The recurring examples use Devi, Northstar Research, Okta Identity Engine, Atlas and Ledger. Addresses and evidence packets are fictional. The course distinguishes SAML rules, documented product capabilities and actual receiver outcomes. It is theory and engineering preparation, with live implementation testing outside the material's verification scope.
 
@@ -58,7 +58,7 @@ The checks cover generated routes and anchors, diagram assets, all question expl
 
 Edit the lesson's JSON file in `content/quizzes/`. Each question has a unique ID, topic, independent prompt, four options and a `correctId` matching one option ID. Every option needs an explanation. Supply enough context inside the question to answer it without opening a lesson. Use plausible misconceptions as distractors and preserve the distinction between protocol rules and product capabilities.
 
-Grading uses stable option IDs. Options are shuffled separately for every question on each page visit, so changing their display position cannot change the correct answer. Selecting another option updates only that question's feedback. The answered count records exploration rather than a pass/fail grade. Choices are not saved across visits or sent to a server. Without JavaScript, native disclosures reveal the correct answer and every explanation.
+Grading uses stable option IDs. Options are shuffled separately for every question on each page visit, so changing their display position cannot change the correct answer. Selecting another option updates only that question's feedback. Retry missed questions resets only the currently incorrect selections, guarantees a different option order and keeps other answers. The answered count records exploration rather than a pass/fail grade. Choices are not saved across visits or sent to a server. Optional `evidence` arrays supply packet observations; `reasoning` supplies a pause-before-selection prompt, without collecting or grading a written response. Without JavaScript, native disclosures reveal the correct answer and every explanation.
 
 Run the build, checks and tests above after editing. They validate the data contract and behavior; a human content review is still needed for technical accuracy and unambiguous choices.
 
